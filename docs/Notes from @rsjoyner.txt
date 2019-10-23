@@ -1,0 +1,135 @@
+
+Example Bundle
+--------------
+
+Notes:
+  (1) 'P' - Member_Status; indicates primary product; add to manifests
+  (2) 'S' - Member_Status; indicates secondary product; ignore / do not record in manifests
+  (3) 'U' - indicates unlabeled product; ignore / do not record in manifests
+  
+P           LADEE_Bundle_1101.xml
+              - content
+P             - collection_mission_context.xml
+P             - collection_mission_context_inventory.tab
+
+              - document
+P                 - collection_mission_document.xml
+P             - collection_mission_document_inventory.tab
+P             - ladee_mission_rev1_5.pdf
+P             - ladee_mission_rev1_5.xml
+P             - ladee_spacecraft_rev1_2.pdf
+P             - ladee_spacecraft_rev1_2.xml
+U         - investigation.txt
+
+              - xml_schema
+P             - collection_mission_xml_schema.xml
+P             - collection_mission_xml_schema_inventory.xml
+P             - ladee_1100.xml
+P             - ladee_1100.xsd
+S         - PDS4_PDS_1C00.sch
+S         - PDS4_PDS_1C00.xml
+S         - PDS4_PDS_1C00.xsd
+
+The basic process of generating the manifests follows:
+ (1) insect the Bundle.xml to get the manifest of collection.xml files
+       -- the collection manifest is located in the Bundle.xml:
+       
+        <Bundle_Member_Entry>
+            <lid_reference>urn:nasa:pds:excalibur:data_collection</lid_reference>
+            <member_status>Primary</member_status>
+            <reference_type>bundle_has_data_collection</reference_type>
+        </Bundle_Member_Entry>
+        <Bundle_Member_Entry>
+            <lid_reference>urn:nasa:pds:excalibur:context_collection</lid_reference>
+            <member_status>Primary</member_status>
+            <reference_type>bundle_has_context_collection</reference_type>
+        </Bundle_Member_Entry>
+        <Bundle_Member_Entry>
+            <lid_reference>urn:nasa:pds:excalibur:xml_schema_collection</lid_reference>
+            <member_status>Primary</member_status>
+            <reference_type>bundle_has_schema_collection</reference_type>
+        </Bundle_Member_Entry>
+
+ (2) inspect each Collection.xml to get the manifest for each product 
+       -- the product manifest is located in the Collection.tab:
+           - 2 column CSV file
+                - member_status
+                - LIDVID
+                
+            S,urn:nasa:pds:context:target:exoplanet_system.55-cnc::1.0
+            S,urn:nasa:pds:context:target:exoplanet_system.gj-1132::1.0
+            S,urn:nasa:pds:context:target:exoplanet_system.gj-1214::1.0
+      
+ (3) compile all products in the Bundle (e.g., Bundle, Collections, basic products) into the manifests
+      - using the above exceptions
+ 
+ (4) XML labels
+      -- xml labels are to be generated against the current (i.e., most recent) version of the IM
+      
+ (5) SIP_4-column_manifest
+      - see enclosure for sample SIP_4-column_manfiest XML label
+          - file reference to '4 column <tab> delimited table'
+      - 4 column <tab> delimited table:
+          - checksum_value
+          - checksum_type
+          - online accessible location (URL)
+          - LIDVID
+          
+      - using the above sample_bundle; manifest would contain:
+      
+      66c540c106af2e94f639b0aa1c86d73d  MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml  urn:nasa:pds:ladee_mission_bundle::1.0
+            86f354fc7e5b02d9a1257d2f02779b44    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/context/collection_mission_context.xml urn:nasa:pds:ladee_mission:context_collection::1.0
+            d25b26e82ce39c3fe7be679536e246b6    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/context/collection_mission_context_inventory.tab   urn:nasa:pds:ladee_mission:context_collection::1.0
+            c49f24dfc6c0d9d8b55f73efd8e9657b    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/document/collection_mission_document.xml   urn:nasa:pds:ladee_mission:document_collection::1.0
+            46c500c7b3641747a13b1e33c525085a    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/document/collection_mission_document_inventory.TAB urn:nasa:pds:ladee_mission:document_collection::1.0
+            0346c3fba8e5f3cbe031d2de77c9372f    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/document/ladee_mission_rev1_5.pdf  urn:nasa:pds:ladee_mission:document:ladee_mission::1.5
+            5ccf23968eee5e3518db488ea5db54e0    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/document/ladee_mission_rev1_5.xml  urn:nasa:pds:ladee_mission:document:ladee_mission::1.5
+            cbacf719a2fd4a6d1cf7d31ca900e199    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/document/ladee_spacecraft_rev1_2.pdf   urn:nasa:pds:ladee_mission:document:ladee_spacecraft::1.2
+            64163c0e513e268163fa8f5c931facdf    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/document/ladee_spacecraft_rev1_2.xml   urn:nasa:pds:ladee_mission:document:ladee_spacecraft::1.2
+            2466f69593b27f0ef575b534ec8f6b78    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/collection_mission_xml_schema.xml   urn:nasa:pds:ladee_mission:xml_schema_collection::1.0
+            5dc1469ab53dfd726b0233cfa03c697f    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/collection_mission_xml_schema_inventory.tab urn:nasa:pds:ladee_mission:xml_schema_collection::1.0
+            b3a6c88ebb369993bd6e3737b1accda3    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/ladee_1100.xml  urn:nasa:pds:ladee_mission:xml_schema:ladee_1100::1.1
+            98946dc2ccd1613a86a8cdef8aa48203    MD5 http://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/ladee_1100.xsd  urn:nasa:pds:ladee_mission:xml_schema:ladee_1100::1.1
+
+ (6) AIP_manifest
+      - see enclosure for sample AIP_manfiest XML label
+          - file reference to 'AIP checksum manifest'; uses <parsing_standard_id>MD5Deep 4.n</parsing_standard_id>
+          
+                            66c540c106af2e94f639b0aa1c86d73d    LADEE_Bundle_1101.xml
+                            86f354fc7e5b02d9a1257d2f02779b44    context/collection_mission_context.xml
+                            d25b26e82ce39c3fe7be679536e246b6    context/collection_mission_context_inventory.tab
+                            c49f24dfc6c0d9d8b55f73efd8e9657b    document/collection_mission_document.xml
+                            46c500c7b3641747a13b1e33c525085a    document/collection_mission_document_inventory.TAB
+                            0346c3fba8e5f3cbe031d2de77c9372f    document/ladee_mission_rev1_5.pdf
+                            5ccf23968eee5e3518db488ea5db54e0    document/ladee_mission_rev1_5.xml
+                            cbacf719a2fd4a6d1cf7d31ca900e199    document/ladee_spacecraft_rev1_2.pdf
+                            64163c0e513e268163fa8f5c931facdf    document/ladee_spacecraft_rev1_2.xml
+                            2466f69593b27f0ef575b534ec8f6b78    xml_schema/collection_mission_xml_schema.xml
+                            5dc1469ab53dfd726b0233cfa03c697f    xml_schema/collection_mission_xml_schema_inventory.tab
+                            b3a6c88ebb369993bd6e3737b1accda3    xml_schema/ladee_1100.xml
+                            98946dc2ccd1613a86a8cdef8aa48203    xml_schema/ladee_1100.xsd
+          
+          - file reference to 'AIP transfer manifest'
+               - 2 colummn fixed-width table:
+                     - LIDVID (255 characters)
+                     - file_specification_name (255 characters)
+
+                            urn:nasa:pds:ladee_mission_bundle::1.0                                                                                                                                                                                                                         \LADEE_Bundle_1101.xml                                                                                                                                                                                                                                         
+                            urn:nasa:pds:ladee_mission:context_collection::1.0                                                                                                                                                                                                             \context\collection_mission_context.xml                                                                                                                                                                                                                        
+                            urn:nasa:pds:ladee_mission:context_collection::1.0                                                                                                                                                                                                             \context\collection_mission_context_inventory.tab                                                                                                                                                                                                              
+                            urn:nasa:pds:ladee_mission:document_collection::1.0                                                                                                                                                                                                            \document\collection_mission_document.xml                                                                                                                                                                                                                      
+                            urn:nasa:pds:ladee_mission:document_collection::1.0                                                                                                                                                                                                            \document\collection_mission_document_inventory.TAB                                                                                                                                                                                                            
+                            urn:nasa:pds:ladee_mission:document:ladee_mission::1.5                                                                                                                                                                                                         \document\ladee_mission_rev1_5.pdf                                                                                                                                                                                                                             
+                            urn:nasa:pds:ladee_mission:document:ladee_mission::1.5                                                                                                                                                                                                         \document\ladee_mission_rev1_5.xml                                                                                                                                                                                                                             
+                            urn:nasa:pds:ladee_mission:document:ladee_spacecraft::1.2                                                                                                                                                                                                      \document\ladee_spacecraft_rev1_2.pdf                                                                                                                                                                                                                          
+                            urn:nasa:pds:ladee_mission:document:ladee_spacecraft::1.2                                                                                                                                                                                                      \document\ladee_spacecraft_rev1_2.xml                                                                                                                                                                                                                          
+                            urn:nasa:pds:ladee_mission:xml_schema_collection::1.0                                                                                                                                                                                                          \xml_schema\collection_mission_xml_schema.xml                                                                                                                                                                                                                  
+                            urn:nasa:pds:ladee_mission:xml_schema_collection::1.0                                                                                                                                                                                                          \xml_schema\collection_mission_xml_schema_inventory.tab                                                                                                                                                                                                        
+                            urn:nasa:pds:ladee_mission:xml_schema:ladee_1100::1.1                                                                                                                                                                                                          \xml_schema\ladee_1100.xml                                                                                                                                                                                                                                     
+                            urn:nasa:pds:ladee_mission:xml_schema:ladee_1100::1.1                                                                                                                                                                                                          \xml_schema\ladee_1100.xsd                                                                                                                                                                                                                                     
+
+ (7) DIP_manifest
+       - software is written; but this manifest is not currently being generated
+       
+       
+ 
