@@ -38,7 +38,7 @@ def _getPrimaries(bundle):
                 lid = elem.text.strip()
             elif elem.tag == '{http://pds.nasa.gov/pds4/pds/v1}member_status':
                 kind = elem.text.strip().lower()
-        if kind == 'primary':
+        if kind == 'primary' and lid:
             primaries.append(lid)
     _logger.debug('XML parse done, got %d primaries', len(primaries))
     return primaries
