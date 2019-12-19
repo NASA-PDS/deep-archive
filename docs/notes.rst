@@ -35,5 +35,12 @@ When the ``member_status`` is ``Primary``, then look up each ``lid_reference`` i
 Iterate through ``results`` and look for ``file_ref_url``. 
 
 
+Grabbing Data
+-------------
+
+Try::
+
+    wget -erobots=off --cut-dirs=1 --reject='index.html*' --no-host-directories --mirror --no-parent --relative --timestamping --no-check-certificate --recursive https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/
+
 .. Copyright © 2019 California Institute of Technology ("Caltech").
    ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.

@@ -1,0 +1,1247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================ -->
+<!-- NameSpace identification                                     -->
+<!--        (1) the global namespace (pds)                        -->
+<!--        (2) the locally defined namespace (ladee)             -->
+<!--                                                              -->
+<!--   - each namespace is further identified by release          -->
+<!-- ============================================================ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://pds.nasa.gov/pds4/ladee/v1"
+  xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:ladee="http://pds.nasa.gov/pds4/ladee/v1" 
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified" version="1.1.0.0">
+  
+  <xsd:annotation>
+    <xsd:documentation>This schema contains locally defined attributes
+    used for LADEE Ultraviolet and Visible Spectrometer (UVS) products
+    </xsd:documentation>
+  </xsd:annotation>
+  
+  <xsd:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="http://pds.nasa.gov/pds4/schema/released/pds/v1/PDS4_PDS_1101.xsd">
+    <xsd:annotation>
+      <xsd:documentation>This import is done so the type definitions in 
+        this file can build on the base types. 
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:import>
+
+  <!-- =========================================================== -->
+  <!-- Longitude, Latitude                                         -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="latitude" type="ladee:latitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+      Latitude of the sub-spacecraft point in Mean Earth frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+    
+  <xsd:simpleType name="latitudeDouble">
+    <xsd:restriction base="xsd:double">
+      <xsd:minInclusive value="-90"/>
+      <xsd:maxInclusive value="90"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <xsd:element name="longitude" type="ladee:longitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+      Longitude of the sub-spacecraft point in Mean Earth frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  
+  <xsd:simpleType name="longitudeDouble">
+    <xsd:restriction base="xsd:double">
+      <xsd:minInclusive value="0"/>
+      <xsd:maxInclusive value="360"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <!-- =========================================================== -->
+  <!-- solar_latitude, solar_longitude                             -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="solar_latitude" type="ladee:latitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+      Latitude of the sub-spacecraft point in a selenocentric,
+      sun-synchronous frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_longitude" type="ladee:longitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+      Longitude of the sub-spacecraft point in a selenocentric,
+      sun-synchronous frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- altitude                                                    -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="altitude" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+      Spacecraft altitude above the lunar reference sphere       
+      (radius=1737.4 km) in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="nonNegativeDouble">
+    <xsd:restriction base="xsd:double">
+      <xsd:minInclusive value="0"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- altitude_above_terrain                                      -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="altitude_above_terrain" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+      Spacecraft altitude above the lunar surface in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- activity_number                                             -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="activity_number" type="xsd:unsignedShort">
+    <xsd:annotation>
+      <xsd:documentation>
+      Activities are the main units of data collection for UVS.
+      They correspond to a single instrument power cycle so spectra
+      collected within a single activity are relatively near each
+      other in both space and time.  Also, the spacecraft was
+      generally oriented during an activity for a single
+      observational purpose.
+
+      Activities are numbered based on an incrementing counter that
+      named UVS data files as they were created onboard the
+      spacecraft.  Most activities generated a single file, so
+      activity numbers are approximately a count of the number of
+      instrument power cycles.  Occultation activities are the
+      exception because they generated enough spectra to span two
+      data files.  Occultation activities, therefore, are assigned
+      the number given to their first file, and no activity is
+      assigned the number given to the second file, i.e., activity
+      numbering skips one number after each occultation.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- activity_type                                               -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="activity_type" type="ladee:activity_type">
+    <xsd:annotation>
+      <xsd:documentation>
+      A short string describing the nature of each activity.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="activity_type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Unknown"/>
+      <xsd:enumeration value="BackwardLimbWithNod"/>
+      <xsd:enumeration value="ForwardLimbWithNod"/>
+      <xsd:enumeration value="NorthLimbWithNod"/>
+      <xsd:enumeration value="SouthLimbWithNod"/>
+      <xsd:enumeration value="BackwardLimbWithoutNod"/>
+      <xsd:enumeration value="ForwardLimbWithoutNod"/>
+      <xsd:enumeration value="NorthLimbWithoutNod"/>
+      <xsd:enumeration value="SouthLimbWithoutNod"/>
+      <xsd:enumeration value="Occultation"/>
+      <xsd:enumeration value="DarkCal"/>
+      <xsd:enumeration value="StarCal"/>
+      <xsd:enumeration value="SolarCal"/>
+      <xsd:enumeration value="SolarBoresightCal"/>
+      <xsd:enumeration value="TelescopeBoresightCal"/>
+      <xsd:enumeration value="RamOnly"/>
+      <xsd:enumeration value="SodiumTail"/>
+      <xsd:enumeration value="SurfaceCal"/>
+      <xsd:enumeration value="AlmostLimb"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- average_counts                                              -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="average_counts" type="ladee:nonNegativeFloat">
+    <xsd:annotation>
+      <xsd:documentation>
+      Average of all pixel values (range 0-1043) in DNs or
+      calibrated units
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="nonNegativeFloat">
+    <xsd:restriction base="xsd:float">
+      <xsd:minInclusive value="0"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- cosmic_ray_hit_count                                        -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="cosmic_ray_hit_count" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+      The number of cosmic ray hits identified within the
+      spectrum.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- cosmic_ray_hit_pixel_00 through 17                          -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="cosmic_ray_hit_pixel_00" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_01" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_02" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_03" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_04" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_05" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_06" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_07" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_08" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_09" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_10" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_11" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_12" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_13" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_14" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_15" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="cosmic_ray_hit_pixel_16" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        16 bits of a 1044-bit vector giving the location of hits
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- drive_current                                               -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="drive_current" type="ladee:nonNegativeFloat">
+    <xsd:annotation>
+      <xsd:documentation>
+        Thermo-Electric Cooler (TEC) Drive current in mA
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- emission_angle                                              -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="emission_angle" type="ladee:elongationAngle">
+    <xsd:annotation>
+      <xsd:documentation>
+      If the UVS telescope boresight intersects the lunar        
+      reference sphereoid, this is the angle at the intersection 
+      between the surface normal and the vector to LADEE in      
+      degrees.  0 otherwise.  Calculated by SPICE ilumin_c().    
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="elongationAngle">
+    <xsd:restriction base="xsd:double">
+      <xsd:minInclusive value="0"/>
+      <xsd:maxInclusive value="180"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- in_sun                                                      -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="in_sun" type="ladee:in_sun">
+    <xsd:annotation>
+      <xsd:documentation>
+      An integer representing three bits.  Each bit represents a 
+      geometric calculation asking whether the upper limb of the 
+      sun is above the lunar limb (including terrain) at (bit 0) 
+      the spectrum’s timestamp, (bit 1) 1 second before the start
+      of data collection, and (bit 2) 1 second after the end of  
+      data collection.  The 1 second buffers were chosen to be   
+      slightly conservative.  A value of 0 means ‘definitely in  
+      shadow’ and 7 means ‘definitely in sun’.  Intermediate     
+      reflect intermediate knowledge.                            
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="in_sun">
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="0"/>
+      <xsd:maxInclusive value="7"/>
+    </xsd:restriction>
+  </xsd:simpleType> 
+
+  <!-- =========================================================== -->
+  <!-- integration_time                                            -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="integration_time" type="ladee:integration_time">
+    <xsd:annotation>
+      <xsd:documentation>
+      The detector integration time for each scan, in            
+      milliseconds.                                              
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="integration_time">
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="8"/>
+      <xsd:maxInclusive value="65535"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- moon_fixed_vx, vy, vz                                       -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="moon_fixed_vx" type="xsd:double">
+    <xsd:annotation>
+      <xsd:documentation>
+        X coordinate of the spacecraft velocity in rectangular
+	coordinates in Mean Earth frame and in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="moon_fixed_vy" type="xsd:double">
+    <xsd:annotation>
+      <xsd:documentation>
+        Y coordinate of the spacecraft velocity in rectangular
+	coordinates in Mean Earth frame and in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="moon_fixed_vz" type="xsd:double">
+    <xsd:annotation>
+      <xsd:documentation>
+        Z coordinate of the spacecraft velocity in rectangular
+	coordinates in Mean Earth frame and in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- moon_fixed_x, y, z                                          -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="moon_fixed_x" type="xsd:double">
+    <xsd:annotation>
+      <xsd:documentation>
+        X coordinate of the spacecraft position in rectangular
+	coordinates in Mean Earth frame and in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="moon_fixed_y" type="xsd:double">
+    <xsd:annotation>
+      <xsd:documentation>
+        Y coordinate of the spacecraft position in rectangular
+	coordinates in Mean Earth frame and in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="moon_fixed_z" type="xsd:double">
+    <xsd:annotation>
+      <xsd:documentation>
+        Z coordinate of the spacecraft position in rectangular
+	coordinates in Mean Earth frame and in km
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- peak_counts                                                 -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="peak_counts" type="xsd:nonNegativeInteger">
+    <xsd:annotation>
+      <xsd:documentation>
+        Maximum value in the spectrum, either in DNs or in         
+        calibrated units                                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- phase_angle                                                 -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="phase_angle" type="ladee:elongationAngle">
+    <xsd:annotation>
+      <xsd:documentation>
+        If the UVS telescope boresight intersects the lunar        
+        reference sphereoid, this is the angle at the intersection 
+        between the sun vector and the vector to LADEE, in degrees.
+        0 otherwise.  Calculated by SPICE ilumin_c().              
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- quaternion_w, x, y, z                                       -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="quaternion_w" type="ladee:quaternion_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        W component of the spacecraft attitude quaternion in J2000
+        frame, estimated on-board by flight software.  w is the
+        scalar term.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="quaternion_x" type="ladee:quaternion_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        X component of the spacecraft attitude quaternion in J2000
+        frame, estimated on-board by flight software.  w is the
+        scalar term.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="quaternion_y" type="ladee:quaternion_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        Y component of the spacecraft attitude quaternion in J2000
+        frame, estimated on-board by flight software.  w is the
+        scalar term.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="quaternion_z" type="ladee:quaternion_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        Z component of the spacecraft attitude quaternion in J2000
+        frame, estimated on-board by flight software.  w is the
+        scalar term.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  
+  <xsd:simpleType name="quaternion_component">
+    <xsd:restriction base="xsd:float">
+      <xsd:minInclusive value="-1"/>
+      <xsd:maxInclusive value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- raw_timestamp                                               -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="raw_timestamp" type="xsd:unsignedLong">
+    <xsd:annotation>
+      <xsd:documentation>
+        Uncorrected timestamp applied by the s/c relative to the   
+        J2000 epoch in units of subseconds (2^-16 sec).  This      
+        timestamp was applied to each spectrum as soon as it had   
+        been fully received by flight software from the UVS        
+        instrument.                                                
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- saturated_pixel_count                                       -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="saturated_pixel_count" type="xsd:unsignedShort">
+    <xsd:annotation>
+      <xsd:documentation>
+        Number of pixels above a threshold value.  Currently 60000 
+        counts.                                                    
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  
+  <!-- =========================================================== -->
+  <!-- scan_number                                                 -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="scan_number" type="xsd:unsignedShort">
+    <xsd:annotation>
+      <xsd:documentation>
+        A sequence number assigned to each spectrum by the
+        instrument.  This number starts at 0 every time the
+        instrument is commanded to capture a stream of spectra with
+        the same integration time and spacing in time.  During some
+        activities, the integration time, spacing or both were
+        changed, causing this number to be reset one or more times.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- sequence_number                                             -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="sequence_number" type="xsd:unsignedShort">
+    <xsd:annotation>
+      <xsd:documentation>
+        A sequence number assigned to each spectrum within an
+        activity.  This number does not reset within an activity, so
+        the activity_number, sequence_number pair forms a unique
+        identifier for each spectrum just as each spectrum’s
+        timestamp is unique.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_incidence_angle                                       -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_incidence_angle" type="ladee:solar_incidence_angle">
+    <xsd:annotation>
+      <xsd:documentation>
+        If the UVS telescope boresight intersects the lunar        
+        reference sphereoid, this is the angle at the intersection 
+        between the sun vector and surface normal.  0 otherwise.   
+        Calculated by SPICE ilumin_c().                            
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  
+  <xsd:simpleType name="solar_incidence_angle">
+    <xsd:restriction base="xsd:float">
+      <xsd:minInclusive value="0"/>
+      <xsd:maxInclusive value="180"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_boresight_j2000_x, y, z                        -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_viewer_boresight_j2000_x" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        X coordinate of the normalized solar-viewer boresight vector
+        in J2000 frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_viewer_boresight_j2000_y" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        Y coordinate of the normalized solar-viewer boresight vector
+        in J2000 frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_viewer_boresight_j2000_z" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+        Z coordinate of the normalized solar-viewer boresight vector
+        in J2000 frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="normalized_vector_component">
+    <xsd:restriction base="xsd:double">
+      <xsd:minInclusive value="-1"/>
+      <xsd:maxInclusive value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_boresight_me_x, y, z                           -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="solar_viewer_boresight_me_x" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	X coordinate of the normalized solar-viewer boresight vector
+	in rectangular Mean Earth frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_viewer_boresight_me_y" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	Y coordinate of the normalized solar-viewer boresight vector
+	in rectangular Mean Earth frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_viewer_boresight_me_z" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	Z coordinate of the normalized solar-viewer boresight vector
+	in rectangular Mean Earth frame.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_fov_graze_altitude_above_terrain               -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="solar_viewer_fov_graze_altitude_above_terrain" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	The circular edge of the solar viewer field-of-view        
+	corresponds to a cone rooted at the spacecraft.  This value
+	is the closest approach of that cone to terrain in km, or 0
+	if the cone intersects.                                    
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_graze_altitude                                 -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_viewer_graze_altitude" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	The closest approach of the solar-viewer boresight vector  
+	to the lunar reference sphere, or 0 if it intersects       
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_graze_altitude_above_terrain                   -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="solar_viewer_graze_altitude_above_terrain" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	The closest approach of the solar-viewer boresight vector  
+	to terrain in km, or 0 if it intersects                    
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_graze_latitude, longitude                      -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_viewer_graze_latitude" type="ladee:latitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Latitude in Mean Earth frame of the intersection of  
+	the solar viewer boresight vector and the LRO lunar        
+	reference sphere or the closest point on the reference     
+	sphere to that vector.                                     
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_viewer_graze_longitude" type="ladee:longitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Longitude in Mean Earth frame of the intersection of  
+	the solar viewer boresight vector and the LRO lunar        
+	reference sphere or the closest point on the reference     
+	sphere to that vector.                                     
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_graze_solar_latitude, longitude                -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_viewer_graze_solar_latitude" type="ladee:latitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Latitude in a selenocentric, sun-synchronous 
+	frame of the intersection of the solar occultation viewer  
+	boresight vector and the lunar reference sphere or the     
+	closest point on the reference sphere to that vector.      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="solar_viewer_graze_solar_longitude" type="ladee:longitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Longitude in a selenocentric, sun-synchronous 
+	frame of the intersection of the solar occultation viewer  
+	boresight vector and the lunar reference sphere or the     
+	closest point on the reference sphere to that vector.      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_solar_elongation                               -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_viewer_solar_elongation" type="ladee:elongationAngle">
+    <xsd:annotation>
+      <xsd:documentation>
+	Angle between the solar viewer boresight and the sun       
+	vector, in degrees                                         
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- solar_viewer_target                                         -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="solar_viewer_target" type="ladee:solar_viewer_target">
+    <xsd:annotation>
+      <xsd:documentation>
+	A short string describing what is in the solar viewer’s    
+	field-of-view.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="solar_viewer_target">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Unknown"/>
+      <xsd:enumeration value="Limb"/>
+      <xsd:enumeration value="LitMoon"/>
+      <xsd:enumeration value="UnlitMoon"/>
+      <xsd:enumeration value="Sun"/>
+      <xsd:enumeration value="Earth"/>
+      <xsd:enumeration value="DarkSky"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- sun_graze_altitude_above_terrain                            -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="sun_graze_altitude_above_terrain" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	The circular limb of the sun corresponds to a cone rooted  
+	at the spacecraft.  This value is the closest approach of  
+	that cone to terrain in km, or 0 if the cone intersects    
+	terrain.                                                   
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- tec_cold                                                    -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="tec_cold" type="xsd:float">
+    <xsd:annotation>
+      <xsd:documentation>
+	Thermo-electric cooler cold-side temperature, which is the 
+	best estimate of the temperature of the detector, in       
+	degrees centigrade                                         
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- tec_enabled                                                 -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="tec_enabled" type="xsd:boolean">
+    <xsd:annotation>
+      <xsd:documentation>
+	Indicates whether the Thermo-electric cooler is active.    
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- tec_hot                                                     -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="tec_hot" type="xsd:float">
+    <xsd:annotation>
+      <xsd:documentation>
+	Thermo-electric cooler hot-side temperature, in degrees    
+	centigrade                                                 
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- tec_setpoint                                                -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="tec_setpoint" type="xsd:float">
+    <xsd:annotation>
+      <xsd:documentation>
+	The target temperature, in degrees C, to which the UVS’    
+	thermo-electric cooler has been configured to drive the    
+	detector temperature.                                      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_boresight_j2000_x, y, z                           -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_boresight_j2000_x" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	X coordinate of the normalized telescope boresight
+	vector in rectangular J2000 frame                                      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="telescope_boresight_j2000_y" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	Y coordinate of the normalized telescope boresight
+	vector in rectangular J2000 frame                                      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="telescope_boresight_j2000_z" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	Z coordinate of the normalized telescope boresight
+	vector in rectangular J2000 frame                                      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_boresight_me_x, y, z                              -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_boresight_me_x" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	X coordinate of the normalized telescope boresight
+	vector in rectangular Mean Earth frame                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="telescope_boresight_me_y" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	Y coordinate of the normalized telescope boresight
+	vector in rectangular Mean Earth frame                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="telescope_boresight_me_z" type="ladee:normalized_vector_component">
+    <xsd:annotation>
+      <xsd:documentation>
+	Z coordinate of the normalized telescope boresight
+	vector in rectangular Mean Earth frame                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_earth_elongation                                  -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_earth_elongation" type="ladee:elongationAngle">
+    <xsd:annotation>
+      <xsd:documentation>
+	Angle between the telescope boresight vector and the Earth 
+	vector, in degrees                                         
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_ecliptic_declination                              -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_ecliptic_declination" type="ladee:telescope_ecliptic_declination">
+    <xsd:annotation>
+      <xsd:documentation>
+	Angle between the telescope boresight vector and the plane 
+	of the ecliptic                                            
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="telescope_ecliptic_declination">
+    <xsd:restriction base="xsd:float">
+      <xsd:minInclusive value="-90"/>
+      <xsd:maxInclusive value="90"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- telescope_fov_graze_altitude_above_terrain                  -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_fov_graze_altitude_above_terrain" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Altitude above terrain in km of the vector through the edge
+	of the telescope field of view closest to the moon center  
+	or 0 if the vector intersects terrain                      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_graze_altitude                                    -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_graze_altitude" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Altitude above the reference sphere in km of the telescope 
+	boresight vector or 0 if the vector intersects the         
+	reference sphere                                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_graze_altitude_above_terrain                      -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_graze_altitude_above_terrain" type="ladee:nonNegativeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Altitude above terrain in km of the telescope boresight    
+	vector or 0 if the vector intersects terrain               
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_graze_latitude, longitude                         -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="telescope_graze_latitude" type="ladee:latitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Latitude in Mean Earth frame of the intersection of the
+	telescope boresight vector and the lunar reference sphere or
+	the closest point on the reference sphere to that vector.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="telescope_graze_longitude" type="ladee:longitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Longitude in Mean Earth frame of the intersection of the
+	telescope boresight vector and the lunar reference sphere or
+	the closest point on the reference sphere to that vector.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_graze_solar_latitude, longitude                   -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="telescope_graze_solar_latitude" type="ladee:latitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Latitude in a selenocentric, sun-synchronous 
+	frame of the intersection of the telescope boresight vector
+	and the lunar reference sphere or the closest point on the 
+	reference sphere to that vector.                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="telescope_graze_solar_longitude" type="ladee:longitudeDouble">
+    <xsd:annotation>
+      <xsd:documentation>
+	Longitude in a selenocentric, sun-synchronous 
+	frame of the intersection of the telescope boresight vector
+	and the lunar reference sphere or the closest point on the 
+	reference sphere to that vector.                           
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_solar_elongation                                  -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_solar_elongation" type="ladee:elongationAngle">
+    <xsd:annotation>
+      <xsd:documentation>
+	Angle between the telescope boresight and the sun vector in
+	degrees                                                    
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- telescope_sun_azimuth                                       -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_sun_azimuth" type="ladee:telescope_sun_azimuth">
+    <xsd:annotation>
+      <xsd:documentation>
+	Azimuth in degrees of the sun vector in UVS telescope      
+	frame.  This is approximately the angle between the        
+	Telescope boresight and the sun vector projected onto the  
+	LADEE radiator panel                                       
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="telescope_sun_azimuth">
+    <xsd:restriction base="xsd:double">
+        <xsd:minInclusive value="-180"/>
+      <xsd:maxInclusive value="180"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- telescope_sun_elevation                                     -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_sun_elevation" type="ladee:telescope_sun_elevation">
+    <xsd:annotation>
+      <xsd:documentation>
+	Elevation in degrees of the sun vector in UVS telescope    
+	frame.  This is approximately the angle between the sun    
+	vector and the LADEE radiator on which UVS is mounted      
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="telescope_sun_elevation">
+    <xsd:restriction base="xsd:double">
+      <xsd:minInclusive value="-90"/>
+      <xsd:maxInclusive value="90"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- telescope_target                                            -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="telescope_target" type="ladee:telescope_target">
+    <xsd:annotation>
+      <xsd:documentation>
+	A short string describing what is in the telescope’s       
+	field-of-view.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="telescope_target">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Unknown"/>
+      <xsd:enumeration value="Limb"/>
+      <xsd:enumeration value="LitMoon"/>
+      <xsd:enumeration value="UnlitMoon"/>
+      <xsd:enumeration value="Sun"/>
+      <xsd:enumeration value="Earth"/>
+      <xsd:enumeration value="DarkSky"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =========================================================== -->
+  <!-- uvs_timestamp                                               -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="uvs_timestamp" type="xsd:unsignedInt">
+    <xsd:annotation>
+      <xsd:documentation>
+	A timestamp applied to the spectrum by the UVS instrument, 
+	in msec since UVS’ firmware booted.  This provides a way to
+	measure relative time that is independent of the spacecraft
+	clock.  It is not synchronized with that clock, and it     
+	starts at 0 during every UVS activity.                     
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <!-- =========================================================== -->
+  <!-- valid_checksum                                              -->
+  <!-- =========================================================== -->
+  
+  <xsd:element name="valid_checksum" type="xsd:boolean">
+    <xsd:annotation>
+      <xsd:documentation>
+	True if the packet received by the spacecraft from UVS     
+	contained one spectrum with a valid checksum, False        
+	otherwise.                                                 
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  
+  <!-- =========================================================== -->
+  <!-- predicted_attitude_flag                                     -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="predicted_attitude_flag" type="ladee:Flag">
+    <xsd:annotation>
+      <xsd:documentation>
+      0 indicates spacecraft attitude estimated onboard by flight
+      software was used to generate the metadata for this spectrum.  1
+      indicates that the attitude commanded by ground controllers was
+      used.  Onboard estimated attitudes were used for all spectra
+      except when they were unavailable.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+    
+  <xsd:simpleType name="Flag">
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="0"/>
+      <xsd:maxInclusive value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>
