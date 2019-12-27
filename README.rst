@@ -22,6 +22,9 @@ reaches end-of-life by January 1st, 2020_.
 
 Make a virtualenv_ and run ``pip install aipgen`` into it. Or use a buildout_
 or, if you absolutely must, install it into your system python you monster.
+This software depends on the lxml_ library which your Python installer should
+take care of, but your *system* will require ``libxml2`` 2.9.2 or later as
+well as ``libxsl2`` 1.1.28 or later.
 
 
 Documentation

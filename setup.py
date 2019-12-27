@@ -18,7 +18,8 @@ with open(path.join(here, 'CHANGES.rst'), encoding='utf-8') as changes_file:
 
 _requirements = [
     'setuptools',  # All modern setup.py's should require setuptools
-    'pysolr',
+    'pysolr',      # In online mode, we look up products using Solr
+    'lxml',        # Needed for generating XML labels (since ElementTree can't add XML PIs above the root elem!)
 ]
 
 

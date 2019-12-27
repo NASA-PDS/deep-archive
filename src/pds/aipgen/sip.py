@@ -3,8 +3,9 @@
 '''Submission Information Package'''
 
 
-from xml.etree import ElementTree
-import argparse, sys, logging, hashlib, pysolr, urllib.request, os.path, re
+from datetime import datetime
+from lxml import etree
+import argparse, logging, hashlib, pysolr, urllib.request, os.path, re
 
 
 # Defaults & Constants
@@ -13,6 +14,29 @@ import argparse, sys, logging, hashlib, pysolr, urllib.request, os.path, re
 _registryServiceURL = 'https://pds-dev-el7.jpl.nasa.gov/services/registry/pds'  # Default registry service
 _bufsiz             = 512                                                       # Buffer size for reading from URL con
 _pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
+_pdsNS              = 'http://pds.nasa.gov/pds4/pds/v1'                         # Namespace URI for PDS XML
+_xsiNS              = 'http://www.w3.org/2001/XMLSchema-instance'               # Namespace URI for XML Schema
+
+# For the XML model processing instruction
+_xmlModel = '''href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch"
+schematypens="http://purl.oclc.org/dsdl/schematron"'''
+# Where to find the PDS schema
+_schemaLocation = 'http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd'
+# URI prefix for logical identifiers of Submission Information Package bundles
+_sipDeepURIPrefix = 'urn:nasa:pds:system_bundle:product_sip_deep_archive:'
+# URI prefix for logical identifiers of volume identifiers for products for Archive Information Packages
+_aipProductURIPrefix = 'urn:nasa:pds:system_bundle:product_aip:'
+# Boilerplate
+_stdManifestDescription = 'Tab-separated manifest table for delivering one bundle to the Deep Archive'
+# Record boilerplate; first is column name, second is its description (all records are ASCII_String in PDS parlance)
+_recordBoilerplate = (
+    ('checksum', 'Checksum Value'),
+    ('checksum_type', 'Checksum Type'),
+    ('file_specification_url', 'URL to file associated with checksum in field #1 and product lidvid in field #3'),
+    ('LIDVID', 'Unique product lidvid that contains this file')
+)
+# Internal reference boilerplate
+_intRefBoilerplate = 'Links this SIP to the specific version of the bundle product in the PDS registry system'
 
 
 # logging
@@ -24,24 +48,31 @@ logging.basicConfig(format='%(levelname)s %(message)s', level=logging.WARNING)
 # Functions
 # ---------
 
-def _getPrimaries(bundle):
-    '''Get the "primaries" from the given bundle XML.'''
+def _getPrimariesAndOtherInfo(bundle):
+    '''Get the "primaries" from the given bundle XML plus the logical identifier,
+    plus the title plus the version ID (this function does too much)'''
     _logger.debug('Parsing XML in %r', bundle)
     primaries = set()
-    tree = ElementTree.parse(bundle)
+    tree = etree.parse(bundle)
     root = tree.getroot()
-    members = root.findall('.//{http://pds.nasa.gov/pds4/pds/v1}Bundle_Member_Entry')
+    members = root.findall(f'.//{{{_pdsNS}}}Bundle_Member_Entry')
     for member in members:
         lid = kind = None
         for elem in member:
-            if elem.tag == '{http://pds.nasa.gov/pds4/pds/v1}lid_reference':
+            if elem.tag == f'{{{_pdsNS}}}lid_reference':
                 lid = elem.text.strip()
-            elif elem.tag == '{http://pds.nasa.gov/pds4/pds/v1}member_status':
+            elif elem.tag == f'{{{_pdsNS}}}member_status':
                 kind = elem.text.strip().lower()
         if kind == 'primary' and lid:
             primaries.add(lid)
     _logger.debug('XML parse done, got %d primaries', len(primaries))
-    return primaries
+    matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}logical_identifier')
+    logicalID = matches[0].text.strip()
+    matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}title')
+    title = matches[0].text.strip()
+    matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}version_id')
+    versionID = matches[0].text.strip()
+    return primaries, logicalID, title, versionID
 
 
 def _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag):
@@ -77,14 +108,14 @@ def _getLogicalIdentifierAndFileInventory(xmlFile):
     None and None
     '''
     _logger.debug('Parsing XML in %s', xmlFile)
-    tree = ElementTree.parse(xmlFile)
+    tree = etree.parse(xmlFile)
     root = tree.getroot()
-    matches = root.findall('./{http://pds.nasa.gov/pds4/pds/v1}Identification_Area/{http://pds.nasa.gov/pds4/pds/v1}logical_identifier')
+    matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}logical_identifier')
     if not matches: return None, None
     lid = matches[0].text.strip()
     if not lid: return None, None
     dirname = os.path.dirname(xmlFile)
-    matches = root.findall('./{http://pds.nasa.gov/pds4/pds/v1}File_Area_Inventory/{http://pds.nasa.gov/pds4/pds/v1}File/{http://pds.nasa.gov/pds4/pds/v1}file_name')
+    matches = root.findall(f'./{{{_pdsNS}}}File_Area_Inventory/{{{_pdsNS}}}File/{{{_pdsNS}}}file_name')
     return lid, [os.path.join(dirname, i.text.strip()) for i in matches]
 
 
@@ -109,9 +140,9 @@ def _findLidVidsInXMLFiles(lidvid, xmlFiles):
     matchingFiles = set()
     for xmlFile in xmlFiles:
         _logger.debug('Parsing XML in %s', xmlFile)
-        tree = ElementTree.parse(xmlFile)
+        tree = etree.parse(xmlFile)
         root = tree.getroot()
-        matches = root.findall('./{http://pds.nasa.gov/pds4/pds/v1}Identification_Area/{http://pds.nasa.gov/pds4/pds/v1}logical_identifier')
+        matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}logical_identifier')
         if not matches: continue
         if lidvid == matches[0].text.strip():
             matchingFiles.add('file:' + xmlFile)
@@ -189,37 +220,158 @@ def _writeTable(hashedFiles, hashName, manifest):
     '''For each file in ``hashedFiles`` (a triple of file URL, digest, and lidvid), write a tab
     separated sequence of lines onto ``manifest`` with the columns containing the digest,
     the name of the hasing algorithm that produced the digest, the URL to the file, and the
-    lidvid
+    lidvid. Return a hex conversion of the MD5 digest of the manifest plus the total bytes
+    written.
     '''
-    for url, digest, lidvid in hashedFiles:
-        manifest.write(f'{digest}\t{hashName}\t{url}\t{lidvid}\n')
+    hashish, size = hashlib.new('md5'), 0
+    for url, digest, lidvid in sorted(hashedFiles):
+        entry = f'{digest}\t{hashName}\t{url}\t{lidvid}\n'.encode('utf-8')
+        hashish.update(entry)
+        manifest.write(entry)
+        size += len(entry)
+    return hashish.hexdigest(), size
 
 
-def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, manifest, offline):
+def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName, manifestFile, site, labelOutputFile):
+    '''Write an XML label to the file ``labelOutputFile``. Note that ``digest`` is a hex version
+    of the *MD5* digest of the generated manifest, but ``hashName`` is the name of the hash algorithm
+    used to produce the *contents* of the manifest, which may be MD5 or something else.
+    '''
+
+    # Get the current time, but drop the microsecond resolution
+    ts = datetime.utcnow()
+    ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
+
+    # Set up convenient prefixes for XML namespaces
+    nsmap = {
+        None: _pdsNS,
+        'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+    }
+    prefix = f'{{{_pdsNS}}}'
+
+    # Root of the XML document: Product_SIP_Deep_Archive
+    root = etree.Element(
+        prefix + 'Product_SIP_Deep_Archive',
+        attrib={f'{{{_xsiNS}}}' + 'schemaLocation': _schemaLocation},
+        nsmap=nsmap
+    )
+
+    identificationArea = etree.Element(prefix + 'Identification_Area')
+    root.append(identificationArea)
+    etree.SubElement(identificationArea, prefix + 'logical_identifier').text = _sipDeepURIPrefix + logicalID.split(':')[-1]
+    etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
+    etree.SubElement(identificationArea, prefix + 'title').text = 'Submission Information Package for the ' + title
+    etree.SubElement(identificationArea, prefix + 'information_model_version').text = '1.13.0.0'
+    etree.SubElement(identificationArea, prefix + 'product_class').text = 'Product_SIP_Deep_Archive'
+
+    modificationHistory = etree.Element(prefix + 'Modification_History')
+    identificationArea.append(modificationHistory)
+    modificationDetail = etree.Element(prefix + 'Modification_Detail')
+    modificationHistory.append(modificationDetail)
+    etree.SubElement(modificationDetail, prefix + 'modification_date').text = ts.date().isoformat()
+    etree.SubElement(modificationDetail, prefix + 'version_id').text = '1.0'
+    etree.SubElement(modificationDetail, prefix + 'description').text = 'SIP was verisoned and created'
+
+    deep = etree.Element(prefix + 'Information_Package_Component_Deep_Archive')
+    root.append(deep)
+    deep.append(etree.Comment('MD5 d̵i̵g̵e̵s̵t̵ checksum for the manifest file'))
+    etree.SubElement(deep, prefix + 'manifest_checksum').text = digest
+    etree.SubElement(deep, prefix + 'checksum_type').text = 'MD5'
+    etree.SubElement(deep, prefix + 'manifest_url').text = 'file:' + os.path.abspath(manifestFile)
+    etree.SubElement(deep, prefix + 'aip_lidvid').text = _aipProductURIPrefix + logicalID.split(':')[-1]
+    etree.SubElement(deep, prefix + 'aip_label_checksum').text = hashName
+
+    deepFileArea = etree.Element(prefix + 'File_Area_SIP_Deep_Archive')
+    deep.append(deepFileArea)
+    f = etree.Element(prefix + 'File')
+    deepFileArea.append(f)
+    etree.SubElement(f, prefix + 'file_name').text = os.path.basename(manifestFile)
+    f.append(etree.Comment('Creation date time in formation YYYY-MM-DDTHH:mm:ss'))
+    etree.SubElement(f, prefix + 'creation_date_time').text = ts.isoformat()
+    etree.SubElement(f, prefix + 'file_size', unit='byte').text = str(size)
+    etree.SubElement(f, prefix + 'records').text = str(numEntries)
+
+    deeper = etree.Element(prefix + 'Manifest_SIP_Deep_Archive')
+    deepFileArea.append(deeper)
+    etree.SubElement(deeper, prefix + 'name').text = 'Delivery Manifest Table'
+    etree.SubElement(deeper, prefix + 'local_identifier').text = 'Table'
+    etree.SubElement(deeper, prefix + 'offset', unit='byte').text = '0'
+    deeper.append(etree.Comment('Size the of the SIP manifest in bytes'))
+    etree.SubElement(deeper, prefix + 'object_length', unit='byte').text = str(size)
+    etree.SubElement(deeper, prefix + 'parsing_standard_id').text = 'PDS DSV 1'
+    etree.SubElement(deeper, prefix + 'description').text = _stdManifestDescription
+    deeper.append(etree.Comment('Number of rows in the manifest'))
+    etree.SubElement(deeper, prefix + 'records').text = str(numEntries)
+    etree.SubElement(deeper, prefix + 'record_delimiter').text = 'Carriage-Return Line-Feed'
+    etree.SubElement(deeper, prefix + 'field_delimiter').text = 'Horizontal Tab'
+
+    columns = etree.Element(prefix + 'Record_Delimited')
+    deeper.append(columns)
+    etree.SubElement(columns, prefix + 'fields').text = '4'
+    etree.SubElement(columns, prefix + 'groups').text = '0'
+    for colNum, (name, desc) in enumerate(_recordBoilerplate, 1):
+        column = etree.Element(prefix + 'Field_Delimited')
+        columns.append(column)
+        etree.SubElement(column, prefix + 'name').text = name
+        etree.SubElement(column, prefix + 'field_number').text = str(colNum)
+        etree.SubElement(column, prefix + 'data_type').text = 'ASCII_String'
+        etree.SubElement(column, prefix + 'description').text = desc
+
+    deep.append(etree.Comment('Include reference to the Bundle being described'))
+    internal = etree.Element(prefix + 'Internal_Reference')
+    deep.append(internal)
+    internal.append(etree.Comment('The LIDVID from the bundle label (combination of logical_identifier and version_id)'))
+    etree.SubElement(internal, prefix + 'lidvid_reference').text = logicalID + '::' + versionID
+    etree.SubElement(internal, prefix + 'reference_type').text = 'package_has_bundle'
+    etree.SubElement(internal, prefix + 'comment').text = _intRefBoilerplate
+
+    sipDeep = etree.Element(prefix + 'SIP_Deep_Archive')
+    root.append(sipDeep)
+    etree.SubElement(sipDeep, prefix + 'description').text = 'Submission Information Package for the' + title
+    sipDeep.append(etree.Comment('Provider Site ID input by user'))
+    etree.SubElement(sipDeep, prefix + 'provider_site_id').text = site
+
+    # Add the xml-model PI, write out the tree
+    model = etree.ProcessingInstruction('xml-model', _xmlModel)
+    root.addprevious(model)
+    tree = etree.ElementTree(root)
+    tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
+
+
+def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, manifest, label, site, offline):
     '''Produce a SIP from the given bundle'''
-    primaries = _getPrimaries(bundle)
+    primaries, logicalID, title, versionID = _getPrimariesAndOtherInfo(bundle)
     if offline:
         lidvidsToFiles = _getLocalFileInfo(bundle, primaries)
     else:
         lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
     hashedFiles = _getDigests(lidvidsToFiles, hashName)
-    _writeTable(hashedFiles, hashName, manifest)
+    md5, size = _writeTable(hashedFiles, hashName, manifest)
+    _writeLabel(logicalID, versionID, title, md5, size, len(hashedFiles), hashName, manifest.name, site, label)
 
 
 def main():
     '''Check the command-line for options and create a SIP from the given bundle XML'''
     parser = argparse.ArgumentParser(description='Generate Submission Information Packages (SIPs) from bundles')
     parser.add_argument(
-        'bundle', nargs='?', type=argparse.FileType('r'), default=sys.stdin, metavar='BUNDLE.XML',
+        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML',
         help='Bundle XML file to read; defaults to stdin if none given'
     )
     parser.add_argument(
-        'manifest', nargs='?', type=argparse.FileType('w'), default=sys.stdout, metavar='MANIFEST.TAB',
+        'manifest', type=argparse.FileType('wb'), metavar='OUT-MANIFEST.TAB',
         help='Tab separated manifest file to generate; defaults to stdout'
+    )
+    parser.add_argument(
+        'label', type=argparse.FileType('wb'), metavar='OUT-LABEL.XML',
+        help='XML label to create describing the generated manifest'
     )
     parser.add_argument(
         '-a', '--algorithm', default='md5', choices=sorted(list(hashlib.algorithms_available)),
         help='File hash (checksum, but not really); default %(default)s'
+    )
+    parser.add_argument(
+        '-s', '--site', default='PDS_JPL',
+        help="Provider site ID for the manifest's label; default %(default)s"
     )
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument(
@@ -242,9 +394,7 @@ def main():
     if args.verbose:
         _logger.setLevel(logging.DEBUG)
     _logger.debug('command line args = %r', args)
-    if args.offline and args.bundle.name == '<stdin>':
-        raise ValueError('In offline mode, a bundle file path must be specified; cannot be read from <stdin>')
-    _produce(args.bundle, args.algorithm, args.url, args.insecure, args.manifest, args.offline)
+    _produce(args.bundle, args.algorithm, args.url, args.insecure, args.manifest, args.label, args.site, args.offline)
 
 
 if __name__ == '__main__':
