@@ -227,7 +227,7 @@ def _writeTable(hashedFiles, hashName, manifest):
     '''
     hashish, size = hashlib.new('md5'), 0
     for url, digest, lidvid in sorted(hashedFiles):
-        entry = f'{digest}\t{hashName}\t{url}\t{lidvid}\n'.encode('utf-8')
+        entry = f'{digest}\t{hashName}\t{url}\t{lidvid}\r\n'.encode('utf-8')
         hashish.update(entry)
         manifest.write(entry)
         size += len(entry)
