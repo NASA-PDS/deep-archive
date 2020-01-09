@@ -11,6 +11,7 @@ import argparse, logging, hashlib, pysolr, urllib.request, os.path, re
 # Defaults & Constants
 # --------------------
 
+_currentIMVersion   = '1.13.0.0'
 _providerSiteIds    = ['PDS_ATM', 'PDS_ENG', 'PDS_GEO', 'PDS_IMG', 'PDS_JPL', 'PDS_NAI', 'PDS_PPI', 'PDS_PSI', 'PDS_RNG', 'PDS_SBN'] # TODO: Auto-generate from PDS4 IM
 _registryServiceURL = 'https://pds-dev-el7.jpl.nasa.gov/services/registry/pds'  # Default registry service
 _bufsiz             = 512                                                       # Buffer size for reading from URL con
@@ -262,7 +263,7 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     etree.SubElement(identificationArea, prefix + 'logical_identifier').text = _sipDeepURIPrefix + logicalID.split(':')[-1]
     etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
     etree.SubElement(identificationArea, prefix + 'title').text = 'Submission Information Package for the ' + title
-    etree.SubElement(identificationArea, prefix + 'information_model_version').text = '1.13.0.0'
+    etree.SubElement(identificationArea, prefix + 'information_model_version').text = _currentIMVersion
     etree.SubElement(identificationArea, prefix + 'product_class').text = 'Product_SIP_Deep_Archive'
 
     modificationHistory = etree.Element(prefix + 'Modification_History')
@@ -280,7 +281,9 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     etree.SubElement(deep, prefix + 'checksum_type').text = 'MD5'
     etree.SubElement(deep, prefix + 'manifest_url').text = 'file:' + os.path.abspath(manifestFile)
     etree.SubElement(deep, prefix + 'aip_lidvid').text = _aipProductURIPrefix + logicalID.split(':')[-1]
-    etree.SubElement(deep, prefix + 'aip_label_checksum').text = hashName
+
+    # TODO: Update with actual checksum from the generated AIP
+    etree.SubElement(deep, prefix + 'aip_label_checksum').text = '00000000000000000000000000000000'
 
     deepFileArea = etree.Element(prefix + 'File_Area_SIP_Deep_Archive')
     deep.append(deepFileArea)
@@ -390,6 +393,10 @@ def main():
     parser.add_argument(
         '-v', '--verbose', default=False, action='store_true',
         help='Verbose _logger; defaults %(default)s'
+    )
+    parser.add_argument(
+        '-i', '--pds4-information-model-version', default=_currentIMVersion,
+        help='Specify PDS4 Information Model version to generate SIP. Must be 1.13.0.0+; default %(default)s'
     )
     args = parser.parse_args()
     if args.verbose:
