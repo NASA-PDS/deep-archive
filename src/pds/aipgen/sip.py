@@ -11,6 +11,7 @@ import argparse, logging, hashlib, pysolr, urllib.request, os.path, re
 # Defaults & Constants
 # --------------------
 
+_providerSiteIds    = ['PDS_ATM', 'PDS_ENG', 'PDS_GEO', 'PDS_IMG', 'PDS_JPL', 'PDS_NAI', 'PDS_PPI', 'PDS_PSI', 'PDS_RNG', 'PDS_SBN'] # TODO: Auto-generate from PDS4 IM
 _registryServiceURL = 'https://pds-dev-el7.jpl.nasa.gov/services/registry/pds'  # Default registry service
 _bufsiz             = 512                                                       # Buffer size for reading from URL con
 _pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
@@ -274,7 +275,7 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
 
     deep = etree.Element(prefix + 'Information_Package_Component_Deep_Archive')
     root.append(deep)
-    deep.append(etree.Comment('MD5 d̵i̵g̵e̵s̵t̵ checksum for the manifest file'))
+    deep.append(etree.Comment('MD5 digest checksum for the manifest file'))
     etree.SubElement(deep, prefix + 'manifest_checksum').text = digest
     etree.SubElement(deep, prefix + 'checksum_type').text = 'MD5'
     etree.SubElement(deep, prefix + 'manifest_url').text = 'file:' + os.path.abspath(manifestFile)
@@ -370,7 +371,7 @@ def main():
         help='File hash (checksum, but not really); default %(default)s'
     )
     parser.add_argument(
-        '-s', '--site', default='PDS_JPL',
+        '-s', '--site', required=True, choices=_providerSiteIds,
         help="Provider site ID for the manifest's label; default %(default)s"
     )
     group = parser.add_mutually_exclusive_group(required=False)
