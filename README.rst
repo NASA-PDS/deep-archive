@@ -72,5 +72,5 @@ prohibited.
 .. _virtualenv: https://docs.python.org/3/library/venv.html
 
 
-.. Copyright © 2019 California Institute of Technology ("Caltech").
+.. Copyright © 2019–2020 California Institute of Technology ("Caltech").
    ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.

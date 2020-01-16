@@ -1,4 +1,4 @@
-# Copyright © 2019 California Institute of Technology ("Caltech").
+# Copyright © 2019–2020 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 
 *.egg-info
@@ -11,9 +11,12 @@
 .DS_Store
 __pycache__
 typescript
+*.tab
+*.xml
 bin/
 build/
 develop-eggs/
 dist/
 eggs/
 parts/
+k

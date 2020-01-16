@@ -5,14 +5,30 @@
 
 from datetime import datetime
 from lxml import etree
-import argparse, logging, hashlib, pysolr, urllib.request, os.path, re
+from urllib.parse import urlparse
+import argparse, logging, hashlib, pysolr, urllib.request, os.path, re, sys
 
 
 # Defaults & Constants
 # --------------------
 
+# Program related info:
+_version = '0.0.0'
+_description = '''Generate Submission Information Packages (SIPs) from bundles.
+This program takes a bundle XML file as input and produces two output files:
+
+① A Submission Information Package (SIP) manifest file; and
+② A PDS XML label of that file.
+
+The files are created in the current working directory when this program is
+run. The names of the files are based on the logical identifier found in the
+bundle file, and any existing files are overwritten. The names of the
+generated files are printed upon successful completion.
+'''
+
+# Other constants and defaults:
 _currentIMVersion   = '1.13.0.0'
-_providerSiteIds    = ['PDS_ATM', 'PDS_ENG', 'PDS_GEO', 'PDS_IMG', 'PDS_JPL', 'PDS_NAI', 'PDS_PPI', 'PDS_PSI', 'PDS_RNG', 'PDS_SBN'] # TODO: Auto-generate from PDS4 IM
+_providerSiteIDs    = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]  # TODO: Auto-generate from PDS4 IM
 _registryServiceURL = 'https://pds-dev-el7.jpl.nasa.gov/services/registry/pds'  # Default registry service
 _bufsiz             = 512                                                       # Buffer size for reading from URL con
 _pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
@@ -39,6 +55,12 @@ _recordBoilerplate = (
 )
 # Internal reference boilerplate
 _intRefBoilerplate = 'Links this SIP to the specific version of the bundle product in the PDS registry system'
+# Command-line names for various hash algorithms, mapped to Python implementation name
+_algorithms = {
+    'MD5':     'md5',
+    'SHA-1':   'sha1',
+    'SHA-256': 'sha256',
+}
 
 
 # logging
@@ -218,15 +240,20 @@ def _getDigests(lidvidsToFiles, hashName):
     return withDigests
 
 
-def _writeTable(hashedFiles, hashName, manifest):
+def _writeTable(hashedFiles, hashName, manifest, offline, baseURL):
     '''For each file in ``hashedFiles`` (a triple of file URL, digest, and lidvid), write a tab
     separated sequence of lines onto ``manifest`` with the columns containing the digest,
     the name of the hasing algorithm that produced the digest, the URL to the file, and the
     lidvid. Return a hex conversion of the MD5 digest of the manifest plus the total bytes
     written.
+
+    If ``offline`` mode, we transform all URLs written to the table by stripping off
+    everything except the last component (the file) and prepending the given ``baseURL``.
     '''
     hashish, size = hashlib.new('md5'), 0
     for url, digest, lidvid in sorted(hashedFiles):
+        if offline:
+            url = baseURL + urlparse(url).path.split('/')[-1]
         entry = f'{digest}\t{hashName}\t{url}\t{lidvid}\r\n'.encode('utf-8')
         hashish.update(entry)
         manifest.write(entry)
@@ -342,39 +369,35 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
-def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, manifest, label, site, offline):
+def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL):
     '''Produce a SIP from the given bundle'''
     primaries, logicalID, title, versionID = _getPrimariesAndOtherInfo(bundle)
+    strippedLogicalID = logicalID.split(':')[-1]
+    manifestFileName, labelFileName = strippedLogicalID + '.tab', strippedLogicalID + '_sip_v1.0.xml'
     if offline:
         lidvidsToFiles = _getLocalFileInfo(bundle, primaries)
     else:
         lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
     hashedFiles = _getDigests(lidvidsToFiles, hashName)
-    md5, size = _writeTable(hashedFiles, hashName, manifest)
-    _writeLabel(logicalID, versionID, title, md5, size, len(hashedFiles), hashName, manifest.name, site, label)
+    with open(manifestFileName, 'wb') as manifest:
+        md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL)
+        with open(labelFileName, 'wb') as label:
+            _writeLabel(logicalID, versionID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label)
+    return manifestFileName, labelFileName
 
 
 def main():
     '''Check the command-line for options and create a SIP from the given bundle XML'''
-    parser = argparse.ArgumentParser(description='Generate Submission Information Packages (SIPs) from bundles')
+    parser = argparse.ArgumentParser(description=_description)
     parser.add_argument(
-        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML',
-        help='Bundle XML file to read; defaults to stdin if none given'
+        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Bundle XML file to read'
     )
     parser.add_argument(
-        'manifest', type=argparse.FileType('wb'), metavar='OUT-MANIFEST.TAB',
-        help='Tab separated manifest file to generate; defaults to stdout'
+        '-a', '--algorithm', default='MD5', choices=sorted(_algorithms.keys()),
+        help='File hash (checksum) algorithm; default %(default)s'
     )
     parser.add_argument(
-        'label', type=argparse.FileType('wb'), metavar='OUT-LABEL.XML',
-        help='XML label to create describing the generated manifest'
-    )
-    parser.add_argument(
-        '-a', '--algorithm', default='md5', choices=sorted(list(hashlib.algorithms_available)),
-        help='File hash (checksum, but not really); default %(default)s'
-    )
-    parser.add_argument(
-        '-s', '--site', required=True, choices=_providerSiteIds,
+        '-s', '--site', required=True, choices=_providerSiteIDs,
         help="Provider site ID for the manifest's label; default %(default)s"
     )
     group = parser.add_mutually_exclusive_group(required=False)
@@ -382,18 +405,23 @@ def main():
         '-u', '--url', default=_registryServiceURL,
         help='URL to the registry service; default %(default)s'
     )
+    parser.add_argument(
+        '-k', '--insecure', default=False, action='store_true',
+        help='Ignore SSL/TLS security issues; default %(default)s'
+    )
     group.add_argument(
         '-n', '--offline', default=False, action='store_true',
         help='Run offline, scanning bundle directory for matching files instead of querying registry service'
     )
     parser.add_argument(
-        '-k', '--insecure', default=False, action='store_true',
-        help='Ignore SSL/TLS security issues; default %(default)s'
+        '-b', '--bundle-base-url', required=False, default='file:/',
+        help='Base URL prepended to URLs in the generated manifest for local files in "offline" mode'
     )
     parser.add_argument(
         '-v', '--verbose', default=False, action='store_true',
-        help='Verbose _logger; defaults %(default)s'
+        help='Verbose logging; defaults %(default)s'
     )
+    # TODO: ``pds4_information_model_version`` is parsed into the arg namespace but is otherwise ignored
     parser.add_argument(
         '-i', '--pds4-information-model-version', default=_currentIMVersion,
         help='Specify PDS4 Information Model version to generate SIP. Must be 1.13.0.0+; default %(default)s'
@@ -402,7 +430,20 @@ def main():
     if args.verbose:
         _logger.setLevel(logging.DEBUG)
     _logger.debug('command line args = %r', args)
-    _produce(args.bundle, args.algorithm, args.url, args.insecure, args.manifest, args.label, args.site, args.offline)
+    manifest, label = _produce(
+        args.bundle,
+        _algorithms[args.algorithm],
+        args.url,
+        args.insecure,
+        args.site,
+        args.offline,
+        args.bundle_base_url
+    )
+    print(f'⚙︎ ``sipgen`` — Submission Information Package (SIP) Generator, version {_version}', file=sys.stderr)
+    print(f'🎉 Success! From {args.bundle.name}, generated these output files:', file=sys.stderr)
+    print(f'• Manifest: {manifest}', file=sys.stderr)
+    print(f'• Label: {label}', file=sys.stderr)
+    sys.exit(0)
 
 
 if __name__ == '__main__':
