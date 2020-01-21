@@ -34,6 +34,7 @@ _bufsiz             = 512                                                       
 _pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
 _pdsNS              = 'http://pds.nasa.gov/pds4/pds/v1'                         # Namespace URI for PDS XML
 _xsiNS              = 'http://www.w3.org/2001/XMLSchema-instance'               # Namespace URI for XML Schema
+_pdsLabelExtension  = '.xml'
 
 # For the XML model processing instruction
 _xmlModel = '''href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch"
@@ -57,9 +58,9 @@ _recordBoilerplate = (
 _intRefBoilerplate = 'Links this SIP to the specific version of the bundle product in the PDS registry system'
 # Command-line names for various hash algorithms, mapped to Python implementation name
 _algorithms = {
-    'MD5':     'md5',
-    'SHA-1':   'sha1',
-    'SHA-256': 'sha256',
+    'MD5':     'MD5',
+    'SHA-1':   'SHA1',
+    'SHA-256': 'SHA256',
 }
 
 
@@ -126,21 +127,28 @@ def _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag):
 
 
 def _getLogicalIdentifierAndFileInventory(xmlFile):
-    '''In the named local ``xmlFile ``, return a pair of its logical identifier via the XPath
-    expression ``Product_Collection/Identification_Area/logical_identifier`` and all ``file_name``
+    '''In the named local ``xmlFile ``, return a triple of its logical identifier via the XPath
+    expression ``Product_Collection/Identification_Area/logical_identifier``, its lidvid 
+    (combination of logical identifier and version_id), and all ``file_name``
     in ``File`` in ``File_Area_Inventory`` entries. If there's no logical identifier, just return
-    None and None
+    None, None, None
     '''
     _logger.debug('Parsing XML in %s', xmlFile)
     tree = etree.parse(xmlFile)
     root = tree.getroot()
     matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}logical_identifier')
-    if not matches: return None, None
+    if not matches: return None, None, None
     lid = matches[0].text.strip()
-    if not lid: return None, None
+
+    matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}version_id')
+    if not matches: return None, None, None
+    lidvid = lid + '::' + matches[0].text.strip()
+
+    if not lid: return None, None, None
     dirname = os.path.dirname(xmlFile)
     matches = root.findall(f'./{{{_pdsNS}}}File_Area_Inventory/{{{_pdsNS}}}File/{{{_pdsNS}}}file_name')
-    return lid, [os.path.join(dirname, i.text.strip()) for i in matches]
+
+    return lid, lidvid, [os.path.join(dirname, i.text.strip()) for i in matches]
 
 
 def _getPLines(tabFilePath):
@@ -152,14 +160,22 @@ def _getPLines(tabFilePath):
         for line in tabFile:
             match = _pLineMatcher.match(line)
             if not match: continue
-            lidvids.add(match.group(1).split('::')[0])
+
+            # All values in collection manifest table must be a lidvid, if not throw an error
+            if '::' not in match.group(1):
+                msg = ('Invalid collection manifest. All records must contain '
+                       'lidvids but found "' + match.group(1))
+                raise Exception(msg)
+
+            lidvids.add(match.group(1))
+
     return lidvids
 
 
 def _findLidVidsInXMLFiles(lidvid, xmlFiles):
     '''Look in each of the ``xmlFiles`` for an XPath from root to ``Identification_Area`` to
-    ``logical_identifier`` and see if the text there matches the ``lidvid``.  If it does, add
-    that XML file to a set as a ``file:`` style URL and return the set.
+    ``logical_identifier`` and ``version_id`` and see if they form a matching ``lidvid``.
+    If it does, add that XML file to a set as a ``file:`` style URL and return the set.
     '''
     matchingFiles = set()
     for xmlFile in xmlFiles:
@@ -168,12 +184,33 @@ def _findLidVidsInXMLFiles(lidvid, xmlFiles):
         root = tree.getroot()
         matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}logical_identifier')
         if not matches: continue
-        if lidvid == matches[0].text.strip():
+        lid = matches[0].text.strip()
+
+        matches = root.findall(f'./{{{_pdsNS}}}Identification_Area/{{{_pdsNS}}}version_id')
+        if not matches: continue
+        vid = matches[0].text.strip()
+
+        if lidvid.strip() == lid + '::' + vid:
             matchingFiles.add('file:' + xmlFile)
+            matchingFiles |= _getAssociatedProducts(tree, os.path.dirname(xmlFile))
+            break
+
     return matchingFiles
 
 
-def _getLocalFileInfo(bundle, primaries):
+def _getAssociatedProducts(root, filepath):
+    '''Parse the XML for all the files associated with it that make up the product'''
+    products = set()
+    matches = root.findall(f'//{{{_pdsNS}}}File/{{{_pdsNS}}}file_name')
+    matches.extend(root.findall(f'//{{{_pdsNS}}}Document_File/{{{_pdsNS}}}file_name'))
+    if not matches: return products
+    for m in matches:
+        products.add('file:' + os.path.join(filepath, m.text))
+
+    return products
+
+
+def _getLocalFileInfo(bundle, primaries, bundleLidvid):
     '''Search all XML files (except for the ``bundle`` file) in the same directory as ``bundle``
     and look for all XPath ``Product_Collection/Identification_Area/logical_identifier`` values
     that match any of the primary names in ``primaries``. If we get a match, note all XPath
@@ -185,33 +222,41 @@ def _getLocalFileInfo(bundle, primaries):
     have that "lidvid" and return then a mapping of lidvids to set of matching files, as ``file:``
     URLs.
     '''
-    # First get a set of all XML fules under the same directory as ``bundle`` but not including ``bundle``.
-    bundlePath = os.path.abspath(bundle.name)
-    root = os.path.dirname(bundlePath)
-    xmlFiles = set()
-    root = os.path.dirname(os.path.abspath(bundle.name))
-    for dirpath, dirnames, filenames in os.walk(root):
-        xmlFiles |= set([os.path.join(dirpath, i) for i in filenames if i.endswith('.xml') or i.endswith('.XML')])
-    xmlFiles.remove(bundlePath)
+    # First get a set of all XML files under the same directory as ``bundle``
 
     # I'll take a six-pack of tabs
     lidvids = set()
-    for xmlFile in xmlFiles:
-        lid, tabs = _getLogicalIdentifierAndFileInventory(xmlFile)
-        if not lid or not tabs: continue
-        if lid in primaries:
-            # This will probably always be the case working with an offline directory tree
-            for tab in tabs:
-                lidvids |= _getPLines(tab)
 
     # Match up lidsvids with xmlFiles
     lidvidsToFiles = {}
+
+    # Add bundle to manifest
+    lidvidsToFiles[bundleLidvid] = {'file:' + bundle}
+
+    root = os.path.dirname(bundle)
+    xmlFiles = set()
+
+    for dirpath, dirnames, filenames in os.walk(root):
+        xmlFiles |= set([os.path.join(dirpath, i) for i in filenames if i.endswith(_pdsLabelExtension) or i.endswith(_pdsLabelExtension.upper())])
+    
+    for xmlFile in xmlFiles:
+        # Need to check for lid or lidvid depending on what is specified in the bundle
+        lid, lidvid, tabs = _getLogicalIdentifierAndFileInventory(xmlFile)
+        if not lid or not tabs: continue
+        if lid in primaries or lidvid in primaries:
+            # This will probably always be the case working with an offline directory tree
+            lidvidsToFiles[lidvid] = {'file:' + xmlFile}
+            for tab in tabs:
+                lidvids |= _getPLines(tab)
+                lidvidsToFiles[lidvid].add('file:' + tab)
+
     for lidvid in lidvids:
-        # We just look in the XML files; is that correct? Should we do "egrep -r" and match *any* file?
-        files = _findLidVidsInXMLFiles(lidvid, xmlFiles)
+        # Look in all XML files for the lidvids
+        products = _findLidVidsInXMLFiles(lidvid, xmlFiles)
         matching = lidvidsToFiles.get(lidvid, set())
-        matching |= files
+        matching |= products
         lidvidsToFiles[lidvid] = matching
+
     return lidvidsToFiles
 
 
@@ -240,7 +285,7 @@ def _getDigests(lidvidsToFiles, hashName):
     return withDigests
 
 
-def _writeTable(hashedFiles, hashName, manifest, offline, baseURL):
+def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, basePathToReplace):
     '''For each file in ``hashedFiles`` (a triple of file URL, digest, and lidvid), write a tab
     separated sequence of lines onto ``manifest`` with the columns containing the digest,
     the name of the hasing algorithm that produced the digest, the URL to the file, and the
@@ -253,8 +298,12 @@ def _writeTable(hashedFiles, hashName, manifest, offline, baseURL):
     hashish, size = hashlib.new('md5'), 0
     for url, digest, lidvid in sorted(hashedFiles):
         if offline:
-            url = baseURL + urlparse(url).path.split('/')[-1]
-        entry = f'{digest}\t{hashName}\t{url}\t{lidvid}\r\n'.encode('utf-8')
+            if baseURL.endswith('/'):
+                baseURL = baseURL[:-1]
+
+            url = baseURL + urlparse(url).path.replace(basePathToReplace, '')
+
+        entry = f'{digest}\t{hashName}\t{url}\t{lidvid.strip()}\r\n'.encode('utf-8')
         hashish.update(entry)
         manifest.write(entry)
         size += len(entry)
@@ -371,18 +420,26 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
 
 def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL):
     '''Produce a SIP from the given bundle'''
-    primaries, logicalID, title, versionID = _getPrimariesAndOtherInfo(bundle)
-    strippedLogicalID = logicalID.split(':')[-1]
-    manifestFileName, labelFileName = strippedLogicalID + '.tab', strippedLogicalID + '_sip_v1.0.xml'
+    # Get the bundle path
+    bundle = os.path.abspath(bundle.name)
+
+    # Get the bundle's primary collections and other useful info
+    primaries, bundleLID, title, bundleVID = _getPrimariesAndOtherInfo(bundle)
+    strippedLogicalID = bundleLID.split(':')[-1]
+
+    filename = strippedLogicalID + '_sip_v' + bundleVID
+    manifestFileName, labelFileName = filename + '.tab', filename + _pdsLabelExtension
     if offline:
-        lidvidsToFiles = _getLocalFileInfo(bundle, primaries)
+        lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID)
     else:
+        print('WARNING: The remote functionality with registry in the loop is still in development.')
         lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
+
     hashedFiles = _getDigests(lidvidsToFiles, hashName)
     with open(manifestFileName, 'wb') as manifest:
-        md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL)
+        md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL, os.path.dirname(os.path.dirname(bundle)))
         with open(labelFileName, 'wb') as label:
-            _writeLabel(logicalID, versionID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label)
+            _writeLabel(bundleLID, bundleVID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label)
     return manifestFileName, labelFileName
 
 

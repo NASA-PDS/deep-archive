@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch" 
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<Product_AIP xmlns="http://pds.nasa.gov/pds4/pds/v1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd">
+
+    
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:system_bundle:product_aip:ladee_mission_bundle</logical_identifier>
+        <version_id>1.0</version_id>
+        <title>Archive Information Package (AIP) for the LADEE Mission Bundle</title>
+        <information_model_version>1.13.0.0</information_model_version>
+        <product_class>Product_AIP</product_class>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2019-08-20</modification_date>
+                <version_id>1.0</version_id>
+                <description>latest version of the Archive Information Package (AIP) for the: LADEE Mission Bundle</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    
+    <Information_Package_Component>
+        <checksum_manifest_checksum>11454a9b07983e82a740cdfa7fbb69dc</checksum_manifest_checksum>
+        <checksum_type>MD5</checksum_type>
+        <transfer_manifest_checksum>227c0d4b025b5a77d3d6ad8ae3292ad6</transfer_manifest_checksum>
+
+        <!-- Include reference to the Bundle being described  -->
+        <Internal_Reference>
+            <lidvid_reference>urn:nasa:pds:ladee_mission_bundle::1.0</lidvid_reference>
+            <reference_type>package_has_bundle</reference_type>
+            <comment>Links this AIP to the specific version of the bundle product in the PDS registry system</comment>
+        </Internal_Reference>
+
+        <File_Area_Checksum_Manifest>
+            <File>
+                <file_name>ladee_mission_bundle_bundle_checksums_v1.0.tab</file_name>
+                <creation_date_time>2019-08-20T08:22:04.9829Z</creation_date_time>
+                <file_size unit="byte">938</file_size>
+                <records>13</records>
+                <md5_checksum>11454a9b07983e82a740cdfa7fbb69dc</md5_checksum>
+            </File>
+            <Checksum_Manifest>
+                <name>checksum manifest</name>
+                <offset unit="byte">0</offset>
+                <object_length unit="byte">938</object_length>
+                <parsing_standard_id>MD5Deep 4.n</parsing_standard_id>
+                <description>This is the checksum manifest for the: LADEE Mission Bundle</description>
+                <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
+            </Checksum_Manifest>
+        </File_Area_Checksum_Manifest>
+
+        <File_Area_Transfer_Manifest>
+            <File>
+                <file_name>ladee_mission_bundle_TransferManifest_inventory_v1.0.tab</file_name>
+                <creation_date_time>2019-08-20T08:22:04.9839Z</creation_date_time>
+                <file_size unit="byte">6656</file_size>
+                <records>13</records>
+                <md5_checksum>227c0d4b025b5a77d3d6ad8ae3292ad6</md5_checksum>
+            </File>
+            <Transfer_Manifest>
+                <name>transfer manifest</name>
+                <offset unit="byte">0</offset>
+                <records>13</records>
+                <description>This is the transfer manifest for the: LADEE Mission Bundle</description>
+                <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
+                <Record_Character>
+                    <fields>2</fields>
+                    <groups>0</groups>
+                    <record_length unit="byte">512</record_length>
+                    <Field_Character>
+                        <name>LIDVID</name>
+                        <field_location unit="byte">1</field_location>
+                        <data_type>ASCII_String</data_type>
+                        <field_length unit="byte">255</field_length>
+                    </Field_Character>
+                    <Field_Character>
+                        <name>File Specification Name</name>
+                        <field_location unit="byte">2</field_location>
+                        <data_type>ASCII_String</data_type>
+                        <field_length unit="byte">255</field_length>
+                    </Field_Character>
+                </Record_Character>
+            </Transfer_Manifest>
+        </File_Area_Transfer_Manifest>
+    </Information_Package_Component>
+    
+    <Archival_Information_Package>
+        <description>This is a test Archival Information Package (AIP) for the PDS4 System Bundle: LADEE Mission Bundle</description>
+    </Archival_Information_Package>
+
+</Product_AIP>

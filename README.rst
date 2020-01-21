@@ -26,6 +26,56 @@ This software depends on the lxml_ library which your Python installer should
 take care of, but your *system* will require ``libxml2`` 2.9.2 or later as
 well as ``libxsl2`` 1.1.28 or later.
 
+Usage
+=====
+
+Basic usage example using data in the test directory::
+
+    $ sipgen -s PDS_ATM -n -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/ test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml
+    ⚙︎ ``sipgen`` — Submission Information Package (SIP) Generator, version 0.0.0
+    🎉 Success! From test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
+    • Manifest: ladee_mission_bundle_sip_v1.0.tab
+    • Label: ladee_mission_bundle_sip_v1.0.xml
+
+Full usage from the ``--help`` flag::
+
+    usage: sipgen [-h] [-a {MD5,SHA-1,SHA-256}] -s
+                  {PDS_ATM,PDS_ENG,PDS_GEO,PDS_IMG,PDS_JPL,PDS_NAI,PDS_PPI,PDS_PSI,PDS_RNG,PDS_SBN}
+                  [-u URL] [-k] [-n] [-b BUNDLE_BASE_URL] [-v]
+                  [-i PDS4_INFORMATION_MODEL_VERSION]
+                  IN-BUNDLE.XML
+
+    Generate Submission Information Packages (SIPs) from bundles. This program
+    takes a bundle XML file as input and produces two output files: ① A Submission
+    Information Package (SIP) manifest file; and ② A PDS XML label of that file.
+    The files are created in the current working directory when this program is
+    run. The names of the files are based on the logical identifier found in the
+    bundle file, and any existing files are overwritten. The names of the
+    generated files are printed upon successful completion.
+
+    positional arguments:
+      IN-BUNDLE.XML         Bundle XML file to read
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -a {MD5,SHA-1,SHA-256}, --algorithm {MD5,SHA-1,SHA-256}
+                            File hash (checksum) algorithm; default MD5
+      -s {PDS_ATM,PDS_ENG,PDS_GEO,PDS_IMG,PDS_JPL,PDS_NAI,PDS_PPI,PDS_PSI,PDS_RNG,PDS_SBN}, --site {PDS_ATM,PDS_ENG,PDS_GEO,PDS_IMG,PDS_JPL,PDS_NAI,PDS_PPI,PDS_PSI,PDS_RNG,PDS_SBN}
+                            Provider site ID for the manifest's label; default
+                            None
+      -u URL, --url URL     URL to the registry service; default https://pds-dev-
+                            el7.jpl.nasa.gov/services/registry/pds
+      -k, --insecure        Ignore SSL/TLS security issues; default False
+      -n, --offline         Run offline, scanning bundle directory for matching
+                            files instead of querying registry service
+      -b BUNDLE_BASE_URL, --bundle-base-url BUNDLE_BASE_URL
+                            Base URL prepended to URLs in the generated manifest
+                            for local files in "offline" mode
+      -v, --verbose         Verbose logging; defaults False
+      -i PDS4_INFORMATION_MODEL_VERSION, --pds4-information-model-version PDS4_INFORMATION_MODEL_VERSION
+                            Specify PDS4 Information Model version to generate
+                            SIP. Must be 1.13.0.0+; default 1.13.0.0
+
 
 Documentation
 =============
@@ -52,7 +102,7 @@ Support
 =======
 
 If you are having issues, please let us know.  You can reach us at
-https://pds.nasa.gov/contact/contact.shtml
+https://pds.nasa.gov/?feedback=true
 
 
 License
