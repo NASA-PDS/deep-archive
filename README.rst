@@ -26,16 +26,55 @@ This software depends on the lxml_ library which your Python installer should
 take care of, but your *system* will require ``libxml2`` 2.9.2 or later as
 well as ``libxsl2`` 1.1.28 or later.
 
+1. Download the tar.gz distribution
+
+2. Create a virtualenv and activate::
+
+    bash> mkdir -p $HOME/.virtualenvs
+    bash> virtualenv $HOME/.virtualenvs/aipgen
+    bash> $HOME/.virtualenvs/aipgen/bin/activate
+
+3. Use the downloaded tar.gz from step 1 and pip to install aipgen and all of its dependencies::
+
+    (aipgen) bash> pip install pds.aipgen-0.0.0.tar.gz
+    
+4. You should now be able to run the deep archive utilities:
+
+    (aipgen) bash> sipgen --help
+
+
+Build
+=====
+
+To build the software for installation
+
+1. Install Buildout (if needed)::
+
+    bash> pip install zc.buildout``
+
+2. Create an install package::
+
+    bash> buildout setup . sdist
+
+3. A tar.gz should now be available in the ``dist/`` directory for distribution.
+
+
 Usage
 =====
 
-Basic usage example using data in the test directory::
+1. If not already activated, activate your virtualenv::
 
-    $ sipgen -s PDS_ATM -n -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/ test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml
+    bash> $HOME/.virtualenvs/aipgen/bin/activate
+    (aipgen) bash>
+
+2. Then you can run sipgen. Here is a basic usage example using data in the test directory::
+
+    (aipgen) bash> sipgen -s PDS_ATM -n -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/ test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml
     ⚙︎ ``sipgen`` — Submission Information Package (SIP) Generator, version 0.0.0
     🎉 Success! From test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
     • Manifest: ladee_mission_bundle_sip_v1.0.tab
     • Label: ladee_mission_bundle_sip_v1.0.xml
+
 
 Full usage from the ``--help`` flag::
 
