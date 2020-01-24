@@ -133,9 +133,9 @@ This product has not been translated into any other languages than US English.
 Contribute
 ==========
 
-• Issue Tracker: https://github.com/NASA-PDS-Incubator/pds.aipgen/issues
-• Source Code: https://github.com/NASA-PDS-Incubator/pds.aipgen
-• Wiki: https://github.com/NASA-PDS-Incubator/pds.aipgen/wiki
+• Issue Tracker: https://github.com/NASA-PDS-Incubator/pds-deep-archive/issues
+• Source Code: https://github.com/NASA-PDS-Incubator/pds-deep-archive
+• Wiki: https://github.com/NASA-PDS-Incubator/pds-deep-archive/wiki
 
 
 Support
