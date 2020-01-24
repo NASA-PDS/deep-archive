@@ -18,7 +18,7 @@ Installation
 ============
 
 First, this requires Python 3.6, 3.7, or 3.8. Are you still using Python 2? It
-reaches end-of-life by January 1st, 2020_.
+reached end-of-life on January 1st, 2020_.
 
 Make a virtualenv_ and run ``pip install aipgen`` into it. Or use a buildout_
 or, if you absolutely must, install it into your system python you monster.
@@ -46,11 +46,12 @@ well as ``libxsl2`` 1.1.28 or later.
 Build
 =====
 
-To build the software for installation
+To build the software for distribution:
 
-1. Install Buildout (if needed)::
+1. Boostrap the buildout (if needed)::
 
-    bash> pip install zc.buildout``
+    bash> python3 bootstrap.py
+    bash> bin/buildout
 
 2. Create an install package::
 
@@ -132,9 +133,9 @@ This product has not been translated into any other languages than US English.
 Contribute
 ==========
 
-• Issue Tracker: https://github.jpl.nasa.gov/PDSEN/aip-gen/issues
-• Source Code: https://github.jpl.nasa.gov/PDSEN/aip-gen
-• Wiki: https://github.jpl.nasa.gov/PDSEN/aip-gen/wiki
+• Issue Tracker: https://github.com/NASA-PDS-Incubator/aip-gen/issues
+• Source Code: https://github.com/NASA-PDS-Incubator/aip-gen
+• Wiki: https://github.com/NASA-PDS-Incubator/aip-gen/wiki
 
 
 Support
@@ -147,11 +148,8 @@ https://pds.nasa.gov/?feedback=true
 License
 =======
 
-The software in this package and developed by this project is proprietary, as
-is its accompanying documentation and support files and metadata. Copyright ©
-2019 California Institute of Technology ("Caltech"). ALL RIGHTS RESERVED. U.S.
-Government sponsorship acknowledged. Use and distribution is strictly
-prohibited.
+The project is licensed under the Apache License, version 2. See the
+LICENSE.txt file for details.
 
 
 .. _2020: https://pythonclock.org/
