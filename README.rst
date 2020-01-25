@@ -36,7 +36,7 @@ well as ``libxsl2`` 1.1.28 or later.
 
 3. Use the downloaded tar.gz from step 1 and pip to install pds-deep-archive and all of its dependencies::
 
-    (pds-deep-archive) bash> pip install pds.deep.archive-0.0.0.tar.gz
+    (pds-deep-archive) bash> pip install pds.deeparchive-0.0.0.tar.gz
     
 4. You should now be able to run the deep archive utilities:
 
