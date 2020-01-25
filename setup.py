@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-'''PDS AIP-GEN'''
+'''PDS Deep Archive Utilities'''
 
 
 from codecs import open
@@ -53,16 +53,16 @@ _requirements = [
 
 
 setup(
-    name='pds.aipgen',
+    name='pds.deeparchive',
     version='0.0.0',
     description='SIP Generator',
     long_description=readme + '\n\n' + changes,
-    keywords='CCSDS OAIS AIP SIP metadata submission archive package',
+    keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',
     author='Sean Kelly',
     author_email='sean.kelly@jpl.nasa.gov',
-    url='https://github.jpl.nasa.gov/PDSEN/aip-gen',
+    url='https://github.com/NASA-PDS-Incubator/pds-deep-archive/',
     entry_points={
-        'console_scripts': ['sipgen=pds.aipgen.sip:main']
+        'console_scripts': ['sipgen=pds.deeparchive.sip:main']
     },
     namespace_packages=['pds'],
     packages=find_packages('src', exclude=['docs', 'tests', 'bootstrap', 'ez_setup']),
