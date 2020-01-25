@@ -1,9 +1,9 @@
 *********
- AIP-GEN
+PDS Deep Archive Utilities
 *********
 
 Software for the Planetary Data System (PDS_) to generate Archive Information
-Package (AIP) and Submission Information Package (SIP) products, based on Open
+Package (AIP) and Submission Information Package (SIP) products, based upon Open
 Archival Information System (OAIS_) standards.
 
 
@@ -20,7 +20,7 @@ Installation
 First, this requires Python 3.6, 3.7, or 3.8. Are you still using Python 2? It
 reached end-of-life on January 1st, 2020_.
 
-Make a virtualenv_ and run ``pip install aipgen`` into it. Or use a buildout_
+Make a virtualenv_ and run ``pip install pds-deep-archive`` into it. Or use a buildout_
 or, if you absolutely must, install it into your system python you monster.
 This software depends on the lxml_ library which your Python installer should
 take care of, but your *system* will require ``libxml2`` 2.9.2 or later as
@@ -31,16 +31,16 @@ well as ``libxsl2`` 1.1.28 or later.
 2. Create a virtualenv and activate::
 
     bash> mkdir -p $HOME/.virtualenvs
-    bash> virtualenv $HOME/.virtualenvs/aipgen
-    bash> $HOME/.virtualenvs/aipgen/bin/activate
+    bash> virtualenv $HOME/.virtualenvs/pds-deep-archive
+    bash> $HOME/.virtualenvs/pds-deep-archive/bin/activate
 
-3. Use the downloaded tar.gz from step 1 and pip to install aipgen and all of its dependencies::
+3. Use the downloaded tar.gz from step 1 and pip to install pds-deep-archive and all of its dependencies::
 
-    (aipgen) bash> pip install pds.aipgen-0.0.0.tar.gz
+    (pds-deep-archive) bash> pip install pds.deep.archive-0.0.0.tar.gz
     
 4. You should now be able to run the deep archive utilities:
 
-    (aipgen) bash> sipgen --help
+    (pds-deep-archive) bash> sipgen --help
 
 
 Build
@@ -65,12 +65,12 @@ Usage
 
 1. If not already activated, activate your virtualenv::
 
-    bash> $HOME/.virtualenvs/aipgen/bin/activate
-    (aipgen) bash>
+    bash> $HOME/.virtualenvs/pds-deep-archive/bin/activate
+    (pds-deep-archive) bash>
 
 2. Then you can run sipgen. Here is a basic usage example using data in the test directory::
 
-    (aipgen) bash> sipgen -s PDS_ATM -n -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/ test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml
+    (pds-deep-archive) bash> sipgen -s PDS_ATM -n -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/ test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml
     ⚙︎ ``sipgen`` — Submission Information Package (SIP) Generator, version 0.0.0
     🎉 Success! From test/data/ladee_test/ladee_mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
     • Manifest: ladee_mission_bundle_sip_v1.0.tab
