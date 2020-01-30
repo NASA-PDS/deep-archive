@@ -38,9 +38,8 @@ well as ``libxsl2`` 1.1.28 or later.
 
     (pds-deep-archive) bash> pip install pds.deeparchive-0.0.0.tar.gz
     
-4. You should now be able to run the deep archive utilities:
+4. You should now be able to run the deep archive utilities::
 
-.. code-block::bash
     (pds-deep-archive) bash> sipgen --help
 
 
