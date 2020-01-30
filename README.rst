@@ -40,7 +40,9 @@ well as ``libxsl2`` 1.1.28 or later.
     
 4. You should now be able to run the deep archive utilities:
 
+.. code-block::bash
     (pds-deep-archive) bash> sipgen --help
+
 
 Build
 =====
