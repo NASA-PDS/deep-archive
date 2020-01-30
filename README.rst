@@ -42,7 +42,6 @@ well as ``libxsl2`` 1.1.28 or later.
 
     (pds-deep-archive) bash> sipgen --help
 
-
 Build
 =====
 
