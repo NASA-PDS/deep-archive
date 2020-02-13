@@ -27,6 +27,11 @@ re-publish the project website_ as well as send artifacts to testing_ Python
 Package Index.  (The official Python Package Index gets updated only with
 official release tags.)
 
+..  note::
+
+    The Python Package Index requires artifacts be uniquely named, so *always*
+    update the ``setup.py`` version info!
+
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
 .. _Sphinx: https://www.sphinx-doc.org/en/master/

@@ -54,7 +54,7 @@ _requirements = [
 
 setup(
     name='pds.deeparchive',
-    version='0.0.0',
+    version='0.0.1',
     description='SIP Generator',
     long_description=readme + '\n\n' + changes,
     keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',
