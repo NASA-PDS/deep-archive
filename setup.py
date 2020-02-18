@@ -54,7 +54,7 @@ _requirements = [
 
 setup(
     name='pds.deeparchive',
-    version='0.0.0',
+    version='0.0.1',
     description='SIP Generator',
     long_description=readme + '\n\n' + changes,
     keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',
@@ -62,7 +62,7 @@ setup(
     author_email='sean.kelly@jpl.nasa.gov',
     url='https://github.com/NASA-PDS-Incubator/pds-deep-archive/',
     entry_points={
-        'console_scripts': ['sipgen=pds.deeparchive.sip:main']
+        'console_scripts': ['sipgen=pds.aipgen.sip:main']
     },
     namespace_packages=['pds'],
     packages=find_packages('src', exclude=['docs', 'tests', 'bootstrap', 'ez_setup']),
@@ -75,7 +75,7 @@ setup(
     zip_safe=True,
     install_requires=_requirements,
     extras_require={'test': []},
-    license='Proprietary',
+    license='ALv2',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',

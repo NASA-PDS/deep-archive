@@ -1,0 +1,129 @@
+# 🏃‍♀️ Continuous Integration and Delivery
+# =======================================
+#
+# This is a GitHub Action workflow that provides Continuous Integration (CI)
+# and Continuous Delivery (CD) of the PDS_ Deep Archive software. Currently
+# it generates installable packages and publishes documentation, but in the
+# future it could also run unit+integration+functional tests, save other
+# artifacts, and so forth.
+#
+# Access Tokens
+# -------------
+#
+# The following tokens must be installed in the project's GitHub repository
+# in ordr for this workflow to function:
+#
+# ``github_personal_access_token``
+#     A personal access token of a user with collaborator or better access to
+#     the project repository. You can generate this by visiting GitHub →
+#     Settings → Developer settings → Personal access tokens → Generate new
+#     token. Give the token scope on ``repo``.
+# ``pypi_upload_token``
+#     An API token for the Python Package Index. You can make one by visiting
+#     pypi.org and choosing Account Settings → Add API Token. It's best to
+#     narrow the scope of the token to just one PyPI project, but that's only
+#     available for projects already hosted on PyPI.
+#  ``test_pypi_upload_token``
+#     The same, but for test.pypi.org.
+#
+#
+# .. _PDS: https://pds.nasa.gov/
+
+
+---
+
+name: 📦 Continuous Integration & Delivery
+
+
+# Driving Event
+# -------------
+#
+# What event starts this workflow: a push. We could refine this to a specific
+# branch, except that we detect if we're pushing to a release tag in the flow
+# and can publish to the official PyPI in addition to the test PyPI. (We
+# always publish to the test PyPI.)
+
+on: push
+
+
+# What to Do
+# ----------
+#
+# Once we get the event, what shall we do? Two things:
+# • Generate and publish documentation to the web
+# • Make an installable package
+#   • Always auto-publish to test.pypi.org
+#   • For tagged releases, auto-publish to the official pypi.org
+
+jobs:
+    documentation:
+        name: 📄 Documentation
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: ⚙️ Checking out repository
+                uses: actions/checkout@v2
+            -
+                name: 🐍 Installing Python
+                uses: actions/setup-python@v1
+                with:
+                    python-version: '3.x'
+                    architecture: 'x64'
+            -
+                name: 🚼 Adding dependencies
+                run: |
+                    sudo apt-get install -y libxml2-dev libxslt1-dev
+            -
+                name: 🖋 Writing documentation
+                run: |
+                    python3 bootstrap.py
+                    bin/buildout
+                    bin/docbuilder
+            -
+                name: 📒 Publishing to GitHub Pages
+                if: success()
+                uses: crazy-max/ghaction-github-pages@master
+                env:
+                    GITHUB_PAT: ${{secrets.github_personal_access_token}}
+                with:
+                    target_branch: gh-pages
+                    build_dir: build/docs/html
+    packaging:
+        name: 📦 Packaging
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: ⚙️ Checking out repository
+                uses: actions/checkout@v2
+            -
+                name: 🐍 Installing Python
+                uses: actions/setup-python@v1
+                with:
+                    python-version: '3.x'
+                    architecture: 'x64'
+            -
+                name: 🚼 Adding dependencies
+                run: |
+                    sudo apt-get install -y libxml2-dev libxslt1-dev
+            -
+                name: 💽 Building distribution
+                run: |
+                    rm -rf dist
+                    python3 bootstrap.py
+                    bin/buildout
+                    bin/buildout setup . sdist
+            # Put in unit+functional+integration testing here
+            -
+                name: 📇 Publishing to Test PyPI
+                uses: pypa/gh-action-pypi-publish@v1.0.0a0
+                with:
+                    password: ${{secrets.test_pypi_upload_token}}
+                    repository_url: https://test.pypi.org/legacy/
+            -
+                name: 🗂 Publishing to PyPI
+                uses: pypa/gh-action-pypi-publish@v1.0.0a0
+                if: startsWith(github.event.ref, 'refs/tags')
+                with:
+                    password: $${secrets.pypi_upload_token}}
+
+...

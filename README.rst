@@ -1,6 +1,6 @@
-*********
-PDS Deep Archive Utilities
-*********
+****************************
+ PDS Deep Archive Utilities
+****************************
 
 Software for the Planetary Data System (PDS_) to generate Archive Information
 Package (AIP) and Submission Information Package (SIP) products, based upon Open
@@ -157,6 +157,7 @@ LICENSE.txt file for details.
 .. _OAIS: https://www2.archivists.org/groups/standards-committee/open-archival-information-system-oais
 .. _PDS: https://pds.nasa.gov/
 .. _virtualenv: https://docs.python.org/3/library/venv.html
+.. _lxml: https://lxml.de/
 
 
 .. Copyright © 2019–2020 California Institute of Technology ("Caltech").
