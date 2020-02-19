@@ -113,19 +113,17 @@ jobs:
                     bin/buildout
                     bin/buildout setup . egg_info --tag-build -$(echo ${GITHUB_SHA} | cut -c1-8) sdist --dist-dir testdist
                     bin/buildout setup . sdist --dist-dir proddist
-                    echo ➔ dist dirs:
-                    ls -l *dist
             # TODO: Put in unit+functional+integration testing here
             -
                 name: 📇 Publishing to Test PyPI
-                uses: pypa/gh-action-pypi-publish@v1.0.0a0
+                uses: pypa/gh-action-pypi-publish@master
                 with:
                     password: ${{secrets.test_pypi_upload_token}}
                     repository_url: https://test.pypi.org/legacy/
                     packages_dir: testdist/
             -
                 name: 🗂 Publishing to PyPI
-                uses: pypa/gh-action-pypi-publish@v1.0.0a0
+                uses: pypa/gh-action-pypi-publish@master
                 if: startsWith(github.event.ref, 'refs/tags')
                 with:
                     password: $${secrets.pypi_upload_token}}
