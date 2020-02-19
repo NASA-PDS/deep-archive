@@ -108,16 +108,14 @@ jobs:
             -
                 name: 💽 Building distribution
                 run: |
-                    rm -rf dist testdist
+                    rm -rf dist proddist testdist
                     python3 bootstrap.py
                     bin/buildout
                     bin/buildout setup . egg_info --tag-build -$(echo ${GITHUB_SHA} | cut -c1-8) sdist --dist-dir testdist
-                    bin/buildout setup . sdist
-                    echo ➔ testdist
-                    ls -l testdist
-                    echo ➔ dist
-                    ls -l dist
-            # Put in unit+functional+integration testing here
+                    bin/buildout setup . sdist --dist-dir proddist
+                    echo ➔ dist dirs:
+                    ls -l *dist
+            # TODO: Put in unit+functional+integration testing here
             -
                 name: 📇 Publishing to Test PyPI
                 uses: pypa/gh-action-pypi-publish@v1.0.0a0
@@ -131,5 +129,6 @@ jobs:
                 if: startsWith(github.event.ref, 'refs/tags')
                 with:
                     password: $${secrets.pypi_upload_token}}
+                    packages_dir: proddist/
 
 ...
