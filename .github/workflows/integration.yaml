@@ -111,7 +111,7 @@ jobs:
                     rm -rf dist proddist testdist
                     python3 bootstrap.py
                     bin/buildout
-                    bin/buildout setup . egg_info --tag-build .dev$(echo ${GITHUB_SHA} | cut -c1-8) sdist --dist-dir testdist
+                    bin/buildout setup . egg_info --tag-build .dev --tag-date sdist --dist-dir testdist
                     bin/buildout setup . sdist --dist-dir proddist
             # TODO: Put in unit+functional+integration testing here
             -
