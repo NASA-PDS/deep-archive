@@ -30,7 +30,9 @@ official release tags.)
 ..  note::
 
     The Python Package Index requires artifacts be uniquely named, so *always*
-    update the ``setup.py`` version info!
+    update the ``setup.py`` version info when committing a release. (For the
+    ``test.pypi.org`` site our continuous delivery workflow automatically
+    adds the commit tag to the package name.)
 
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html

@@ -108,9 +108,10 @@ jobs:
             -
                 name: 💽 Building distribution
                 run: |
-                    rm -rf dist
+                    rm -rf dist testdist
                     python3 bootstrap.py
                     bin/buildout
+                    bin/buildout setup . egg_info --tag-build -$(echo ${GITHUB_SHA} | cut -c1-8) sdist --dist-dir testdist
                     bin/buildout setup . sdist
             # Put in unit+functional+integration testing here
             -
@@ -119,6 +120,7 @@ jobs:
                 with:
                     password: ${{secrets.test_pypi_upload_token}}
                     repository_url: https://test.pypi.org/legacy/
+                    packages_dir: testdist
             -
                 name: 🗂 Publishing to PyPI
                 uses: pypa/gh-action-pypi-publish@v1.0.0a0
