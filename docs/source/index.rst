@@ -6,8 +6,12 @@ handling *deep* archives. It includes software for Archive Information Package
 (AIP) and Submission Information Package (SIP) products, based on Open
 Archival Information System (OAIS_) standards.
 
-Currently, this package provides an executable program, ``sipgen``, that
-creates Submission Information Packages (SIPs) from PDS bundles.
+Currently, this package provides two executable programs:
+
+•  ``aipgen``, to create Archive Information Packages (AIPs); and
+•  ``sipgen``, to create Submission Information Packages (SIPs)
+
+from PDS bundles.
 
 
 .. toctree::

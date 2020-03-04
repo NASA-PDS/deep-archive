@@ -62,7 +62,10 @@ setup(
     author_email='sean.kelly@jpl.nasa.gov',
     url='https://github.com/NASA-PDS-Incubator/pds-deep-archive/',
     entry_points={
-        'console_scripts': ['sipgen=pds.aipgen.sip:main']
+        'console_scripts': [
+            'sipgen=pds.aipgen.sip:main',
+            'aipgen=pds.aipgen.aip:main'
+        ]
     },
     namespace_packages=['pds'],
     packages=find_packages('src', exclude=['docs', 'tests', 'bootstrap', 'ez_setup']),
