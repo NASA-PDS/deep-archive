@@ -366,7 +366,8 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
 
     identificationArea = etree.Element(prefix + 'Identification_Area')
     root.append(identificationArea)
-    etree.SubElement(identificationArea, prefix + 'logical_identifier').text = _sipDeepURIPrefix + logicalID.split(':')[-1]
+    logicalIdentifier = _sipDeepURIPrefix + logicalID.split(':')[-1] + ':' + versionID
+    etree.SubElement(identificationArea, prefix + 'logical_identifier').text = logicalIdentifier
     etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
     etree.SubElement(identificationArea, prefix + 'title').text = 'Submission Information Package for the ' + title
     etree.SubElement(identificationArea, prefix + 'information_model_version').text = _currentIMVersion
