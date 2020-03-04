@@ -9,9 +9,10 @@ build it out::
     python3 bootstrap.py
     bin/buildout
 
-At this point, you'll have the ``sipgen`` program ready to run as
-``bin/sipgen`` that's set up to use source Python code under ``src``. Changes
-you make to the code are reflected in ``bin/sipgen`` immediately.
+At this point, you'll have the ``aipgen`` and ``sipgen`` programs ready to run
+as ``bin/aipgen`` and ``bin/sipgen`` that's set up to use source Python code
+under ``src``. Changes you make to the code are reflected in ``bin/sipgen``
+immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run
@@ -32,7 +33,7 @@ official release tags.)
     The Python Package Index requires artifacts be uniquely named, so *always*
     update the ``setup.py`` version info when committing a release. (For the
     ``test.pypi.org`` site our continuous delivery workflow automatically
-    adds the commit tag to the package name.)
+    adds the commit date to the package name.)
 
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
