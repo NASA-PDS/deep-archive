@@ -1,35 +1,6 @@
 # encoding: utf-8
-#
-# Copyright © 2019–2020 California Institute of Technology ("Caltech").
-# ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# • Redistributions of source code must retain the above copyright notice,
-#   this list of conditions and the following disclaimer.
-# • Redistributions must reproduce the above copyright notice, this list of
-#   conditions and the following disclaimer in the documentation and/or other
-#   materials provided with the distribution.
-# • Neither the name of Caltech nor its operating division, the Jet Propulsion
-#   Laboratory, nor the names of its contributors may be used to endorse or
-#   promote products derived from this software without specific prior written
-#   permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
 
 '''Submission Information Package'''
-
 
 from datetime import datetime
 from lxml import etree
@@ -56,15 +27,13 @@ generated files are printed upon successful completion.
 
 # Other constants and defaults:
 _currentIMVersion   = '1.13.0.0'
+_providerSiteIDs    = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]  # TODO: Auto-generate from PDS4 IM
 _registryServiceURL = 'https://pds-dev-el7.jpl.nasa.gov/services/registry/pds'  # Default registry service
 _bufsiz             = 512                                                       # Buffer size for reading from URL con
 _pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
 _pdsNS              = 'http://pds.nasa.gov/pds4/pds/v1'                         # Namespace URI for PDS XML
 _xsiNS              = 'http://www.w3.org/2001/XMLSchema-instance'               # Namespace URI for XML Schema
 _pdsLabelExtension  = '.xml'
-
-# TODO: Auto-generate from PDS4 IM
-_providerSiteIDs = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]
 
 # For the XML model processing instruction
 _xmlModel = '''href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch"
@@ -290,10 +259,17 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid):
     return lidvidsToFiles
 
 
-def _getDigests(lidvidsToFiles, hashName):
+def _getDigests(lidvidsToFiles, hashName, digests):
     '''``lidvidsToFiles`` is a mapping of lidvid (string) to a set of matching file URLs.
-    Using a digest algorithm identified by ``hashName``, retrieve each URL's content and cmpute
-    its digest. Return a sequence of triples of (url, digest (hex string), and lidvid)
+    Using a digest algorithm identified by ``hashName``, retrieve each URL's content and compute
+    its digest—or, alternatively, if the file occurs in ``digests`, use its value instead.
+    Return a sequence of ⑶-triples of (url, digest (hex string), and lidvid).
+
+    By "ocurring in ``digests``", we mean just the last component of the URL to the file is
+    a key in the ``digests`` mapping; so if a potential file has the URL
+    ``http://whatever.com/some/data/file.xml``, then if ``file.xml`` maps to ``123abc``
+    in ``digests``, then ``123abc`` is the final hex digest; otherwise we retrieve that
+    (potentially huge) URL and hand-crank out its digest ⚙️
     '''
     withDigests = []
     # TODO: potential optimization is that if the same file appears for multiple lidvids we retrieve it
@@ -301,17 +277,24 @@ def _getDigests(lidvidsToFiles, hashName):
     for lidvid, files in lidvidsToFiles.items():
         for url in files:
             try:
-                hashish = hashlib.new(hashName)
-                _logger.debug('Getting «%s» for hashing with %s', url, hashName)
-                with urllib.request.urlopen(url) as i:
-                    while True:
-                        buf = i.read(_bufsiz)
-                        if len(buf) == 0: break
-                        hashish.update(buf)
-                # FIXME: some hash algorithms take variable length digests; we should filter those out
-                withDigests.append((url, hashish.hexdigest(), lidvid))
-            except urllib.error.URLError as error:
-                _logger.info('Problem retrieving «%s» for digest: %r; ignoring', url, error)
+                fileComponent = urllib.parse.urlparse(url).path.split('/')[-1]
+                _logger.debug('Looking for «%s» in precomputed digests', fileComponent)
+                digest = digests[fileComponent]
+                _logger.debug("Found, it's %s", digest)
+            except KeyError:
+                _logger.debug("Not found, computing %s myself by retrieving «%s»", hashName, url)
+                try:
+                    hashish = hashlib.new(hashName)
+                    with urllib.request.urlopen(url) as i:
+                        while True:
+                            buf = i.read(_bufsiz)
+                            if len(buf) == 0: break
+                            hashish.update(buf)
+                    # FIXME: some hash algorithms take variable length digests; we should filter those out
+                    digest = hashish.hexdigest()
+                except urllib.error.URLError as error:
+                    _logger.info('Problem retrieving «%s» for digest: %r; ignoring', url, error)
+            withDigests.append((url, digest, lidvid))
     return withDigests
 
 
@@ -447,9 +430,39 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     tree = etree.ElementTree(root)
     tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
+def _getPrecomputedDigests(digestdir):
+    '''Find all ``digest.tsv`` files in ``digestdir`` and make a mapping of {flename → digest}
+    so we don't have to compute digests ourselves.  Why not a single digest.tsv file?
+    And why is it ``.tsv`` when any "whitespace" character will do?  No idea!  Yet 😉
+    '''
+    digests = {}
+    if digestdir:
+        for dirpath, dirnames, filenames in os.walk(os.path.abspath(digestdir)):
+            for filename in filenames:
+                if filename == 'digest.tsv':
+                    with open(os.path.join(dirpath, filename), 'r') as precomputedDigestInput:
+                        for line in precomputedDigestInput:
+                            # TODO: Extremely brittle; assumes whitespace separation, but then again
+                            # we are working with imprecise specifications so this will probably need
+                            # to change anyway
+                            line = line.split()
+                            fn, digest = line[0], line[1]
+                            digests[fn] = digest
+    return digests
 
-def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL):
-    '''Produce a SIP from the given bundle'''
+def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, digestdir, baseURL):
+    '''Produce a SIP from the given bundle.
+
+    • ``bundle`` — bundle XML file to read in which to find "primaries"
+    • ``hashName`` — hashing (checksum) algorithm to use
+    • ``registryServiceURL`` — in online mode, what registry service to query
+    • ``insecureConnectionFlag`` — true if we ignore TLS warnings connecting to ``registryServiceURL``
+    • ``manifest`` — package to produce
+    • ``offline`` — if true, ignore ``registryServiceURL`` and just ``.tab`` files to find files to include
+    • ``digestdir`` — root of a tree containing ``digest.tsv`` files with digests to use instead of hashing ourselves
+
+    The ``digestDir`` may be None.
+    '''
     # Get the bundle path
     bundle = os.path.abspath(bundle.name)
 
@@ -459,13 +472,14 @@ def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site,
 
     filename = strippedLogicalID + '_sip_v' + bundleVID
     manifestFileName, labelFileName = filename + '.tab', filename + _pdsLabelExtension
+
     if offline:
         lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID)
     else:
         print('WARNING: The remote functionality with registry in the loop is still in development.')
         lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
 
-    hashedFiles = _getDigests(lidvidsToFiles, hashName)
+    hashedFiles = _getDigests(lidvidsToFiles, hashName, _getPrecomputedDigests(digestdir))
     with open(manifestFileName, 'wb') as manifest:
         md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL, os.path.dirname(os.path.dirname(bundle)))
         with open(labelFileName, 'wb') as label:
@@ -505,6 +519,10 @@ def main():
         help='Base URL prepended to URLs in the generated manifest for local files in "offline" mode'
     )
     parser.add_argument(
+        '-d', '--digestdir',
+        help='Pre-computed message digest (checksum) directory; only when used with --offline'
+    )
+    parser.add_argument(
         '-v', '--verbose', default=False, action='store_true',
         help='Verbose logging; defaults %(default)s'
     )
@@ -517,6 +535,12 @@ def main():
     if args.verbose:
         _logger.setLevel(logging.DEBUG)
     _logger.debug('command line args = %r', args)
+
+    if args.offline and args.bundle.name == '<stdin>':
+        raise ValueError('In offline mode, a bundle file path must be specified; cannot be read from <stdin>')
+    if args.digestdir and not args.offline:
+        raise ValueError('Specifying a DIGESTDIR only makes sense in offline mode; specify --offline')
+
     manifest, label = _produce(
         args.bundle,
         _algorithms[args.algorithm],
@@ -524,6 +548,7 @@ def main():
         args.insecure,
         args.site,
         args.offline,
+        args.digestdir,
         args.bundle_base_url
     )
     print(f'⚙︎ ``sipgen`` — Submission Information Package (SIP) Generator, version {_version}', file=sys.stderr)
