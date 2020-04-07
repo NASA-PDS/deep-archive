@@ -62,7 +62,7 @@ generated files are printed upon successful completion.
 '''
 
 # Other constants and defaults:
-_registryServiceURL = 'https://pds-dev-el7.jpl.nasa.gov/services/registry/pds'  # Default registry service
+_registryServiceURL = 'https://pds.nasa.gov/services/registry/pds'  # Default registry service
 _bufsiz             = 512                                                       # Buffer size for reading from URL con
 _pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
 
@@ -475,7 +475,9 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
-    manifest, label = produce(
+    if args.offline and not args.bundle_base_url:
+        parser.error('--bundle-base-url is required when in offline mode (--offline).')
+    manifest, label = _produce(
         args.bundle,
         HASH_ALGORITHMS[args.algorithm],
         args.url,
