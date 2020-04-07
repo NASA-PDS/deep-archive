@@ -32,7 +32,7 @@
 
 from .constants import PDS_NS_URI
 from lxml import etree
-import logging, hashlib, os.path
+import logging, hashlib, os.path, functools, urllib
 
 
 # Logging
@@ -44,17 +44,39 @@ _logger = logging.getLogger(__name__)
 # -----------------
 
 _bufsiz = 512  # Is there a better place to set this—or a better place to find it?
+_xmlCacheSize = 2**16
+_digestCacheSize = 2**16
 
 
 # Functions
 # ---------
 
+
+@functools.lru_cache(maxsize=_xmlCacheSize)
+def parseXML(f):
+    '''Parse the XML in object ``f``'''
+    return etree.parse(f)
+
+
+@functools.lru_cache(maxsize=_digestCacheSize)
+def getDigest(url, hashName):
+    '''Compute a digest of the object at url and return it as a hex string'''
+    hashish = hashlib.new(hashName)
+    _logger.debug('Getting «%s» for hashing with %s', url, hashName)
+    with urllib.request.urlopen(url) as i:
+        while True:
+            buf = i.read(_bufsiz)
+            if len(buf) == 0: break
+            hashish.update(buf)
+    return hashish.hexdigest()  # XXX We do not support hashes with varialbe-length digests
+
+
 def getPrimariesAndOtherInfo(bundle):
     '''Get the "primaries" from the given bundle XML plus the logical identifier,
     plus the title plus the version ID (this function does too much)'''
-    _logger.debug('Parsing XML in %r', bundle)
+    _logger.debug('Fetching primaries and other info by parsing XML in %r', bundle)
     primaries = set()
-    tree = etree.parse(bundle)
+    tree = parseXML(bundle)
     root = tree.getroot()
     members = root.findall(f'.//{{{PDS_NS_URI}}}Bundle_Member_Entry')
     for member in members:
@@ -93,8 +115,8 @@ def getLogicalIdentifierAndFileInventory(xmlFile):
     in ``File`` in ``File_Area_Inventory`` entries. If there's no logical identifier, just return
     None, None, None
     '''
-    _logger.debug('Parsing XML in %s', xmlFile)
-    tree = etree.parse(xmlFile)
+    _logger.debug('Getting logical IDs and file inventories by parsing XML in %s', xmlFile)
+    tree = parseXML(xmlFile)
     root = tree.getroot()
     matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
     if not matches: return None, None, None
@@ -109,3 +131,15 @@ def getLogicalIdentifierAndFileInventory(xmlFile):
     matches = root.findall(f'./{{{PDS_NS_URI}}}File_Area_Inventory/{{{PDS_NS_URI}}}File/{{{PDS_NS_URI}}}file_name')
 
     return lid, lidvid, [os.path.join(dirname, i.text.strip()) for i in matches]
+
+
+def addLoggingArguments(parser):
+    '''Add command-line arguments to the given argument ``parser`` to support logging.'''
+    parser.add_argument(
+        '-d', '--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO,
+        help='Log debugging messages for developers'
+    )
+    parser.add_argument(
+        '-q', '--quiet', action='store_const', dest='loglevel', const=logging.WARNING,
+        help="Don't log informational messages"
+    )

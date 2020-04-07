@@ -64,7 +64,8 @@ setup(
     entry_points={
         'console_scripts': [
             'sipgen=pds.aipgen.sip:main',
-            'aipgen=pds.aipgen.aip:main'
+            'aipgen=pds.aipgen.aip:main',
+            'aipsip=pds.aipgen.main:main'
         ]
     },
     namespace_packages=['pds'],

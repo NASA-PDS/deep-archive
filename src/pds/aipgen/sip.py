@@ -33,13 +33,15 @@
 
 from .constants import (
     INFORMATION_MODEL_VERSION, PDS_NS_URI, XML_SCHEMA_INSTANCE_NS_URI, XML_MODEL_PI,
-    PDS_SCHEMA_URL, AIP_PRODUCT_URI_PREFIX, PDS_LABEL_FILENAME_EXTENSION
+    PDS_SCHEMA_URL, AIP_PRODUCT_URI_PREFIX, PDS_LABEL_FILENAME_EXTENSION, HASH_ALGORITHMS
 )
-from .utils import getPrimariesAndOtherInfo, getMD5, getLogicalIdentifierAndFileInventory
+from .utils import (
+    getPrimariesAndOtherInfo, getMD5, getLogicalIdentifierAndFileInventory, parseXML, getDigest, addLoggingArguments
+)
 from datetime import datetime
 from lxml import etree
 from urllib.parse import urlparse
-import argparse, logging, hashlib, pysolr, urllib.request, os.path, re, sys
+import argparse, logging, hashlib, pysolr, urllib.request, os.path, re, sys, sqlite3, tempfile
 
 
 # Defaults & Constants
@@ -84,20 +86,10 @@ _recordBoilerplate = (
 # Internal reference boilerplate
 _intRefBoilerplate = 'Links this SIP to the specific version of the bundle product in the PDS registry system'
 
-# Command-line names for various hash algorithms, mapped to Python implementation name—OK,
-# not really! The Python implementation names are lowercase, but thankfully ``hashlib`` doesn't
-# care. (Still not sure why these were up-cased.)
-_algorithms = {
-    'MD5':     'MD5',
-    'SHA-1':   'SHA1',
-    'SHA-256': 'SHA256',
-}
-
 
 # Logging
 # -------
 _logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(levelname)s %(message)s', level=logging.WARNING)
 
 
 # Functions
@@ -142,42 +134,31 @@ def _getPLines(tabFilePath):
             # All values in collection manifest table must be a lidvid, if not throw an error
             if '::' not in match.group(1):
                 msg = ('Invalid collection manifest. All records must contain '
-                       'lidvids but found "' + match.group(1))
+                       'lidvids but found "' + match.group(1) + '"')
                 raise Exception(msg)
-
             lidvids.add(match.group(1))
-
     return lidvids
 
 
-def _findLidVidsInXMLFiles(lidvid, xmlFiles):
-    '''Look in each of the ``xmlFiles`` for an XPath from root to ``Identification_Area`` to
-    ``logical_identifier`` and ``version_id`` and see if they form a matching ``lidvid``.
-    If it does, add that XML file to a set as a ``file:`` style URL and return the set.
+def _findLidVidsInXMLFiles(lidvid, con):
+    '''Query the database ``con``nection for the ``lidvid`` to see if there's a match
+    based on an earlier population in the DB's ``lidvids`` table. If so, add those
+    XML files as a ``file:`` style URL to a set of matching files.
     '''
     matchingFiles = set()
-    for xmlFile in xmlFiles:
-        _logger.debug('Parsing XML in %s', xmlFile)
-        tree = etree.parse(xmlFile)
-        root = tree.getroot()
-        matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
-        if not matches: continue
-        lid = matches[0].text.strip()
-
-        matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}version_id')
-        if not matches: continue
-        vid = matches[0].text.strip()
-
-        if lidvid.strip() == lid + '::' + vid:
-            matchingFiles.add('file:' + xmlFile)
-            matchingFiles |= _getAssociatedProducts(tree, os.path.dirname(xmlFile))
-            break
-
+    cursor = con.cursor()
+    cursor.execute('''SELECT xmlFile FROM lidvids WHERE lidvid = ?''', (lidvid,))
+    for xmlFile in cursor.fetchall():
+        xmlFile = xmlFile[0]
+        matchingFiles.add('file:' + xmlFile)
+        tree = parseXML(xmlFile)
+        matchingFiles |= _getAssociatedProducts(tree, os.path.dirname(xmlFile))
     return matchingFiles
 
 
 def _getAssociatedProducts(root, filepath):
-    '''Parse the XML for all the files associated with it that make up the product'''
+    '''Parse the XML at ``root`` for all the files associated with it that make up the product,
+    preprending ``filepath`` to each match.'''
     products = set()
     matches = root.findall(f'//{{{PDS_NS_URI}}}File/{{{PDS_NS_URI}}}file_name')
     matches.extend(root.findall(f'//{{{PDS_NS_URI}}}Document_File/{{{PDS_NS_URI}}}file_name'))
@@ -188,11 +169,12 @@ def _getAssociatedProducts(root, filepath):
     return products
 
 
-def _getLocalFileInfo(bundle, primaries, bundleLidvid):
+def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
     '''Search all XML files (except for the ``bundle`` file) in the same directory as ``bundle``
     and look for all XPath ``Product_Collection/Identification_Area/logical_identifier`` values
     that match any of the primary names in ``primaries``. If we get a match, note all XPath
-    ``File_Area_Inventory/File/file_name`` entries for later inclusion.
+    ``File_Area_Inventory/File/file_name`` entries for later inclusion.  We use the database
+    at ``con`` to make a working table for noting this info as we go along.
 
     What does later inclusion mean? We open each of those files (usually ending in ``.tab`` or
     ``.TAB``) and look for any lines with ``P,\\s*`` at the front: the next token is a magical
@@ -208,33 +190,49 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid):
     # Match up lidsvids with xmlFiles
     lidvidsToFiles = {}
 
+    # Set up a database table to map many-to-many lidvids to xml files
+    with con:
+        cursor = con.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS lidvids (
+            lidvid text NOT NULL,
+            xmlFile text NOT NULL
+        )''')
+        cursor.execute('''CREATE INDEX IF NOT EXISTS lidvidIndex ON lidvids (lidvid)''')
+
     # Add bundle to manifest
     lidvidsToFiles[bundleLidvid] = {'file:' + bundle}
 
+    # OK, here we go
     root = os.path.dirname(bundle)
     xmlFiles = set()
 
+    # Locate all the XML files
     for dirpath, dirnames, filenames in os.walk(root):
-        xmlFiles |= set([os.path.join(dirpath, i) for i in filenames if i.endswith(PDS_LABEL_FILENAME_EXTENSION) or i.endswith(PDS_LABEL_FILENAME_EXTENSION.upper())])
+        xmlFiles |= set([os.path.join(dirpath, i) for i in filenames if i.lower().endswith(PDS_LABEL_FILENAME_EXTENSION.lower())])
 
-    for xmlFile in xmlFiles:
-        # Need to check for lid or lidvid depending on what is specified in the bundle
-        lid, lidvid, tabs = getLogicalIdentifierAndFileInventory(xmlFile)
-        if not lid or not tabs: continue
-        if lid in primaries or lidvid in primaries:
-            # This will probably always be the case working with an offline directory tree
-            lidvidsToFiles[lidvid] = {'file:' + xmlFile}
-            for tab in tabs:
-                lidvids |= _getPLines(tab)
-                lidvidsToFiles[lidvid].add('file:' + tab)
+    # Get the lidvids and inventory of files mentioned in each xml file
+    with con:
+        for xmlFile in xmlFiles:
+            # Need to check for lid or lidvid depending on what is specified in the bundle
+            lid, lidvid, tabs = getLogicalIdentifierAndFileInventory(xmlFile)
+            if not lid or not tabs: continue
+            if lid in primaries or lidvid in primaries:
+                # This will probably always be the case working with an offline directory tree
+                lidvidsToFiles[lidvid] = {'file:' + xmlFile}
+                for tab in tabs:
+                    lidvids |= _getPLines(tab)
+                    lidvidsToFiles[lidvid].add('file:' + tab)
+                    for lidvid in lidvids:
+                        con.execute('INSERT INTO lidvids (lidvid, xmlFile) VALUES (?,?)', (lidvid, xmlFile))
 
+    # Now go through each lidvid mentioned by the PLines in each inventory tab and find their xml files
     for lidvid in lidvids:
-        # Look in all XML files for the lidvids
-        products = _findLidVidsInXMLFiles(lidvid, xmlFiles)
+        products = _findLidVidsInXMLFiles(lidvid, con)
         matching = lidvidsToFiles.get(lidvid, set())
         matching |= products
         lidvidsToFiles[lidvid] = matching
 
+    # That should do it
     return lidvidsToFiles
 
 
@@ -245,19 +243,13 @@ def _getDigests(lidvidsToFiles, hashName):
     '''
     withDigests = []
     # TODO: potential optimization is that if the same file appears for multiple lidvids we retrieve it
-    # multiple times; we could cache previous hash computations
+    # multiple times; we could cache previous hash computations.
+    # BANDAID: ``getDigests`` has an LRU cache.
     for lidvid, files in lidvidsToFiles.items():
         for url in files:
             try:
-                hashish = hashlib.new(hashName)
-                _logger.debug('Getting «%s» for hashing with %s', url, hashName)
-                with urllib.request.urlopen(url) as i:
-                    while True:
-                        buf = i.read(_bufsiz)
-                        if len(buf) == 0: break
-                        hashish.update(buf)
-                # FIXME: some hash algorithms take variable length digests; we should filter those out
-                withDigests.append((url, hashish.hexdigest(), lidvid))
+                d = getDigest(url, hashName)
+                withDigests.append((url, d, lidvid))
             except urllib.error.URLError as error:
                 _logger.info('Problem retrieving «%s» for digest: %r; ignoring', url, error)
     return withDigests
@@ -278,7 +270,6 @@ def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, basePathToRep
         if offline:
             if baseURL.endswith('/'):
                 baseURL = baseURL[:-1]
-
             url = baseURL + urlparse(url).path.replace(basePathToReplace, '')
 
         entry = f'{digest}\t{hashName}\t{url}\t{lidvid.strip()}\r\n'.encode('utf-8')
@@ -401,39 +392,43 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
-def _produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL, aipFile):
+def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL, aipFile):
     '''Produce a SIP from the given bundle'''
-    # Get the bundle path
-    bundle = os.path.abspath(bundle.name)
+    # Make a temp file to use as a database; TODO: could pass ``delete=False`` in
+    # the future for sharing this DB amongst many processes for some fancy multiprocessing
+    _logger.info('👟 Submission Information Package (SIP) Generator, version %s', _version)
+    with tempfile.NamedTemporaryFile() as dbfile:
+        con = sqlite3.connect(dbfile.name)
+        _logger.debug('→ Database file (deleted) is %sf', dbfile.name)
 
-    # Get the bundle's primary collections and other useful info
-    primaries, bundleLID, title, bundleVID = getPrimariesAndOtherInfo(bundle)
-    strippedLogicalID = bundleLID.split(':')[-1]
+        # Get the bundle path
+        bundle = os.path.abspath(bundle.name)
 
-    filename = strippedLogicalID + '_sip_v' + bundleVID
-    manifestFileName, labelFileName = filename + '.tab', filename + PDS_LABEL_FILENAME_EXTENSION
-    if offline:
-        lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID)
-    else:
-        _logger.warning('The remote functionality with registry in the loop is still in development.')
-        lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
+        # Get the bundle's primary collections and other useful info
+        primaries, bundleLID, title, bundleVID = getPrimariesAndOtherInfo(bundle)
+        strippedLogicalID = bundleLID.split(':')[-1]
+        filename = strippedLogicalID + '_sip_v' + bundleVID
+        manifestFileName, labelFileName = filename + '.tab', filename + PDS_LABEL_FILENAME_EXTENSION
+        if offline:
+            lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID, con)
+        else:
+            _logger.warning('⚠️ The remote functionality with registry in the loop is still in development.')
+            lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
 
-    hashedFiles = _getDigests(lidvidsToFiles, hashName)
-    with open(manifestFileName, 'wb') as manifest:
-        md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL, os.path.dirname(os.path.dirname(bundle)))
-        with open(labelFileName, 'wb') as label:
-            _writeLabel(bundleLID, bundleVID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label, aipFile)
-    return manifestFileName, labelFileName
+        hashedFiles = _getDigests(lidvidsToFiles, hashName)
+        with open(manifestFileName, 'wb') as manifest:
+            md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL, os.path.dirname(os.path.dirname(bundle)))
+            with open(labelFileName, 'wb') as label:
+                _writeLabel(bundleLID, bundleVID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label, aipFile)
+        _logger.info('🎉 Success! From %s, generated these output files:', bundle)
+        _logger.info('• SIP Manifest: %s', manifestFileName)
+        _logger.info('• XML label for the SIP: %s', labelFileName)
+        return manifestFileName, labelFileName
 
 
-def main():
-    '''Check the command-line for options and create a SIP from the given bundle XML'''
-    parser = argparse.ArgumentParser(description=_description)
+def addSIParguments(parser):
     parser.add_argument(
-        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Bundle XML file to read'
-    )
-    parser.add_argument(
-        '-a', '--algorithm', default='MD5', choices=sorted(_algorithms.keys()),
+        '-a', '--algorithm', default='MD5', choices=sorted(HASH_ALGORITHMS.keys()),
         help='File hash (checksum) algorithm; default %(default)s'
     )
     parser.add_argument(
@@ -454,29 +449,35 @@ def main():
         help='Ignore SSL/TLS security issues; default %(default)s'
     )
     parser.add_argument(
-        '-c', '--aip', type=argparse.FileType('rb'), metavar='AIP-CHECKSUM-MANIFEST.TAB',
-        help='Archive Information Product checksum manifest file'
-    )
-    parser.add_argument(
         '-b', '--bundle-base-url', required=False, default='file:/',
         help='Base URL prepended to URLs in the generated manifest for local files in "offline" mode'
-    )
-    parser.add_argument(
-        '-v', '--verbose', default=False, action='store_true',
-        help='Verbose logging; defaults %(default)s'
     )
     # TODO: ``pds4_information_model_version`` is parsed into the arg namespace but is otherwise ignored
     parser.add_argument(
         '-i', '--pds4-information-model-version', default=INFORMATION_MODEL_VERSION,
         help='Specify PDS4 Information Model version to generate SIP. Must be 1.13.0.0+; default %(default)s'
     )
+
+
+def main():
+    '''Check the command-line for options and create a SIP from the given bundle XML'''
+    parser = argparse.ArgumentParser(description=_description)
+    parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
+    addSIParguments(parser)
+    addLoggingArguments(parser)
+    parser.add_argument(
+        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Bundle XML file to read'
+    )
+    parser.add_argument(
+        '-c', '--aip', type=argparse.FileType('rb'), metavar='AIP-CHECKSUM-MANIFEST.TAB',
+        help='Archive Information Product checksum manifest file'
+    )
     args = parser.parse_args()
-    if args.verbose:
-        _logger.setLevel(logging.DEBUG)
-    _logger.debug('command line args = %r', args)
-    manifest, label = _produce(
+    logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
+    _logger.debug('⚙️ command line args = %r', args)
+    manifest, label = produce(
         args.bundle,
-        _algorithms[args.algorithm],
+        HASH_ALGORITHMS[args.algorithm],
         args.url,
         args.insecure,
         args.site,
@@ -484,10 +485,7 @@ def main():
         args.bundle_base_url,
         args.aip
     )
-    print(f'⚙︎ ``sipgen`` — Submission Information Package (SIP) Generator, version {_version}', file=sys.stderr)
-    print(f'🎉 Success! From {args.bundle.name}, generated these output files:', file=sys.stderr)
-    print(f'• Manifest: {manifest}', file=sys.stderr)
-    print(f'• Label: {label}', file=sys.stderr)
+    _logger.info('INFO 👋 All done. Thanks for making a SIP. Bye!')
     sys.exit(0)
 
 

@@ -31,7 +31,7 @@
 
 
 from .constants import PDS_NS_URI, XML_SCHEMA_INSTANCE_NS_URI, PDS_SCHEMA_URL, XML_MODEL_PI, INFORMATION_MODEL_VERSION
-from .utils import getPrimariesAndOtherInfo, getMD5
+from .utils import getPrimariesAndOtherInfo, getMD5, parseXML, addLoggingArguments
 from datetime import datetime
 from lxml import etree
 import argparse, logging, sys, os, os.path, hashlib
@@ -41,6 +41,7 @@ import argparse, logging, sys, os, os.path, hashlib
 # ---------
 
 # For ``--help``:
+_version = '0.0.0'
 _description = '''Generate an Archive Information Package or AIP. An AIP consists of three files:
  ➀ a "checksum manifest" which contains MD5 hashes of *all* files in a product;
  ➁ a "transfer manifest" which lists the "lidvids" for files within each XML label mentioned in a product; and
@@ -53,12 +54,8 @@ _aipProductPrefix = 'urn:nasa:pds:system_bundle:product_aip:'
 # Comment to insert near the top of an AIP XML label
 _iaComment = 'Parse name from bundle logical_identifier, e.g. urn:nasa:pds:ladee_mission_bundle would be ladee_mission_bundle'
 
-
-# Logging
-# -------
-
+# Logging:
 _logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
 
 
 # Functions
@@ -94,7 +91,7 @@ def _getLIDVIDandFileInventory(xmlFile):
     identifier, return None and None.
     '''
     _logger.debug('📜 Analyzing XML in %s', xmlFile)
-    tree = etree.parse(xmlFile)
+    tree = parseXML(xmlFile)
     root = tree.getroot()
     matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
     if not matches:
@@ -291,10 +288,10 @@ def _writeLabel(
     tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
-def _process(bundle):
+def process(bundle):
     '''Generate a "checksum manifest", a "transfer manifest", and a PDS label from the given
     ``bundle``, which is an open file stream (with a ``name`` atribute) on the local
-    filesystem.
+    filesystem. Return the name of the generated checksum manifest file.
     '''
     _logger.info('🏃‍♀️ Starting AIP generation for %s', bundle.name)
     d = os.path.dirname(os.path.abspath(bundle.name))
@@ -304,7 +301,7 @@ def _process(bundle):
     strippedLogicalID = bundleLID.split(':')[-1]
 
     # Easy one: the checksum† manifest
-    # †It's actually an MD5 hash, not a checksum 😅
+    # †It's actually an MD5 *hash*, not a checksum 😅
     chksumFN = strippedLogicalID + '_checksum_manifest_v' + bundleVID + '.tab'
     chksumMD5, chksumSize, chksumNum = _writeChecksumManifest(chksumFN, d)
 
@@ -328,27 +325,25 @@ def _process(bundle):
         xferSize,
         xferNum
     )
-    _logger.info('🎉  Success! All done, files generated:')
+    _logger.info('🎉  Success! AIP done, files generated:')
     _logger.info('• Checksum manifest: %s', chksumFN)
     _logger.info('• Transfer manifest: %s', xferFN)
-    _logger.info('• XML label: %s', labelFN)
+    _logger.info('• XML label for them both: %s', labelFN)
+    return chksumFN
 
 
 def main():
-    '''Check the command-line for options and create a SIP from the given bundle XML'''
+    '''Check the command-line for options and create an AIP from the given bundle XML'''
     parser = argparse.ArgumentParser(description=_description)
+    parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
+    addLoggingArguments(parser)
     parser.add_argument(
         'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Root bundle XML file to read'
     )
-    parser.add_argument(
-        '-v', '--verbose', default=False, action='store_true',
-        help='Verbose logging; defaults %(default)s'
-    )
     args = parser.parse_args()
-    if args.verbose:
-        _logger.setLevel(logging.DEBUG)
+    logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
-    _process(args.bundle)
+    process(args.bundle)
     _logger.info('👋 Thanks for using this program! Bye!')
     sys.exit(0)
 
