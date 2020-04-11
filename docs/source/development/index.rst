@@ -9,8 +9,8 @@ build it out::
     python3 bootstrap.py
     bin/buildout
 
-At this point, you'll have the ``aipgen`` and ``sipgen`` programs ready to run
-as ``bin/aipgen`` and ``bin/sipgen`` that's set up to use source Python code
+At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen`` programs ready to run
+as ``bin/pds-deep-archive``, ``bin/aipgen``, and ``bin/sipgen`` that's set up to use source Python code
 under ``src``. Changes you make to the code are reflected in ``bin/sipgen``
 immediately.
 
