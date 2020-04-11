@@ -67,7 +67,7 @@ def _writeChecksumManifest(checksumManifestFN, dn):
     Return the hex MD5 digest, byte size of the file we created, and the number of records
     in the file.
     '''
-    _logger.info('🧾 Writing checksum manifest for %s to %s', dn, checksumManifestFN)
+    _logger.debug('🧾 Writing checksum manifest for %s to %s', dn, checksumManifestFN)
     md5, size, count = hashlib.new('md5'), 0, 0
     prefixLen = len(dn)
     with open(checksumManifestFN, 'wb') as o:
@@ -77,7 +77,7 @@ def _writeChecksumManifest(checksumManifestFN, dn):
                 with open(fileToHash, 'rb') as i:
                     digest = getMD5(i)
                     strippedFN = fileToHash[prefixLen + 1:]
-                    entry = f'{digest}\t{strippedFN}\n'.encode('utf-8')
+                    entry = f'{digest}\t{strippedFN}\r\n'.encode('utf-8')
                     o.write(entry)
                     md5.update(entry)
                     size += len(entry)
@@ -121,7 +121,7 @@ def _writeTransferManifest(transferManifestFN, dn):
     transfer manifest at the top level of the bundle file given and turn all ``/`` directory
     separators into backslashes. Return a triple of the MD5 digest, byte size, and number of
     entries in the transfer manifest we created.'''
-    _logger.info('🚢 Writing transfer manifest for %s to %s', dn, transferManifestFN)
+    _logger.debug('🚢 Writing transfer manifest for %s to %s', dn, transferManifestFN)
     md5, size, count = hashlib.new('md5'), 0, 0
     lidvidsToFiles = {}
     for dirpath, dirnames, filenames in os.walk(dn):
@@ -138,8 +138,9 @@ def _writeTransferManifest(transferManifestFN, dn):
     with open(transferManifestFN, 'wb') as o:
         for lidvid, filenames in lidvidsToFiles.items():
             for fn in filenames:
-                transformedFN = '\\' + fn[prefixLen + 1:].replace('/', '\\')
-                entry = f'{lidvid:255} {transformedFN:255}\n'.encode('utf-8')
+                # transformedFN = '\\' + fn[prefixLen + 1:].replace('/', '\\')
+                transformedFN = '/' + fn[prefixLen + 1:]
+                entry = f'{lidvid:255}{transformedFN:255}\r\n'.encode('utf-8')
                 o.write(entry)
                 md5.update(entry)
                 size += len(entry)
@@ -177,7 +178,7 @@ def _writeLabel(
     • ``xferNum`` — count of records in the transfer manifest file
     '''
 
-    _logger.info('🏷  Writing AIP label to %s', labelOutputFile)
+    _logger.debug('🏷  Writing AIP label to %s\n', labelOutputFile)
     ts = datetime.utcnow()
     ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
@@ -263,6 +264,7 @@ def _writeLabel(
     tm.append(rc)
     etree.SubElement(rc, prefix + 'fields').text = '2'
     etree.SubElement(rc, prefix + 'groups').text = '0'
+    etree.SubElement(rc, prefix + 'record_length', unit='byte').text = '512'
     fc = etree.Element(prefix + 'Field_Character')
     rc.append(fc)
     etree.SubElement(fc, prefix + 'name').text = 'LIDVID'
@@ -272,7 +274,7 @@ def _writeLabel(
     fc = etree.Element(prefix + 'Field_Character')
     rc.append(fc)
     etree.SubElement(fc, prefix + 'name').text = 'File Specification Name'
-    etree.SubElement(fc, prefix + 'field_location', unit='byte').text = '2'
+    etree.SubElement(fc, prefix + 'field_location', unit='byte').text = '256'
     etree.SubElement(fc, prefix + 'data_type').text = 'ASCII_File_Specification_Name'
     etree.SubElement(fc, prefix + 'field_length', unit='byte').text = '255'
 
@@ -293,12 +295,12 @@ def process(bundle):
     ``bundle``, which is an open file stream (with a ``name`` atribute) on the local
     filesystem. Return the name of the generated checksum manifest file.
     '''
-    _logger.info('🏃‍♀️ Starting AIP generation for %s', bundle.name)
+    _logger.info('🏃‍♀️ Starting AIP generation for %s\n', bundle.name)
     d = os.path.dirname(os.path.abspath(bundle.name))
 
     # Get the bundle's primary collections and other useful info
     primaries, bundleLID, title, bundleVID = getPrimariesAndOtherInfo(bundle)
-    strippedLogicalID = bundleLID.split(':')[-1]
+    strippedLogicalID = bundleLID.split(':')[-1] + '_v' + bundleVID
 
     # Easy one: the checksum† manifest
     # †It's actually an MD5 *hash*, not a checksum 😅
@@ -328,13 +330,14 @@ def process(bundle):
     _logger.info('🎉  Success! AIP done, files generated:')
     _logger.info('• Checksum manifest: %s', chksumFN)
     _logger.info('• Transfer manifest: %s', xferFN)
-    _logger.info('• XML label for them both: %s', labelFN)
+    _logger.info('• XML label for them both: %s\n', labelFN)
     return chksumFN
 
 
 def main():
     '''Check the command-line for options and create an AIP from the given bundle XML'''
-    parser = argparse.ArgumentParser(description=_description)
+    parser = argparse.ArgumentParser(description=_description,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
     addLoggingArguments(parser)
     parser.add_argument(
@@ -344,7 +347,7 @@ def main():
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
     process(args.bundle)
-    _logger.info('👋 Thanks for using this program! Bye!')
+    _logger.info('👋 Thanks for using this program! Bye!\n\n')
     sys.exit(0)
 
 

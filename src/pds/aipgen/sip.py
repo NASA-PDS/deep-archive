@@ -288,7 +288,6 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     to write an MD5 hash into this label. If it's not given, we default to writing an
     MD5 of zeros.
     '''
-
     # Get the current time, but drop the microsecond resolution
     ts = datetime.utcnow()
     ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
@@ -309,7 +308,7 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
 
     identificationArea = etree.Element(prefix + 'Identification_Area')
     root.append(identificationArea)
-    logicalIdentifier = _sipDeepURIPrefix + logicalID.split(':')[-1] + ':' + versionID
+    logicalIdentifier = _sipDeepURIPrefix + logicalID.split(':')[-1] + '_v' + versionID
     etree.SubElement(identificationArea, prefix + 'logical_identifier').text = logicalIdentifier
     etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
     etree.SubElement(identificationArea, prefix + 'title').text = 'Submission Information Package for the ' + title
@@ -330,7 +329,7 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     etree.SubElement(deep, prefix + 'manifest_checksum').text = digest
     etree.SubElement(deep, prefix + 'checksum_type').text = 'MD5'
     etree.SubElement(deep, prefix + 'manifest_url').text = 'file:' + os.path.abspath(manifestFile)
-    etree.SubElement(deep, prefix + 'aip_lidvid').text = AIP_PRODUCT_URI_PREFIX + logicalID.split(':')[-1]
+    etree.SubElement(deep, prefix + 'aip_lidvid').text = AIP_PRODUCT_URI_PREFIX + logicalID.split(':')[-1]+ '_v' + versionID + '::1.0'
 
     aipMD5 = getMD5(aipFile) if aipFile else '00000000000000000000000000000000'
     etree.SubElement(deep, prefix + 'aip_label_checksum').text = aipMD5
@@ -396,18 +395,20 @@ def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, 
     '''Produce a SIP from the given bundle'''
     # Make a temp file to use as a database; TODO: could pass ``delete=False`` in
     # the future for sharing this DB amongst many processes for some fancy multiprocessing
-    _logger.info('👟 Submission Information Package (SIP) Generator, version %s', _version)
     with tempfile.NamedTemporaryFile() as dbfile:
         con = sqlite3.connect(dbfile.name)
         _logger.debug('→ Database file (deleted) is %sf', dbfile.name)
+
+        _logger.info('🏃‍♀️ Starting SIP generation for %s\n', bundle.name)
 
         # Get the bundle path
         bundle = os.path.abspath(bundle.name)
 
         # Get the bundle's primary collections and other useful info
         primaries, bundleLID, title, bundleVID = getPrimariesAndOtherInfo(bundle)
-        strippedLogicalID = bundleLID.split(':')[-1]
-        filename = strippedLogicalID + '_sip_v' + bundleVID
+        # strippedLogicalID = bundleLID.split(':')[-1]
+        strippedLogicalID = bundleLID.split(':')[-1] + '_v' + bundleVID
+        filename = strippedLogicalID + '_sip_v1.0'
         manifestFileName, labelFileName = filename + '.tab', filename + PDS_LABEL_FILENAME_EXTENSION
         if offline:
             lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID, con)
@@ -422,46 +423,56 @@ def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, 
                 _writeLabel(bundleLID, bundleVID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label, aipFile)
         _logger.info('🎉 Success! From %s, generated these output files:', bundle)
         _logger.info('• SIP Manifest: %s', manifestFileName)
-        _logger.info('• XML label for the SIP: %s', labelFileName)
+        _logger.info('• XML label for the SIP: %s\n', labelFileName)
         return manifestFileName, labelFileName
 
 
 def addSIParguments(parser):
-    parser.add_argument(
-        '-a', '--algorithm', default='MD5', choices=sorted(HASH_ALGORITHMS.keys()),
-        help='File hash (checksum) algorithm; default %(default)s'
-    )
+    # TODO: Temporarily commenting out this argument until an input manifest is available
+    # parser.add_argument(
+    #     '-a', '--algorithm', default='MD5', choices=sorted(HASH_ALGORITHMS.keys()),
+    #     help='File hash (checksum) algorithm; default %(default)s'
+    # )
     parser.add_argument(
         '-s', '--site', required=True, choices=_providerSiteIDs,
-        help="Provider site ID for the manifest's label; default %(default)s"
+        help="Provider site ID for the manifest's label"
     )
     group = parser.add_mutually_exclusive_group(required=False)
+
+    # TODO: Temporarily setting offline to True by default until online mode is available
+    # group.add_argument(
+    #     '-u', '--url', default=_registryServiceURL,
+    #     help='URL to the registry service; default %(default)s'
+    # )
+
+    # TODO: Temporarily setting offline to True by default until online mode is available
     group.add_argument(
-        '-u', '--url', default=_registryServiceURL,
-        help='URL to the registry service; default %(default)s'
+        '-n', '--offline', default=True, action='store_true',
+        help='Run offline, scanning bundle directory for matching files instead of querying registry service.'+
+             ' NOTE: By default, set to True until online mode is available.'
     )
-    group.add_argument(
-        '-n', '--offline', default=False, action='store_true',
-        help='Run offline, scanning bundle directory for matching files instead of querying registry service'
-    )
+
+    # TODO: Temporarily commenting out until online mode is available
+    # parser.add_argument(
+    #     '-k', '--insecure', default=False, action='store_true',
+    #     help='Ignore SSL/TLS security issues; default %(default)s'
+    # )
+
+    # TODO: Temporarily setting to be required by default until online mode is available
     parser.add_argument(
-        '-k', '--insecure', default=False, action='store_true',
-        help='Ignore SSL/TLS security issues; default %(default)s'
-    )
-    parser.add_argument(
-        '-b', '--bundle-base-url', required=False, default='file:/',
-        help='Base URL prepended to URLs in the generated manifest for local files in "offline" mode'
-    )
-    # TODO: ``pds4_information_model_version`` is parsed into the arg namespace but is otherwise ignored
-    parser.add_argument(
-        '-i', '--pds4-information-model-version', default=INFORMATION_MODEL_VERSION,
-        help='Specify PDS4 Information Model version to generate SIP. Must be 1.13.0.0+; default %(default)s'
+        '-b', '--bundle-base-url', required=True,
+        help='Base URL for Node data archive. This URL will be prepended to' +
+             ' the bundle directory to form URLs to the products. For example,'
+             ' if we are generating a SIP for mission_bundle/LADEE_Bundle_1101.xml,'
+             ' and bundle-base-url is https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/,'
+             ' the URL in the SIP will be https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml.'
     )
 
 
 def main():
     '''Check the command-line for options and create a SIP from the given bundle XML'''
-    parser = argparse.ArgumentParser(description=_description)
+    parser = argparse.ArgumentParser(description=_description,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
     addSIParguments(parser)
     addLoggingArguments(parser)
@@ -479,15 +490,19 @@ def main():
         parser.error('--bundle-base-url is required when in offline mode (--offline).')
     manifest, label = _produce(
         args.bundle,
-        HASH_ALGORITHMS[args.algorithm],
-        args.url,
-        args.insecure,
+        # TODO: Temporarily hardcoding these values until other modes are available
+        # HASH_ALGORITHMS[args.algorithm],
+        # args.url,
+        # args.insecure,
+        HASH_ALGORITHMS['MD5'],
+        '',
+        '',
         args.site,
         args.offline,
         args.bundle_base_url,
         args.aip
     )
-    _logger.info('INFO 👋 All done. Thanks for making a SIP. Bye!')
+    _logger.info('INFO 👋 All done. Thanks for making a SIP. Bye!\n\n')
     sys.exit(0)
 
 

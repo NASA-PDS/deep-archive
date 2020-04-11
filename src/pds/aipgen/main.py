@@ -47,15 +47,23 @@ _version = '0.0.0'
 _description = '''
 Generate an Archive Information Package (AIP) and a Submission Information
 Package (SIP). This creates three files for the AIP in the current directory
-(overwriting them if they already exist): ➀ a "checksum manifest" which
-contains MD5 hashes of *all* files in a product; ➁ a "transfer manifest" which
-lists the "lidvids" for files within each XML label mentioned in a product;
-and ➂ an XML label for these two files. It also creates two files for the SIP
-(also overwriting them if they exist): ➀ A "SIP manifest" file; and an XML
-label of that file too. The names of the generated files are based on the
-logical identifier found in the bundle file, and any existing files are
-overwritten. The names of the generated files are printed upon successful
-completion.
+(overwriting them if they already exist):
+➀ a "checksum manifest" which contains MD5 hashes of *all* files in a product
+➁ a "transfer manifest" which lists the "lidvids" for files within each XML
+  label mentioned in a product
+➂ an XML label for these two files.
+
+It also creates two files for the SIP (also overwriting them if they exist):
+① A "SIP manifest" file; and an XML label of that file too. The names of
+  the generated files are based on the logical identifier found in the 
+  bundle file, and any existing files are overwritten. The names of the 
+  generated files are printed upon successful completion.
+② A PDS XML label of that file.
+
+The files are created in the current working directory when this program is
+run. The names of the files are based on the logical identifier found in the
+bundle file, and any existing files are overwritten. The names of the
+generated files are printed upon successful completion.
 '''
 
 # Logging:
@@ -67,7 +75,8 @@ _logger = logging.getLogger(__name__)
 
 def main():
     '''Make an AIP and a SIP'''
-    parser = argparse.ArgumentParser(description=_description)
+    parser = argparse.ArgumentParser(description=_description,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
     addSIParguments(parser)
     addLoggingArguments(parser)
@@ -76,20 +85,25 @@ def main():
     )
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
+    _logger.info('👟 PDS Deep Archive, version %s', _version)
     _logger.debug('⚙️ command line args = %r', args)
     chksumFN = aipProcess(args.bundle)
     with open(chksumFN, 'rb') as chksumStream:
         sipProcess(
             args.bundle,
-            HASH_ALGORITHMS[args.algorithm],
-            args.url,
-            args.insecure,
+            # TODO: Temporarily hardcoding these values until other modes are available
+            # HASH_ALGORITHMS[args.algorithm],
+            # args.url,
+            # args.insecure,
+            HASH_ALGORITHMS['MD5'],
+            '',
+            '',
             args.site,
             args.offline,
             args.bundle_base_url,
             chksumStream
         )
-    _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!")
+    _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!\n\n")
     sys.exit(0)
 
 
