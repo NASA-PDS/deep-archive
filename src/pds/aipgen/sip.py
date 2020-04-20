@@ -63,8 +63,8 @@ generated files are printed upon successful completion.
 
 # Other constants and defaults:
 _registryServiceURL = 'https://pds.nasa.gov/services/registry/pds'  # Default registry service
-_bufsiz             = 512                                                       # Buffer size for reading from URL con
-_pLineMatcher       = re.compile(r'^P,\s*(.+)')                                 # Match P-lines in a tab file
+_bufsiz             = 512                                           # Buffer size for reading from URL con
+_pLineMatcher       = re.compile(r'^P,\s*([^\s]+)')                 # Match P-lines in a tab file
 
 # TODO: Auto-generate from PDS4 IM
 _providerSiteIDs = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]
@@ -89,6 +89,7 @@ _intRefBoilerplate = 'Links this SIP to the specific version of the bundle produ
 
 # Logging
 # -------
+
 _logger = logging.getLogger(__name__)
 
 
@@ -165,8 +166,25 @@ def _getAssociatedProducts(root, filepath):
     if not matches: return products
     for m in matches:
         products.add('file:' + os.path.join(filepath, m.text))
-
     return products
+
+
+def _createLidVidtoXMLFileTable(xmlFiles, con):
+    '''Fill out a table for later (future multiprocessing-enabled) use to rapidly look up lidvids
+    in XML files. We get all of this XPath out of the way!
+    '''
+    for xmlFile in xmlFiles:
+        tree = etree.parse(xmlFile)
+        root = tree.getroot()
+        matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
+        if not matches: continue
+        lid = matches[0].text.strip()
+
+        matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}version_id')
+        if not matches: continue
+        vid = matches[0].text.strip()
+        lidvid = lid + '::' + vid
+        con.execute('''INSERT OR IGNORE INTO lidvids (lidvid, xmlFile) VALUES (?,?)''', (lidvid, xmlFile))
 
 
 def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
@@ -182,8 +200,6 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
     have that "lidvid" and return then a mapping of lidvids to set of matching files, as ``file:``
     URLs.
     '''
-    # First get a set of all XML files under the same directory as ``bundle``
-
     # I'll take a six-pack of tabs
     lidvids = set()
 
@@ -198,6 +214,7 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
             xmlFile text NOT NULL
         )''')
         cursor.execute('''CREATE INDEX IF NOT EXISTS lidvidIndex ON lidvids (lidvid)''')
+        cursor.execute('''CREATE UNIQUE INDEX lidvidPairing ON lidvids (lidvid, xmlFile)''')
 
     # Add bundle to manifest
     lidvidsToFiles[bundleLidvid] = {'file:' + bundle}
@@ -209,6 +226,8 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
     # Locate all the XML files
     for dirpath, dirnames, filenames in os.walk(root):
         xmlFiles |= set([os.path.join(dirpath, i) for i in filenames if i.lower().endswith(PDS_LABEL_FILENAME_EXTENSION.lower())])
+    with con:
+        _createLidVidtoXMLFileTable(xmlFiles, con)
 
     # Get the lidvids and inventory of files mentioned in each xml file
     with con:
@@ -222,8 +241,6 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
                 for tab in tabs:
                     lidvids |= _getPLines(tab)
                     lidvidsToFiles[lidvid].add('file:' + tab)
-                    for lidvid in lidvids:
-                        con.execute('INSERT INTO lidvids (lidvid, xmlFile) VALUES (?,?)', (lidvid, xmlFile))
 
     # Now go through each lidvid mentioned by the PLines in each inventory tab and find their xml files
     for lidvid in lidvids:
@@ -265,7 +282,7 @@ def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, basePathToRep
     If ``offline`` mode, we transform all URLs written to the table by stripping off
     everything except the last component (the file) and prepending the given ``baseURL``.
     '''
-    hashish, size = hashlib.new('md5'), 0
+    hashish, size, hashName = hashlib.new('md5'), 0, hashName.upper()
     for url, digest, lidvid in sorted(hashedFiles):
         if offline:
             if baseURL.endswith('/'):
@@ -397,9 +414,8 @@ def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, 
     # the future for sharing this DB amongst many processes for some fancy multiprocessing
     with tempfile.NamedTemporaryFile() as dbfile:
         con = sqlite3.connect(dbfile.name)
-        _logger.debug('→ Database file (deleted) is %sf', dbfile.name)
 
-        _logger.info('🏃‍♀️ Starting SIP generation for %s\n', bundle.name)
+        _logger.info('🏃‍♀️ Starting SIP generation for %s', bundle.name)
 
         # Get the bundle path
         bundle = os.path.abspath(bundle.name)
@@ -423,7 +439,7 @@ def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, 
                 _writeLabel(bundleLID, bundleVID, title, md5, size, len(hashedFiles), hashName, manifestFileName, site, label, aipFile)
         _logger.info('🎉 Success! From %s, generated these output files:', bundle)
         _logger.info('• SIP Manifest: %s', manifestFileName)
-        _logger.info('• XML label for the SIP: %s\n', labelFileName)
+        _logger.info('• XML label for the SIP: %s', labelFileName)
         return manifestFileName, labelFileName
 
 
@@ -448,7 +464,7 @@ def addSIParguments(parser):
     # TODO: Temporarily setting offline to True by default until online mode is available
     group.add_argument(
         '-n', '--offline', default=True, action='store_true',
-        help='Run offline, scanning bundle directory for matching files instead of querying registry service.'+
+        help='Run offline, scanning bundle directory for matching files instead of querying registry service.'
              ' NOTE: By default, set to True until online mode is available.'
     )
 
@@ -461,7 +477,7 @@ def addSIParguments(parser):
     # TODO: Temporarily setting to be required by default until online mode is available
     parser.add_argument(
         '-b', '--bundle-base-url', required=True,
-        help='Base URL for Node data archive. This URL will be prepended to' +
+        help='Base URL for Node data archive. This URL will be prepended to'
              ' the bundle directory to form URLs to the products. For example,'
              ' if we are generating a SIP for mission_bundle/LADEE_Bundle_1101.xml,'
              ' and bundle-base-url is https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/,'
@@ -471,8 +487,10 @@ def addSIParguments(parser):
 
 def main():
     '''Check the command-line for options and create a SIP from the given bundle XML'''
-    parser = argparse.ArgumentParser(description=_description,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=_description,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
     addSIParguments(parser)
     addLoggingArguments(parser)
@@ -488,21 +506,21 @@ def main():
     _logger.debug('⚙️ command line args = %r', args)
     if args.offline and not args.bundle_base_url:
         parser.error('--bundle-base-url is required when in offline mode (--offline).')
-    manifest, label = _produce(
-        args.bundle,
+    manifest, label = produce(
+        bundle=args.bundle,
         # TODO: Temporarily hardcoding these values until other modes are available
-        # HASH_ALGORITHMS[args.algorithm],
-        # args.url,
-        # args.insecure,
-        HASH_ALGORITHMS['MD5'],
-        '',
-        '',
-        args.site,
-        args.offline,
-        args.bundle_base_url,
-        args.aip
+        # hashName=HASH_ALGORITHMS[args.algorithm],
+        # registryServiceURL=args.url,
+        # insecureConnectionFlag=args.insecure,
+        hashName=HASH_ALGORITHMS['MD5'],
+        registryServiceURL=None,
+        insecureConnectionFlag=False,
+        site=args.site,
+        offline=args.offline,
+        baseURL=args.bundle_base_url,
+        aipFile=args.aip
     )
-    _logger.info('INFO 👋 All done. Thanks for making a SIP. Bye!\n\n')
+    _logger.info('👋 All done. Thanks for making a SIP. Bye!')
     sys.exit(0)
 
 
