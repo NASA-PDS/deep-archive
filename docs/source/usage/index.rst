@@ -5,14 +5,16 @@ This package provides one primary executable, ``pds-deep-archive`` that generate
 and Archive Information Package (AIP) and a Submission Information Package (SIP). The 
 SIP is what is delivered by the PDS to the NASA Space Science Data Coordinated Archive (NSSDCA).
 For more information about the products produced, see the following references:
-* OAIS Information - http://www.oais.info/
-* AIP Information - https://www.iasa-web.org/tc04/archival-information-package-aip
-* SIP Information - https://www.iasa-web.org/tc04/submission-information-package-sip
+
+•   OAIS Information - http://www.oais.info/
+•   AIP Information - https://www.iasa-web.org/tc04/archival-information-package-aip
+•   SIP Information - https://www.iasa-web.org/tc04/submission-information-package-sip
 
 This package also comes with the two sub-components of ``pds-deep-archive`` that can be ran
 individually:
-* ``aipgen`` that generates Archive Information Packages from a PDS4 bundle
-* ``sipgen`` that generates Submission Information from a PDS4 bundle
+
+•  ``aipgen`` that generates Archive Information Packages from a PDS4 bundle
+•  ``sipgen`` that generates Submission Information from a PDS4 bundle
 
 Running ``pds-deep-archive --help`` will give a summary of the
 command-line invocation, its required arguments, and any options that refine
