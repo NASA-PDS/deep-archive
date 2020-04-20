@@ -9,6 +9,7 @@
 .*.cfg
 .*.swp
 .DS_Store
+.eggs
 __pycache__
 typescript
 /*.tab

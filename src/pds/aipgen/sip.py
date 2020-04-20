@@ -41,14 +41,17 @@ from .utils import (
 from datetime import datetime
 from lxml import etree
 from urllib.parse import urlparse
+from . import VERSION
 import argparse, logging, hashlib, pysolr, urllib.request, os.path, re, sys, sqlite3, tempfile
 
 
 # Defaults & Constants
 # --------------------
 
+# Module metadata:
+__version__ = VERSION
+
 # Program related info:
-_version = '0.0.0'
 _description = '''Generate Submission Information Packages (SIPs) from bundles.
 This program takes a bundle XML file as input and produces two output files:
 
@@ -473,7 +476,7 @@ def main():
     '''Check the command-line for options and create a SIP from the given bundle XML'''
     parser = argparse.ArgumentParser(description=_description,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     addSIParguments(parser)
     addLoggingArguments(parser)
     parser.add_argument(
@@ -488,7 +491,7 @@ def main():
     _logger.debug('⚙️ command line args = %r', args)
     if args.offline and not args.bundle_base_url:
         parser.error('--bundle-base-url is required when in offline mode (--offline).')
-    manifest, label = _produce(
+    manifest, label = produce(
         args.bundle,
         # TODO: Temporarily hardcoding these values until other modes are available
         # HASH_ALGORITHMS[args.algorithm],

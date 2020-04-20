@@ -34,14 +34,18 @@ from .constants import PDS_NS_URI, XML_SCHEMA_INSTANCE_NS_URI, PDS_SCHEMA_URL, X
 from .utils import getPrimariesAndOtherInfo, getMD5, parseXML, addLoggingArguments
 from datetime import datetime
 from lxml import etree
+from . import VERSION
 import argparse, logging, sys, os, os.path, hashlib
 
 
 # Constants
 # ---------
 
+# Module metadata
+
+__version__ = VERSION
+
 # For ``--help``:
-_version = '0.0.0'
 _description = '''Generate an Archive Information Package or AIP. An AIP consists of three files:
  ➀ a "checksum manifest" which contains MD5 hashes of *all* files in a product;
  ➁ a "transfer manifest" which lists the "lidvids" for files within each XML label mentioned in a product; and
@@ -338,7 +342,7 @@ def main():
     '''Check the command-line for options and create an AIP from the given bundle XML'''
     parser = argparse.ArgumentParser(description=_description,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     addLoggingArguments(parser)
     parser.add_argument(
         'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Root bundle XML file to read'
