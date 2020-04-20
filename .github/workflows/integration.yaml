@@ -106,14 +106,14 @@ jobs:
                 run: |
                     sudo apt-get install -y libxml2-dev libxslt1-dev
             -
-                name: 💽 Building distribution
+                name: 💽 Building & testing distribution
                 run: |
                     rm -rf dist proddist testdist
                     python3 bootstrap.py
                     bin/buildout
-                    bin/buildout setup . egg_info --tag-build .dev --tag-date sdist --dist-dir testdist
+                    bin/test
+                    bin/buildout setup . egg_info --tag-build .$(date --utc '+%Y%m%d%H%M%S')  sdist --dist-dir testdist
                     bin/buildout setup . sdist --dist-dir proddist
-            # TODO: Put in unit+functional+integration testing here
             -
                 name: 📇 Publishing to Test PyPI
                 uses: pypa/gh-action-pypi-publish@master

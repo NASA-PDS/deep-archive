@@ -68,6 +68,7 @@ setup(
             'pds-deep-archive=pds.aipgen.main:main'
         ]
     },
+    test_suite='pds.aipgen.tests.test_suite',
     namespace_packages=['pds'],
     packages=find_packages('src', exclude=['docs', 'tests', 'bootstrap', 'ez_setup']),
     package_dir={'': 'src'},

@@ -135,11 +135,12 @@ def getLogicalIdentifierAndFileInventory(xmlFile):
 
 def addLoggingArguments(parser):
     '''Add command-line arguments to the given argument ``parser`` to support logging.'''
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         '-d', '--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO,
         help='Log debugging messages for developers'
     )
-    parser.add_argument(
+    group.add_argument(
         '-q', '--quiet', action='store_const', dest='loglevel', const=logging.WARNING,
         help="Don't log informational messages"
     )

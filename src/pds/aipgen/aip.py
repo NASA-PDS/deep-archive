@@ -178,7 +178,7 @@ def _writeLabel(
     • ``xferNum`` — count of records in the transfer manifest file
     '''
 
-    _logger.debug('🏷  Writing AIP label to %s\n', labelOutputFile)
+    _logger.debug('🏷  Writing AIP label to %s', labelOutputFile)
     ts = datetime.utcnow()
     ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
@@ -295,7 +295,7 @@ def process(bundle):
     ``bundle``, which is an open file stream (with a ``name`` atribute) on the local
     filesystem. Return the name of the generated checksum manifest file.
     '''
-    _logger.info('🏃‍♀️ Starting AIP generation for %s\n', bundle.name)
+    _logger.info('🏃‍♀️ Starting AIP generation for %s', bundle.name)
     d = os.path.dirname(os.path.abspath(bundle.name))
 
     # Get the bundle's primary collections and other useful info
@@ -330,7 +330,7 @@ def process(bundle):
     _logger.info('🎉  Success! AIP done, files generated:')
     _logger.info('• Checksum manifest: %s', chksumFN)
     _logger.info('• Transfer manifest: %s', xferFN)
-    _logger.info('• XML label for them both: %s\n', labelFN)
+    _logger.info('• XML label for them both: %s', labelFN)
     return chksumFN
 
 
@@ -347,7 +347,7 @@ def main():
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
     process(args.bundle)
-    _logger.info('👋 Thanks for using this program! Bye!\n\n')
+    _logger.info('👋 Thanks for using this program! Bye!')
     sys.exit(0)
 
 

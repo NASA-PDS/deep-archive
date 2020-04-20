@@ -3,5 +3,5 @@
 
 graft src/pds
 graft docs
-include *.rst
+include *.rst *.tab *.TAB *.xml *.xsd *.pdf
 global-exclude *.pyc *.pyo

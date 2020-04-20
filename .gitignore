@@ -10,6 +10,7 @@
 .*.swp
 .DS_Store
 __pycache__
+.eggs
 typescript
 /*.tab
 /*.xml
