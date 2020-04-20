@@ -13,7 +13,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
     <Modification_History>
       <Modification_Detail>
         <!--Creation date in format YYYY-MM-DD-->
-        <modification_date>2020-04-11</modification_date>
+        <modification_date>2020-04-20</modification_date>
         <version_id>1.0</version_id>
         <description>Archive Information Package was versioned and created</description>
       </Modification_Detail>
@@ -34,7 +34,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
       <File>
         <file_name>ladee_mission_bundle_v1.0_checksum_manifest_v1.0.tab</file_name>
         <!--Creation date time in formation YYYY-MM-DDTHH:mm:ss-->
-        <creation_date_time>2020-04-11T22:46:19</creation_date_time>
+        <creation_date_time>2020-04-20T21:24:17</creation_date_time>
         <file_size unit="byte">938</file_size>
         <records>13</records>
       </File>
@@ -49,7 +49,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
     <File_Area_Transfer_Manifest>
       <File>
         <file_name>ladee_mission_bundle_v1.0_transfer_manifest_v1.0.tab</file_name>
-        <creation_date_time>2020-04-11T22:46:19</creation_date_time>
+        <creation_date_time>2020-04-20T21:24:17</creation_date_time>
         <file_size unit="byte">6656</file_size>
         <records>13</records>
       </File>

@@ -41,8 +41,7 @@ won't interfere with—or be interfered by—other packages.  To do so::
 It's also possible to use ``easy_install`` if you prefer, or to install it
 via a Buildout_, or (if you must) into the system Python.
 
-You can then run ``aipgen --help`` or ``sipgen --help`` to get a usage message
-and ensure it's properly installed.
+You can then run ``pds-deep-archive --help`` to get a usage message and ensure it's properly installed.
 
 
 ..  note::

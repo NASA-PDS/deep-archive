@@ -10,7 +10,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
     <product_class>Product_SIP_Deep_Archive</product_class>
     <Modification_History>
       <Modification_Detail>
-        <modification_date>2020-04-11</modification_date>
+        <modification_date>2020-04-20</modification_date>
         <version_id>1.0</version_id>
         <description>SIP was verisoned and created</description>
       </Modification_Detail>
@@ -18,7 +18,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
   </Identification_Area>
   <Information_Package_Component_Deep_Archive>
     <!--MD5 digest checksum for the manifest file-->
-    <manifest_checksum>78981a52129ac25b3fb63d57ec8e6c6f</manifest_checksum>
+    <manifest_checksum>9b7cf41cadd6d3b5b1212fe33f66268e</manifest_checksum>
     <checksum_type>MD5</checksum_type>
     <manifest_url>file:/Users/jpadams/Documents/proj/pds/pdsen/workspace/pds-deep-archive/ladee_mission_bundle_v1.0_sip_v1.0.tab</manifest_url>
     <aip_lidvid>urn:nasa:pds:system_bundle:product_aip:ladee_mission_bundle_v1.0::1.0</aip_lidvid>
@@ -27,20 +27,20 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
       <File>
         <file_name>ladee_mission_bundle_v1.0_sip_v1.0.tab</file_name>
         <!--Creation date time in formation YYYY-MM-DDTHH:mm:ss-->
-        <creation_date_time>2020-04-11T22:46:19</creation_date_time>
-        <file_size unit="byte">4505</file_size>
-        <records>23</records>
+        <creation_date_time>2020-04-20T21:24:17</creation_date_time>
+        <file_size unit="byte">2431</file_size>
+        <records>13</records>
       </File>
       <Manifest_SIP_Deep_Archive>
         <name>Delivery Manifest Table</name>
         <local_identifier>Table</local_identifier>
         <offset unit="byte">0</offset>
         <!--Size the of the SIP manifest in bytes-->
-        <object_length unit="byte">4505</object_length>
+        <object_length unit="byte">2431</object_length>
         <parsing_standard_id>PDS DSV 1</parsing_standard_id>
         <description>Tab-separated manifest table for delivering one bundle to the Deep Archive</description>
         <!--Number of rows in the manifest-->
-        <records>23</records>
+        <records>13</records>
         <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
         <field_delimiter>Horizontal Tab</field_delimiter>
         <Record_Delimited>

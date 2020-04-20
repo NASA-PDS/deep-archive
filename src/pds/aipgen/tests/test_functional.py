@@ -44,7 +44,7 @@ class SIPFunctionalTestCase(unittest.TestCase):
     def setUp(self):
         super(SIPFunctionalTestCase, self).setUp()
         self.input = pkg_resources.resource_stream(__name__, 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml')
-        self.valid = pkg_resources.resource_filename(__name__, 'data/ladee_test/valid/ladee_mission_bundle_sip_v1.0.tab')
+        self.valid = pkg_resources.resource_filename(__name__, 'data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab')
         self.cwd, self.testdir = os.getcwd(), tempfile.mkdtemp()
         os.chdir(self.testdir)
     def test_sip_of_a_ladee(self):
