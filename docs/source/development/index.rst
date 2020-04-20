@@ -9,10 +9,10 @@ build it out::
     python3 bootstrap.py
     bin/buildout
 
-At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen`` programs ready to run
-as ``bin/pds-deep-archive``, ``bin/aipgen``, and ``bin/sipgen`` that's set up to use source Python code
-under ``src``. Changes you make to the code are reflected in ``bin/sipgen``
-immediately.
+At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen``
+programs ready to run as ``bin/pds-deep-archive``, ``bin/aipgen``, and
+``bin/sipgen`` that's set up to use source Python code under ``src``.
+Changes you make to the code are reflected in ``bin/sipgen`` immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run
