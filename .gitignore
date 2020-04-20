@@ -11,6 +11,7 @@
 .DS_Store
 .eggs
 __pycache__
+.eggs
 typescript
 /*.tab
 /*.xml

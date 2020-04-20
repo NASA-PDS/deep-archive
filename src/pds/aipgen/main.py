@@ -106,7 +106,7 @@ def main():
             args.bundle_base_url,
             chksumStream
         )
-    _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!\n\n")
+    _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!")
     sys.exit(0)
 
 

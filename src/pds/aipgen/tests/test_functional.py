@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright © 2019–2020 California Institute of Technology ("Caltech").
+# Copyright © 2020 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,16 +29,43 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-'''PDS AIP-GEN Tests'''
+'''PDS AIP-GEN functional tests'''
 
 
-import unittest
-import pds.aipgen.tests.test_utils
-import pds.aipgen.tests.test_functional
+import unittest, tempfile, shutil, os, pkg_resources, filecmp
+from pds.aipgen.sip import produce
+
+
+class SIPFunctionalTestCase(unittest.TestCase):
+    '''Functional test case for SIP generation.
+
+    TODO: factor this out so we can generically do AIP and other file-based functional tests too.
+    '''
+    def setUp(self):
+        super(SIPFunctionalTestCase, self).setUp()
+        self.input = pkg_resources.resource_stream(__name__, 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml')
+        self.valid = pkg_resources.resource_filename(__name__, 'data/ladee_test/valid/ladee_mission_bundle_sip_v1.0.tab')
+        self.cwd, self.testdir = os.getcwd(), tempfile.mkdtemp()
+        os.chdir(self.testdir)
+    def test_sip_of_a_ladee(self):
+        '''Test if the SIP manifest of LADEE bundle works as expected'''
+        manifest, label = produce(
+            bundle=self.input,
+            hashName='md5',
+            registryServiceURL=None,
+            insecureConnectionFlag=True,
+            site='PDS_ATM',
+            offline=True,
+            baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
+            aipFile=None
+        )
+        self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
+    def tearDown(self):
+        self.input.close()
+        os.chdir(self.cwd)
+        shutil.rmtree(self.testdir, ignore_errors=True)
+        super(SIPFunctionalTestCase, self).tearDown()
 
 
 def test_suite():
-    return unittest.TestSuite([
-        pds.aipgen.tests.test_utils.test_suite(),
-        pds.aipgen.tests.test_functional.test_suite()
-    ])
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)
