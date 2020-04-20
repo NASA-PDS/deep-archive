@@ -36,14 +36,17 @@ from .constants import HASH_ALGORITHMS
 from .sip import addSIParguments
 from .sip import produce as sipProcess
 from .utils import addLoggingArguments
+from . import VERSION
 import argparse, sys, logging
 
 
 # Constants
 # ---------
 
+# Module metadata:
+__version__ = VERSION
+
 # For ``--help``:
-_version = '0.0.0'
 _description = '''
 Generate an Archive Information Package (AIP) and a Submission Information
 Package (SIP). This creates three files for the AIP in the current directory
@@ -77,7 +80,7 @@ def main():
     '''Make an AIP and a SIP'''
     parser = argparse.ArgumentParser(description=_description,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     addSIParguments(parser)
     addLoggingArguments(parser)
     parser.add_argument(
@@ -85,7 +88,7 @@ def main():
     )
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
-    _logger.info('👟 PDS Deep Archive, version %s', _version)
+    _logger.info('👟 PDS Deep Archive, version %s', __version__)
     _logger.debug('⚙️ command line args = %r', args)
     chksumFN = aipProcess(args.bundle)
     with open(chksumFN, 'rb') as chksumStream:

@@ -43,6 +43,8 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as readme_file:
     readme = readme_file.read()
 with open(path.join(here, 'CHANGES.rst'), encoding='utf-8') as changes_file:
     changes = changes_file.read()
+with open(path.join(here, 'src', 'pds', 'aipgen', 'version.txt'), encoding='utf-8') as version_file:
+    version = version_file.read().strip()
 
 
 _requirements = [
@@ -54,7 +56,7 @@ _requirements = [
 
 setup(
     name='pds.deeparchive',
-    version='0.0.1',
+    version=version,
     description='SIP Generator',
     long_description=readme + '\n\n' + changes,
     keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',

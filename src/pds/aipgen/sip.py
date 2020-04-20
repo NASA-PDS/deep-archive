@@ -41,14 +41,17 @@ from .utils import (
 from datetime import datetime
 from lxml import etree
 from urllib.parse import urlparse
+from . import VERSION
 import argparse, logging, hashlib, pysolr, urllib.request, os.path, re, sys, sqlite3, tempfile
 
 
 # Defaults & Constants
 # --------------------
 
+# Module metadata:
+__version__ = VERSION
+
 # Program related info:
-_version = '0.0.0'
 _description = '''Generate Submission Information Packages (SIPs) from bundles.
 This program takes a bundle XML file as input and produces two output files:
 
@@ -491,7 +494,7 @@ def main():
         description=_description,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('--version', action='version', version=f'%(prog)s {_version}')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     addSIParguments(parser)
     addLoggingArguments(parser)
     parser.add_argument(
