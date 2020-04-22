@@ -34,7 +34,8 @@
 
 import unittest, tempfile, os, pkg_resources, argparse, logging
 from pds.aipgen.utils import (
-    getDigest, getMD5, getPrimariesAndOtherInfo, getLogicalIdentifierAndFileInventory, addLoggingArguments
+    getDigest, getMD5, getPrimariesAndOtherInfo, getLogicalIdentifierAndFileInventory, addLoggingArguments,
+    LogicalReference
 )
 
 
@@ -71,7 +72,7 @@ class BundleParsingTestCase(unittest.TestCase):
     def test_primaries_etc(self):
         primaries, logicalID, title, versionID = getPrimariesAndOtherInfo(self.emptyBun)
         primaries = sorted(list(primaries))
-        primaries = [i.split(':')[-1] for i in primaries]
+        primaries = [i.lid.split(':')[-1] for i in primaries]
         self.assertEqual(3, len(primaries))
         self.assertEqual(['context_collection', 'document_collection', 'xml_schema_collection'], primaries)
         self.assertEqual('urn:nasa:pds:ladee_mission_bundle', logicalID)
@@ -105,6 +106,67 @@ class ArgumentTestCase(unittest.TestCase):
         self.assertEqual(logging.DEBUG, parser.parse_args(['--debug']).loglevel)
         self.assertEqual(logging.WARNING, parser.parse_args(['--quiet']).loglevel)
         self.assertRaises(ValueError, parser.parse_args, ['--debug', '--quiet'])
+
+
+class LogicalReferenceTestCase(unittest.TestCase):
+    '''Test case the LogicalReference class'''
+    def test_init(self):
+        '''Ensure init args work'''
+        self.assertRaises(TypeError, LogicalReference, None)
+        r = LogicalReference('a')
+        self.assertEqual('a', r.lid)
+        self.assertTrue(r.vid is None)
+        r = LogicalReference('a', 'b')
+        self.assertEqual('a', r.lid)
+        self.assertEqual('b', r.vid)
+    def test_repr(self):
+        '''Make sure the representation function works'''
+        self.assertEqual('<LogicalReference(lid=a,vid=None)>', repr(LogicalReference('a')))
+        self.assertEqual('<LogicalReference(lid=a,vid=b)>', repr(LogicalReference('a', 'b')))
+    def test_str(self):
+        '''Check if LogicalReferences can be stringified'''
+        self.assertEqual('a', str(LogicalReference('a')))
+        self.assertEqual('a::b', str(LogicalReference('a', 'b')))
+    def test_hash(self):
+        '''Test if hasing of LogicalReferences is sane'''
+        same1, same2, diff = LogicalReference('a', 'b'), LogicalReference('a', 'b'), LogicalReference('c')
+        self.assertEqual(hash(same1), hash(same2))
+        self.assertNotEqual(hash(same1), hash(diff))
+    def test_eq(self):
+        '''Guarantee that equality works'''
+        a1, a2 = LogicalReference('a'), LogicalReference('a')
+        b1, b2 = LogicalReference('b', '1'), LogicalReference('b', '1')
+        c1, c2 = LogicalReference('c', '1'), LogicalReference('c', '2')
+        self.assertEqual(a1, a2)
+        self.assertEqual(b1, b2)
+        self.assertNotEqual(c1, c2)
+        self.assertNotEqual(a1, b1)
+        self.assertNotEqual(a1, c1)
+        self.assertNotEqual(a2, c2)
+    def test_cmp(self):
+        '''Clinch that comparisons work'''
+        a, b = LogicalReference('a'), LogicalReference('b')
+        a1, b1 = LogicalReference('a', '1'), LogicalReference('b', '1')
+        a2, b2 = LogicalReference('a', '2'), LogicalReference('b', '2')
+        self.assertTrue(a < b)
+        self.assertTrue(a < a1 < a2 < b < b1 < b2)
+        # And make sure version numbers sort like version numbers and not strings or floats
+        v1, v2 = LogicalReference('v', '2.9'), LogicalReference('v', '2.10')
+        self.assertTrue(v1 < v2)
+    def test_match(self):
+        '''Corroborate that matching other lids or lidvids work'''
+        a, a1 = LogicalReference('a'), LogicalReference('a', '1')
+        self.assertFalse(a.match('x'))
+        self.assertFalse(a1.match('x'))
+        self.assertFalse(a.match('x::1'))
+        self.assertFalse(a1.match('x::1'))
+        self.assertTrue(a.match('a'))
+        self.assertTrue(a.match('a::1'))
+        self.assertTrue(a1.match('a'))
+        self.assertTrue(a1.match('a::1'))
+        self.assertTrue(a.match('a::2'))
+        self.assertFalse(a1.match('a::2'))
+        self.assertRaises(ValueError, a.match, 'a::b::c')
 
 
 def test_suite():

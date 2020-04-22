@@ -161,7 +161,7 @@ def _findLidVidsInXMLFiles(lidvid, con):
 
 
 def _getAssociatedProducts(root, filepath):
-    '''Parse the XML at ``root`` for all the files associated with it that make up the product,
+    '''Search the XML at ``root`` for all the files associated with it that make up the product,
     preprending ``filepath`` to each match.'''
     products = set()
     matches = root.findall(f'//{{{PDS_NS_URI}}}File/{{{PDS_NS_URI}}}file_name')
@@ -174,7 +174,7 @@ def _getAssociatedProducts(root, filepath):
 
 def _createLidVidtoXMLFileTable(xmlFiles, con):
     '''Fill out a table for later (future multiprocessing-enabled) use to rapidly look up lidvids
-    in XML files. We get all of this XPath out of the way!
+    in XML files. We get a bunch of this XPath out of the way!
     '''
     for xmlFile in xmlFiles:
         tree = etree.parse(xmlFile)
@@ -190,7 +190,7 @@ def _createLidVidtoXMLFileTable(xmlFiles, con):
         con.execute('''INSERT OR IGNORE INTO lidvids (lidvid, xmlFile) VALUES (?,?)''', (lidvid, xmlFile))
 
 
-def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
+def _getLocalFileInfo(bundle, primaries, bundleLidvid, allCollections, con):
     '''Search all XML files (except for the ``bundle`` file) in the same directory as ``bundle``
     and look for all XPath ``Product_Collection/Identification_Area/logical_identifier`` values
     that match any of the primary names in ``primaries``. If we get a match, note all XPath
@@ -202,6 +202,9 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
     "lidvid". We then have to find in the directory tree where ``bundle`` is all files that
     have that "lidvid" and return then a mapping of lidvids to set of matching files, as ``file:``
     URLs.
+
+    If ``allCollections`` is True, then when a bundle reference is "lid only", then include all
+    versions of the collections; otherwise just include the latest. TODO: #24 this isn't yet implemented!
     '''
     # I'll take a six-pack of tabs
     lidvids = set()
@@ -233,17 +236,19 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, con):
         _createLidVidtoXMLFileTable(xmlFiles, con)
 
     # Get the lidvids and inventory of files mentioned in each xml file
-    with con:
-        for xmlFile in xmlFiles:
-            # Need to check for lid or lidvid depending on what is specified in the bundle
-            lid, lidvid, tabs = getLogicalIdentifierAndFileInventory(xmlFile)
-            if not lid or not tabs: continue
-            if lid in primaries or lidvid in primaries:
-                # This will probably always be the case working with an offline directory tree
-                lidvidsToFiles[lidvid] = {'file:' + xmlFile}
-                for tab in tabs:
-                    lidvids |= _getPLines(tab)
-                    lidvidsToFiles[lidvid].add('file:' + tab)
+    for xmlFile in xmlFiles:
+        # Need to check for lid or lidvid depending on what is specified in the bundle.
+        # WAIT: The *references* have optional version IDs, *not* the ``Identification_Area``; they
+        # will always have the version, so we ignore the lid; just use the lidvid.
+        lidWhichWeIgnore, lidvid, tabs = getLogicalIdentifierAndFileInventory(xmlFile)
+        # But if we don't get the lidvid or tabs, don't even bother
+        if not lidvid or not tabs: continue
+        if any([p.match(lidvid) for p in primaries]):
+            # This will probably always be the case working with an offline directory tree
+            lidvidsToFiles[lidvid] = {'file:' + xmlFile}
+            for tab in tabs:
+                lidvids |= _getPLines(tab)
+                lidvidsToFiles[lidvid].add('file:' + tab)
 
     # Now go through each lidvid mentioned by the PLines in each inventory tab and find their xml files
     for lidvid in lidvids:
@@ -411,10 +416,16 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
-def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL, aipFile):
+def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, offline, baseURL, aipFile, allCollections):
     '''Produce a SIP from the given bundle'''
+
     # Make a temp file to use as a database; TODO: could pass ``delete=False`` in
     # the future for sharing this DB amongst many processes for some fancy multiprocessing
+
+    if not allCollections:
+        _logger.warning("🤚 Notice! --include-all-collections isn't yet supported; will assume it's enabled for now")
+        allCollections = True
+
     with tempfile.NamedTemporaryFile() as dbfile:
         con = sqlite3.connect(dbfile.name)
 
@@ -425,12 +436,11 @@ def produce(bundle, hashName, registryServiceURL, insecureConnectionFlag, site, 
 
         # Get the bundle's primary collections and other useful info
         primaries, bundleLID, title, bundleVID = getPrimariesAndOtherInfo(bundle)
-        # strippedLogicalID = bundleLID.split(':')[-1]
         strippedLogicalID = bundleLID.split(':')[-1] + '_v' + bundleVID
         filename = strippedLogicalID + '_sip_v1.0'
         manifestFileName, labelFileName = filename + '.tab', filename + PDS_LABEL_FILENAME_EXTENSION
         if offline:
-            lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID, con)
+            lidvidsToFiles = _getLocalFileInfo(bundle, primaries, bundleLID + '::' + bundleVID, allCollections, con)
         else:
             _logger.warning('⚠️ The remote functionality with registry in the loop is still in development.')
             lidvidsToFiles = _getFileInfo(primaries, registryServiceURL, insecureConnectionFlag)
@@ -487,6 +497,12 @@ def addSIParguments(parser):
              ' the URL in the SIP will be https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml.'
     )
 
+    parser.add_argument(
+        '-i', '--include-all-collections', required=False, action='store_true',
+        help='For bundles that reference collections by LID, this flag will include ALL versions of collections'
+             ' in the bundle. By default, the software only includes the latest version of the collection'
+    )
+
 
 def main():
     '''Check the command-line for options and create a SIP from the given bundle XML'''
@@ -521,7 +537,8 @@ def main():
         site=args.site,
         offline=args.offline,
         baseURL=args.bundle_base_url,
-        aipFile=args.aip
+        aipFile=args.aip,
+        allCollections=args.include_all_collections
     )
     _logger.info('👋 All done. Thanks for making a SIP. Bye!')
     sys.exit(0)

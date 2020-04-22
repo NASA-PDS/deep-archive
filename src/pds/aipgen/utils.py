@@ -32,7 +32,7 @@
 
 from .constants import PDS_NS_URI
 from lxml import etree
-import logging, hashlib, os.path, functools, urllib
+import logging, hashlib, os.path, functools, urllib, packaging.version
 
 
 # Logging
@@ -50,6 +50,11 @@ _digestCacheSize = 2**16
 
 # Functions
 # ---------
+
+def vparse(spec):
+    '''Parse spec into a comparable version object; treat Nones as empties'''
+    if spec is None: spec = ''
+    return packaging.version.parse(spec)
 
 
 @functools.lru_cache(maxsize=_xmlCacheSize)
@@ -80,14 +85,16 @@ def getPrimariesAndOtherInfo(bundle):
     root = tree.getroot()
     members = root.findall(f'.//{{{PDS_NS_URI}}}Bundle_Member_Entry')
     for member in members:
-        lid = kind = None
+        lid = vid = kind = None
         for elem in member:
             if elem.tag == f'{{{PDS_NS_URI}}}lid_reference':
                 lid = elem.text.strip()
+            elif elem.tag == f'{{{PDS_NS_URI}}}lidvid_reference':
+                lid, vid = elem.text.strip().split('::')
             elif elem.tag == f'{{{PDS_NS_URI}}}member_status':
                 kind = elem.text.strip().lower()
         if kind == 'primary' and lid:
-            primaries.add(lid)
+            primaries.add(LogicalReference(lid, vid))
     _logger.debug('XML parse done, got %d primaries', len(primaries))
     matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
     logicalID = matches[0].text.strip()
@@ -144,3 +151,45 @@ def addLoggingArguments(parser):
         '-q', '--quiet', action='store_const', dest='loglevel', const=logging.WARNING,
         help="Don't log informational messages"
     )
+
+
+# Classes
+# -------
+
+class LogicalReference(object):
+    def __init__(self, lid, vid=None):
+        if lid is None: raise TypeError('The logical identifier ``lid`` is required')
+        # TODO: We could also ensure lid and vid are str types
+        self.lid, self.vid = lid, vid
+    def match(self, urn):
+        '''```urn``` is a logical identifier like ``urn:nasa:pds:fish`` or a logical identifer
+        plus a version identifier like ``urn:nasa:pds:fish::1.0``.  Return True if ``urn``
+        matches this object (is the same lid and also the same vid if specified), or False
+        otherwise
+        '''
+        components = urn.split('::')
+        num = len(components)
+        if num not in (1, 2):
+            raise ValueError(f'Bad number of :: in urn «{urn}», expected none or one, got {len(components)-1}')
+        lid, vid = components[0], components[1] if num == 2 else None
+        if self.lid != lid: return False
+        if self.lid == lid and (self.vid is None or vid is None): return True
+        return self.lid == lid and self.vid == vid
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(lid={self.lid},vid={self.vid})>'
+    def __str__(self):
+        if self.vid:
+            return f'{self.lid}::{self.vid}'
+        else:
+            return f'{self.lid}'
+    def __hash__(self):
+        return hash((self.lid, self.vid))
+    def __lt__(self, other):
+        if self.lid < other.lid:
+            return True
+        elif self.lid == other.lid:
+            return vparse(self.vid) < vparse(other.vid)
+        else:
+            return False
+    def __eq__(self, other):
+        return self.lid == other.lid and self.vid == other.vid

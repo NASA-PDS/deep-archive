@@ -57,6 +57,7 @@ class SIPFunctionalTestCase(unittest.TestCase):
             site='PDS_ATM',
             offline=True,
             baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
+            allCollections=True,
             aipFile=None
         )
         self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
