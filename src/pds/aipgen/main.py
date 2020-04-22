@@ -104,7 +104,8 @@ def main():
             args.site,
             args.offline,
             args.bundle_base_url,
-            chksumStream
+            chksumStream,
+            args.include_all_collections
         )
     _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!")
     sys.exit(0)
