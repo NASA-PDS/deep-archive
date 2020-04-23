@@ -1,4 +1,4 @@
-🪐 PDS Deep Archive
+PDS Deep Archive
 ===================
 
 The PDS Deep Archive is a Python_ based package providing utilities for
