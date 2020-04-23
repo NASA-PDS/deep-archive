@@ -9,7 +9,7 @@
    PDS Delivery Checklist
 
 Overview
-========
+------------
 
 This package provides one primary executable, ``pds-deep-archive`` that generates both
 and Archive Information Package (AIP) and a Submission Information Package (SIP). The 
@@ -27,7 +27,7 @@ individually:
 •  ``sipgen`` that generates Submission Information from a PDS4 bundle
 
 Usage Information
-=================
+------------
 
 Running ``pds-deep-archive --help`` will give a summary of the
 command-line invocation, its required arguments, and any options that refine
@@ -35,7 +35,7 @@ the behavior.
 
 
 Example
-========
+------------
 
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run::
@@ -78,7 +78,7 @@ Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_
 
 
 PDS Delivery Checklist
-======================
+------------------------
 The following is a checklist and procedure Discipline Node personnel should follow when delivering a PDS Deep Archive data package to the PDS Engineering Node upon a new release of data:
 
 *  ▶ START: New Bundle is ready for Delivery.
