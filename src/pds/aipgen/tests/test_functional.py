@@ -32,8 +32,10 @@
 '''PDS AIP-GEN functional tests'''
 
 
-import unittest, tempfile, shutil, os, pkg_resources, filecmp
+from lxml import etree
 from pds.aipgen.sip import produce
+from pds.aipgen.constants import PDS_NS_URI
+import unittest, tempfile, shutil, os, pkg_resources, filecmp
 
 
 class SIPFunctionalTestCase(unittest.TestCase):
@@ -41,6 +43,7 @@ class SIPFunctionalTestCase(unittest.TestCase):
 
     TODO: factor this out so we can generically do AIP and other file-based functional tests too.
     '''
+    _urlXPath = f'./{{{PDS_NS_URI}}}Information_Package_Component_Deep_Archive/{{{PDS_NS_URI}}}manifest_url'
     def setUp(self):
         super(SIPFunctionalTestCase, self).setUp()
         self.input = pkg_resources.resource_stream(__name__, 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml')
@@ -49,7 +52,7 @@ class SIPFunctionalTestCase(unittest.TestCase):
         os.chdir(self.testdir)
     def test_sip_of_a_ladee(self):
         '''Test if the SIP manifest of LADEE bundle works as expected'''
-        manifest, label = produce(
+        manifest, ignoredLabel = produce(
             bundle=self.input,
             hashName='md5',
             registryServiceURL=None,
@@ -61,6 +64,22 @@ class SIPFunctionalTestCase(unittest.TestCase):
             aipFile=None
         )
         self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
+    def test_label_url(self):
+        '''Test if the label of a SIP manifest has the right ``manifest_url``'''
+        ignoredManifest, label = produce(
+            bundle=self.input,
+            hashName='md5',
+            registryServiceURL=None,
+            insecureConnectionFlag=True,
+            site='PDS_ATM',
+            offline=True,
+            baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
+            allCollections=True,
+            aipFile=None
+        )
+        matches = etree.parse(label).getroot().findall(self._urlXPath)
+        self.assertEqual(1, len(matches))
+        self.assertEqual('https://pds-gamma.jpl.nasa.gov/data/pds4/manifests/', matches[0].text)
     def tearDown(self):
         self.input.close()
         os.chdir(self.cwd)

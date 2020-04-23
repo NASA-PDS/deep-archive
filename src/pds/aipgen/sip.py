@@ -33,7 +33,7 @@
 
 from .constants import (
     INFORMATION_MODEL_VERSION, PDS_NS_URI, XML_SCHEMA_INSTANCE_NS_URI, XML_MODEL_PI,
-    PDS_SCHEMA_URL, AIP_PRODUCT_URI_PREFIX, PDS_LABEL_FILENAME_EXTENSION, HASH_ALGORITHMS
+    PDS_SCHEMA_URL, AIP_PRODUCT_URI_PREFIX, PDS_LABEL_FILENAME_EXTENSION, HASH_ALGORITHMS, SIP_MANIFEST_URL
 )
 from .utils import (
     getPrimariesAndOtherInfo, getMD5, getLogicalIdentifierAndFileInventory, parseXML, getDigest, addLoggingArguments
@@ -353,8 +353,8 @@ def _writeLabel(logicalID, versionID, title, digest, size, numEntries, hashName,
     deep.append(etree.Comment('MD5 digest checksum for the manifest file'))
     etree.SubElement(deep, prefix + 'manifest_checksum').text = digest
     etree.SubElement(deep, prefix + 'checksum_type').text = 'MD5'
-    etree.SubElement(deep, prefix + 'manifest_url').text = 'file:' + os.path.abspath(manifestFile)
-    etree.SubElement(deep, prefix + 'aip_lidvid').text = AIP_PRODUCT_URI_PREFIX + logicalID.split(':')[-1]+ '_v' + versionID + '::1.0'
+    etree.SubElement(deep, prefix + 'manifest_url').text = SIP_MANIFEST_URL
+    etree.SubElement(deep, prefix + 'aip_lidvid').text = AIP_PRODUCT_URI_PREFIX + logicalID.split(':')[-1] + '_v' + versionID + '::1.0'
 
     aipMD5 = getMD5(aipFile) if aipFile else '00000000000000000000000000000000'
     etree.SubElement(deep, prefix + 'aip_label_checksum').text = aipMD5
