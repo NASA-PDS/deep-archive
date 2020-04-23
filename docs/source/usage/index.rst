@@ -68,9 +68,11 @@ This creates 5 output files in the current directory as part of the AIP and SIP 
    tab-separated values file.
 •  ``ladee_mission_bundle_v1.0_sip_v1.0.xml``, an PDS label for the SIP file.
 
-* Be sure to check out the SIP Manifest, ``ladee_mission_bundle_v1.0_sip_v1.0.tab``, to ensure the URLs included are valid URLs.
-* If everything looks good to go, package them up into a PDS Deep Archive data package (e.g. ``ladee_mission_bundle_v1.0_pds_deep_archive.zip``).
-* Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ .
+Be sure to check out the SIP Manifest, ``ladee_mission_bundle_v1.0_sip_v1.0.tab``, to ensure the URLs included are valid URLs.
+
+If everything looks good to go, package them up into a PDS Deep Archive data package (e.g. ``ladee_mission_bundle_v1.0_pds_deep_archive.zip``).
+
+Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ .
 
 
 PDS Delivery Checklist
