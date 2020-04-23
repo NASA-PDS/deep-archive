@@ -1,6 +1,14 @@
 🏃‍♀️ Usage
 ===========
 
+* `Overview <#overview>`_
+* `Usage Information <#usage-information>`_
+* `Example <#example>`_
+* `PDS Delivery Checklist <#pds-delivery-checklist>`_
+
+Overview
+========
+
 This package provides one primary executable, ``pds-deep-archive`` that generates both
 and Archive Information Package (AIP) and a Submission Information Package (SIP). The 
 SIP is what is delivered by the PDS to the NASA Space Science Data Coordinated Archive (NSSDCA).
@@ -16,12 +24,21 @@ individually:
 •  ``aipgen`` that generates Archive Information Packages from a PDS4 bundle
 •  ``sipgen`` that generates Submission Information from a PDS4 bundle
 
+Usage Information
+=================
+
 Running ``pds-deep-archive --help`` will give a summary of the
 command-line invocation, its required arguments, and any options that refine
-the behavior.  For example, to create an AIP from the LADEE 1101 bundle in
+the behavior. 
+
+
+Example
+========
+
+For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run::
 
-    aipgen test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+    pds-deep-archive -s PDS_ATM -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 
 The program will print::
 
@@ -51,52 +68,24 @@ This creates 5 output files in the current directory as part of the AIP and SIP 
    tab-separated values file.
 •  ``ladee_mission_bundle_v1.0_sip_v1.0.xml``, an PDS label for the SIP file.
 
-For reference, the full "usage" message from ``pds-deep-archive`` is::
+Be sure to check out the SIP Manifest, ``ladee_mission_bundle_v1.0_sip_v1.0.tab``, to ensure the URLs included are valid URLs.
 
-    $ pds-deep-archive --help
-    usage: pds-deep-archive [-h] [--version] -s
-                            {PDS_ATM,PDS_ENG,PDS_GEO,PDS_IMG,PDS_JPL,PDS_NAI,PDS_PPI,PDS_PSI,PDS_RNG,PDS_SBN}
-                            [-n] -b BUNDLE_BASE_URL [-d] [-q]
-                            IN-BUNDLE.XML
+If everything looks good to go, package them up into a PDS Deep Archive data package (e.g. ``ladee_mission_bundle_v1.0_pds_deep_archive.zip``).
 
-    Generate an Archive Information Package (AIP) and a Submission Information
-    Package (SIP). This creates three files for the AIP in the current directory
-    (overwriting them if they already exist):
-    ➀ a "checksum manifest" which contains MD5 hashes of *all* files in a product
-    ➁ a "transfer manifest" which lists the "lidvids" for files within each XML
-      label mentioned in a product
-    ➂ an XML label for these two files.
+Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ .
 
-    It also creates two files for the SIP (also overwriting them if they exist):
-    ① A "SIP manifest" file; and an XML label of that file too. The names of
-      the generated files are based on the logical identifier found in the
-      bundle file, and any existing files are overwritten. The names of the
-      generated files are printed upon successful completion.
-    ② A PDS XML label of that file.
 
-    The files are created in the current working directory when this program is
-    run. The names of the files are based on the logical identifier found in the
-    bundle file, and any existing files are overwritten. The names of the
-    generated files are printed upon successful completion.
+PDS Delivery Checklist
+======================
+The following is a checklist and procedure Discipline Node personnel should follow when delivering a PDS Deep Archive data package to the PDS Engineering Node upon a new release of data:
 
-    positional arguments:
-      IN-BUNDLE.XML         Bundle XML file to read
+*  START: New Bundle is ready for Delivery.
+*  Bundle has completed successful validation with PDS4 Validate Tool.
+*  Execute PDS Deep Archive software per usage instructions and example above.
+*  Check the SIP Manifest (``*._sip_v1.0.tab``) file to verify URLs indicated are valid.
+*  Package up the five ``*.tab` and ``*.xml`` files into a ``.ZIP`` or ``.TAR.GZ`` PDS Deep Archive Delivery package.
+*  Email PDS Deep Archive Delivery package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ for delivery to NSSDCA.
+*  Receive confirmation from PDS Operator once delivery has completed.
+*  🎉 DONE
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      --version             show program's version number and exit
-      -s {PDS_ATM,PDS_ENG,PDS_GEO,PDS_IMG,PDS_JPL,PDS_NAI,PDS_PPI,PDS_PSI,PDS_RNG,PDS_SBN}, --site {PDS_ATM,PDS_ENG,PDS_GEO,PDS_IMG,PDS_JPL,PDS_NAI,PDS_PPI,PDS_PSI,PDS_RNG,PDS_SBN}
-                            Provider site ID for the manifest's label
-      -n, --offline         Run offline, scanning bundle directory for matching
-                            files instead of querying registry service. NOTE: By
-                            default, set to True until online mode is available.
-      -b BUNDLE_BASE_URL, --bundle-base-url BUNDLE_BASE_URL
-                            Base URL for Node data archive. This URL will be
-                            prepended to the bundle directory to form URLs to the
-                            products. For example, if we are generating a SIP for
-                            mission_bundle/LADEE_Bundle_1101.xml, and bundle-base-
-                            url is https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/,
-                            the URL in the SIP will be https://atmos.nmsu.edu/PDS/
-                            data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml.
-      -d, --debug           Log debugging messages for developers
-      -q, --quiet           Don't log informational messages
+
