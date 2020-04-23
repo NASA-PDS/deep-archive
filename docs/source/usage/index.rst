@@ -1,10 +1,10 @@
 🏃‍♀️ Usage
 ===========
 
-* :ref:`Overview`
-* :ref:`Usage Information`
-* :ref:`Example`
-* :ref:`PDS Delivery Checklist`
+* `Overview <#overview>`_
+* `Usage Information <#usage-information>`_
+* `Example <#example>`_
+* `PDS Delivery Checklist <#pds-delivery-checklist>`_
 
 Overview
 ========
@@ -69,7 +69,9 @@ This creates 5 output files in the current directory as part of the AIP and SIP 
 •  ``ladee_mission_bundle_v1.0_sip_v1.0.xml``, an PDS label for the SIP file.
 
 | ✔ Be sure to check out the ladee_mission_bundle_v1.0_sip_v1.0.tab files to ensure the URLs included are actually valid URLs.
+
 | ✔ If everything looks good to go, package them up into a PDS Deep Archive data package (e.g. ladee_mission_bundle_v1.0_pds_deep_archive.zip).
+
 | ✔ Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ .
 
 
@@ -78,12 +80,19 @@ PDS Delivery Checklist
 The following is a checklist and procedure Discipline Node personnel should follow when delivering a PDS Deep Archive data package to the PDS Engineering Node upon a new release of data:
 
 | ▶  START: New Bundle is ready for Delivery.
+
 | ✔  Bundle has completed successful validation with PDS4 Validate Tool.
+
 | ✔ Execute PDS Deep Archive software per usage instructions and example above.
+
 | ✔ Check the SIP Manifest (*._sip_v1.0.tab) file to verify URLs indicated are valid.
+
 | ✔ Package up the 5 .TAB and .XML files into a ZIP or TAR.GZ PDS Deep Archive Delivery package.
+
 | ✔ Email PDS Deep Archive Delivery package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ for delivery to NSSDCA.
+
 | ✔ Receive confirmation from PDS Operator once delivery has completed.
+
 | 🎉 DONE
 
 
