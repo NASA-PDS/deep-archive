@@ -2,7 +2,11 @@
 ===========
 
 .. toctree::
-   :maxdepth: 1
+
+   Overview
+   Usage Information
+   Example
+   PDS Delivery Checklist
 
 Overview
 ========
@@ -77,7 +81,7 @@ PDS Delivery Checklist
 ======================
 The following is a checklist and procedure Discipline Node personnel should follow when delivering a PDS Deep Archive data package to the PDS Engineering Node upon a new release of data:
 
-*  START: New Bundle is ready for Delivery.
+*  ▶ START: New Bundle is ready for Delivery.
 *  Bundle has completed successful validation with PDS4 Validate Tool.
 *  Execute PDS Deep Archive software per usage instructions and example above.
 *  Check the SIP Manifest (``*._sip_v1.0.tab``) file to verify URLs indicated are valid.
