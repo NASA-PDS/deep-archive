@@ -1,10 +1,8 @@
 🏃‍♀️ Usage
 ===========
 
-* `Overview <#overview>`_
-* `Usage Information <#usage-information>`_
-* `Example <#example>`_
-* `PDS Delivery Checklist <#pds-delivery-checklist>`_
+.. toctree::
+   :maxdepth: 1
 
 Overview
 ========
