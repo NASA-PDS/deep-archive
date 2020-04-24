@@ -49,10 +49,17 @@ You can then run ``pds-deep-archive --help`` to get a usage message and ensure i
     The above commands will install last approved release from the Python
     Package Index ("Cheeseshop_"). The latest, cutting edge release is posted
     at the Test Package Index, but these releases may not be fully confirmed
-    to be operational. If you like taking risks, add
-    ``--index-url https://test.pypi.org/simple`` and
-    ``--extra-index-url https://pypi.org/simple`` to the ``pip3 install``
-    command.
+    to be operational. If you like taking risks, run
+    ``pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple``
+    to install the latest development version of the software.
+    
+
+Upgrade Software
+----------------
+To check and install an upgrade to the software, run the following command in your 
+virtual environment::
+
+   pip install pds.deeparchive --upgrade
 
 
 .. References:
