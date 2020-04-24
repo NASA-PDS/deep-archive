@@ -36,7 +36,7 @@ from .constants import (
     PDS_SCHEMA_URL, AIP_PRODUCT_URI_PREFIX, PDS_LABEL_FILENAME_EXTENSION, HASH_ALGORITHMS, SIP_MANIFEST_URL
 )
 from .utils import (
-    getPrimariesAndOtherInfo, getMD5, getLogicalIdentifierAndFileInventory, parseXML, getDigest, addLoggingArguments
+    getPrimariesAndOtherInfo, getMD5, getLogicalIdentifierAndFileInventory, parseXML, getDigest, addLoggingArguments, getBundleFiles
 )
 from datetime import datetime
 from lxml import etree
@@ -222,8 +222,8 @@ def _getLocalFileInfo(bundle, primaries, bundleLidvid, allCollections, con):
         cursor.execute('''CREATE INDEX IF NOT EXISTS lidvidIndex ON lidvids (lidvid)''')
         cursor.execute('''CREATE UNIQUE INDEX lidvidPairing ON lidvids (lidvid, xmlFile)''')
 
-    # Add bundle to manifest
-    lidvidsToFiles[bundleLidvid] = {'file:' + bundle}
+    # Add bundle and associated files to manifest
+    lidvidsToFiles[bundleLidvid] = getBundleFiles(bundle)
 
     # OK, here we go
     root = os.path.dirname(bundle)
