@@ -79,7 +79,7 @@ class SIPFunctionalTestCase(unittest.TestCase):
         )
         matches = etree.parse(label).getroot().findall(self._urlXPath)
         self.assertEqual(1, len(matches))
-        self.assertEqual('https://pds-gamma.jpl.nasa.gov/data/pds4/manifests/', matches[0].text)
+        self.assertEqual('https://pds.nasa.gov/data/pds4/manifests/', matches[0].text)
     def tearDown(self):
         self.input.close()
         os.chdir(self.cwd)
