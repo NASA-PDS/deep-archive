@@ -49,9 +49,13 @@ You can then run ``pds-deep-archive --help`` to get a usage message and ensure i
     The above commands will install last approved release from the Python
     Package Index ("Cheeseshop_"). The latest, cutting edge release is posted
     at the Test Package Index, but these releases may not be fully confirmed
-    to be operational. If you like taking risks, run
-    ``pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple``
-    to install the latest development version of the software.
+    to be operational. If you like taking risks, run the following to create a
+    new virtual environment and install the latest development version of the software::
+    
+      mkdir -p $HOME/.virtualenvs
+      python3 -m venv $HOME/.virtualenvs/pds-deep-archive
+      source $HOME/.virtualenvs/pds-deep-archive/bin/activate
+      pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple`` pds.deeparchive
     
 
 Upgrade Software
@@ -59,7 +63,8 @@ Upgrade Software
 To check and install an upgrade to the software, run the following command in your 
 virtual environment::
 
-   pip install pds.deeparchive --upgrade
+  source $HOME/.virtualenvs/pds-deep-archive/bin/activate
+  pip install pds.deeparchive --upgrade
 
 
 .. References:

@@ -66,6 +66,18 @@ and push this, then, on GitHub (and with appropriate permissions), visit:
 and enter a release tag with the same version number plus any release notes.
 This will trigger a GitHub Actions release to the official PyPI 🤞.
 
+To deploy to the official PyPi manually:
+
+1. Place the appropriate credentials in ``~/.pypirc``
+2. Create the package::
+
+    python setup.py sdist
+
+3. Deploy to PyPi::
+
+    pip install twine
+    twine upload dist/*.tar.gz
+
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
 .. _Sphinx: https://www.sphinx-doc.org/en/master/

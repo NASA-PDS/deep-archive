@@ -38,9 +38,10 @@ Example
 ------------
 
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
-``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run::
+``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run the following (NOTE: assumes you followed the default Installation into a Virtual Environment)::
 
-    pds-deep-archive -s PDS_ATM -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+    $ source $HOME/.virtualenvs/pds-deep-archive/bin/activate
+    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 
 The program will print::
 
