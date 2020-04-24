@@ -22,6 +22,7 @@ from PDS bundles.
    installation/index
    usage/index
    development/index
+   support/index
 
 
 .. Perhaps we will use this in the future:

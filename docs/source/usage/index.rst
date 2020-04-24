@@ -3,13 +3,9 @@
 
 .. toctree::
 
-   Overview
-   Usage Information
-   Example
-   PDS Delivery Checklist
 
 Overview
-------------
+--------
 
 This package provides one primary executable, ``pds-deep-archive`` that generates both
 and Archive Information Package (AIP) and a Submission Information Package (SIP). The 
@@ -27,7 +23,7 @@ individually:
 •  ``sipgen`` that generates Submission Information from a PDS4 bundle
 
 Usage Information
-------------
+-----------------
 
 Running ``pds-deep-archive --help`` will give a summary of the
 command-line invocation, its required arguments, and any options that refine
@@ -35,7 +31,7 @@ the behavior.
 
 
 Example
-------------
+-------
 
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run the following (NOTE: assumes you followed the default Installation into a Virtual Environment)::

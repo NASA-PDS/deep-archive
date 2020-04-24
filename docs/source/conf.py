@@ -12,8 +12,8 @@
 # there a way to get parity with ``setup.py`` though? 🤔
 
 project            = 'PDS Deep Archive'
-author             = 'NASA PDS Incubator Project'
-copyright          = '2020, NASA PDS Incubator Project'
+author             = 'NASA Planetary Data System'
+copyright          = '2020 California Institute of Technology'
 version            = '1.0'
 release            = '1.0.0'
 language           = 'en'
@@ -33,13 +33,31 @@ language           = 'en'
 exclude_patterns   = []
 html_static_path   = ['_static']
 html_theme         = 'alabaster'
-html_theme_options = {}
 master_doc         = 'index'
 pygments_style     = 'sphinx'
 source_suffix      = '.rst'
 templates_path     = ['_templates']
 todo_include_todos = True
 
+# Alabaster Theme
+# ~~~~~~~~~~~~~~~
+#
+# The "alabaster" theme requires these settings
+
+html_theme_options = {
+    'logo': 'PDS_Planets.png',
+    'github_user': 'NASA-PDS-Incubator',
+    'github_repo': 'pds-deep-archive'
+}
+
+html_sidebars = {
+    '**': [
+        'about.html',
+        'relations.html',  # needs 'show_related': True theme option to display
+        'searchbox.html',
+        'navigation.html'
+    ]
+}
 
 # Extensions
 # ~~~~~~~~~~
@@ -54,20 +72,6 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
 ]
-
-
-# Alabaster Theme
-# ~~~~~~~~~~~~~~~
-#
-# The "alabaster" theme requires these settings
-
-html_sidebars = {
-    '**': [
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-    ]
-}
-
 
 # Other Options
 # ~~~~~~~~~~~~~

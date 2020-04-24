@@ -79,6 +79,12 @@ To deploy to the official PyPi manually:
     twine upload dist/*.tar.gz
 
 
+Contribute
+----------
+
+Source Code: https://github.com/NASA-PDS-Incubator/pds-deep-archive
+
+
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _testing: https://test.pypi.org/
