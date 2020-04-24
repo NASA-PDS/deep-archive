@@ -153,6 +153,20 @@ def addLoggingArguments(parser):
     )
 
 
+def getBundleFiles(bundle):
+    files = {'file:' + bundle}
+
+    tree = parseXML(bundle)
+    root = tree.getroot()
+    matches = root.findall(f'./{{{PDS_NS_URI}}}File_Area_Text/{{{PDS_NS_URI}}}File/{{{PDS_NS_URI}}}file_name')
+
+    if matches:
+        for i in matches:
+            files.add('file:' + os.path.join(os.path.dirname(bundle), i.text.strip()))
+
+    return files
+
+
 # Classes
 # -------
 
