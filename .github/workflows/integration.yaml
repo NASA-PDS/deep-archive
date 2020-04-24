@@ -112,7 +112,7 @@ jobs:
                     python3 bootstrap.py
                     bin/buildout
                     bin/test
-                    bin/buildout setup . egg_info --tag-build .$(date --utc '+%Y%m%d%H%M%S')  sdist --dist-dir testdist
+                    bin/buildout setup . egg_info --tag-build $(date --utc '+%Y%m%d%H%M%S')  sdist --dist-dir testdist
                     bin/buildout setup . sdist --dist-dir proddist
             -
                 name: 📇 Publishing to Test PyPI
