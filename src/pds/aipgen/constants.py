@@ -64,4 +64,4 @@ HASH_ALGORITHMS = {
 }
 
 # The "well-defined" location for SIP manifests
-SIP_MANIFEST_URL = 'https://pds-gamma.jpl.nasa.gov/data/pds4/manifests/'
+SIP_MANIFEST_URL = 'https://pds.nasa.gov/data/pds4/manifests/'
