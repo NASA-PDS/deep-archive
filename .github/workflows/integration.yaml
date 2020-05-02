@@ -99,7 +99,7 @@ jobs:
             # convert markdown file to html because jekyll is disabled in this repository
             - uses: docker://pandoc/core:2.9
               with:
-                args: --standalone -f markdown -t html --output=CHANGELOG CHANGELOG.md
+                args: --standalone -f markdown -t html --output=CHANGELOG.html CHANGELOG.md
             - name: Commit CHANGELOG.md file
               run: |
                 git config --local user.email "action@github.com"
