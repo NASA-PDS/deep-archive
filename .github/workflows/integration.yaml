@@ -82,7 +82,7 @@ jobs:
             -
                 name: 📒 Publishing to GitHub Pages
                 if: success()
-                uses: crazy-max/ghaction-github-pages@master
+                uses: crazy-max/ghaction-github-pages@master@v1
                 env:
                     GITHUB_PAT: ${{secrets.github_personal_access_token}}
                 with:
