@@ -514,7 +514,7 @@ def main():
     addSIParguments(parser)
     addLoggingArguments(parser)
     parser.add_argument(
-        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Bundle XML file to read'
+        'bundle', type=argparse.FileType('rb'), metavar='INPUT-BUNDLE.XML', help='Bundle XML file to read from local filesystem.'
     )
     parser.add_argument(
         '-c', '--aip', type=argparse.FileType('rb'), metavar='AIP-CHECKSUM-MANIFEST.TAB',
