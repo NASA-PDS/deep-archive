@@ -36,10 +36,25 @@ Example
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run the following (NOTE: assumes you followed the default Installation into a Virtual Environment)::
 
+    # Prep your environment by sourcing your Python virtual environment
     $ source $HOME/.virtualenvs/pds-deep-archive/bin/activate
-    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 
-The program will print::
+    # The (pds-deep-archive) prefix indicates your virtual environment is active
+    (pds-deep-archive) $
+
+    # Now let's run pds-deep-archive
+    # NOTE: This software must be run against data on your local filesystem
+    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
+                            -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE  \
+                            test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+
+From this command-line execution, we are inputting the following information:
+
+* ``-s PDS_ATM`` - uses ``-s`` flag to specify Atmospheres Node as the provider site for the manifest's label
+* ``-b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE`` - uses ``-b`` flag Base URL for Node data archive. This URL will be prepended to the bundle directory to form URLs to the products. For this case, this will allow us to form proper URLs in the output manifests based upon the valid online products, e.g. https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml
+* ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` - this is the final positional argument input to the software that specifies the bundle product file on the local filesystem.
+
+Once you complete this execution, the program will print::
 
     INFO 👟 PDS Deep Archive, version 0.0.0
     INFO 🏃‍♀️ Starting AIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
