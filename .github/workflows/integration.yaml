@@ -72,7 +72,7 @@ jobs:
             -
                 name: 🚼 Adding dependencies
                 run: |
-                    sudo apt-get install -y libxml2-dev libxslt1-dev
+                    sudo apt-get update && sudo apt-get install -y libxml2-dev libxslt1-dev
             -
                 name: 🖋 Writing documentation
                 run: |
