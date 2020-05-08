@@ -20,7 +20,9 @@ requirements:
    ``xslt-config`` to see.
 
 Consult your operating system instructions or system administrator to install
-the required packages.
+the required packages. For those without system administrator access and are 
+feeling anxious, you could try a local (home directory) Python_ 3 installation 
+using a Miniconda_ installation.
 
 
 Doing the Installation
@@ -73,3 +75,4 @@ virtual environment::
 .. _`virtual environment`: https://docs.python.org/3/library/venv.html
 .. _Buildout: http://www.buildout.org/
 .. _Cheeseshop: https://pypi.org/
+.. _Miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
