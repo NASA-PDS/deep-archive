@@ -155,7 +155,7 @@ def comprehendDirectory(dn, con):
                     matches = tree.getroot().findall(f'.//{{{PDS_NS_URI}}}file_name')
                     for match in matches:
                         # any sibling directory_path_name?
-                        dpnNode = match.getparent().find('./{http://pds.nasa.gov/pds4/pds/v1}directory_path_name')
+                        dpnNode = match.getparent().find(f'./{{{PDS_NS_URI}}}directory_path_name')
                         fn = match.text.strip()
                         dn = None if dpnNode is None else dpnNode.text.strip()
                         filepath = os.path.join(dirpath, dn, fn) if dn else os.path.join(dirpath, fn)
