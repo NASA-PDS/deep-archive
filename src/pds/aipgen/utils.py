@@ -30,9 +30,9 @@
 
 '''Utilities'''
 
-from .constants import PDS_NS_URI
+from .constants import PDS_NS_URI, PDS_TABLE_FILENAME_EXTENSION
 from lxml import etree
-import logging, hashlib, os.path, functools, urllib, packaging.version
+import logging, hashlib, os.path, functools, urllib, re
 
 
 # Logging
@@ -43,18 +43,133 @@ _logger = logging.getLogger(__name__)
 # Private Constants
 # -----------------
 
-_bufsiz = 512  # Is there a better place to set this—or a better place to find it?
-_xmlCacheSize = 2**16
-_digestCacheSize = 2**16
+_bufsiz = 512                                            # Byte buffer
+_xmlCacheSize = 2**16                                    # XML files to cache in memory
+_digestCacheSize = 2**16                                 # Message digests to cache in memory
+_pLineMatcher = re.compile(r'^P,\s*([^\s]+)::([^\s]+)')  # Match separate lids and vids in "P" lines in ``.tab`` files
+
+# Help message for ``--include-all-collections``:
+_allCollectionsHelp = '''For bundles that reference collections by LID, this flag will include ALL versions of
+collections in the bundle. By default, the software only includes the latest version of the collection.
+'''
 
 
 # Functions
 # ---------
 
-def vparse(spec):
-    '''Parse spec into a comparable version object; treat Nones as empties'''
-    if spec is None: spec = ''
-    return packaging.version.parse(spec)
+
+def createSchema(con):
+    '''Make the database schema for handing AIPs and SIPs in the given ``con``nection
+    '''
+    cursor = con.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS labels (
+        lid text NOT NULL,
+        vid text NOT NULL
+    )''')
+    cursor.execute('CREATE UNIQUE INDEX lidvidIndex ON labels (lid, vid)')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS inter_label_references (
+        lid text NOT NULL,
+        vid text NOT NULL,
+        to_lid text NOT NULL,
+        to_vid text
+    )''')
+    cursor.execute('CREATE UNIQUE INDEX lidvidlidMapping ON inter_label_references (lid, vid, to_lid, to_vid)')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS label_file_references (
+        lid text NOT NULL,
+        vid text NOT NULL,
+        filepath text NOT NULL
+    )''')
+    cursor.execute('CREATE UNIQUE INDEX lidvidfileIndex on label_file_references (lid, vid, filepath)')
+
+
+def getLogicalVersionIdentifier(tree):
+    '''In the XML document ``tree``, return the logical identifier and the version identifier as
+    strings, or ``None, None`` if they're not found.
+    '''
+    lid = vid = None
+    root = tree.getroot()
+    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
+    if matches:
+        lid = matches[0].text.strip()
+        matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}version_id')
+        if matches:
+            vid = matches[0].text.strip()
+    return lid, vid
+
+
+def _addInterLabelReferencesFromTabFile(lid, vid, tabFile, con):
+    '''Open the PDS tab file ``tabFile`` and find all "P lines" in it, adding them as destination
+    references from the given logical version identifier ``lid`` and version identifier ``vid``
+    to the ``inter_label_references`` table in the database ``con``nection.
+    '''
+    with open(tabFile, 'r') as f:
+        for line in f:
+            match = _pLineMatcher.match(line)
+            if not match: continue
+            con.execute(
+                'INSERT INTO inter_label_references (lid, vid, to_lid, to_vid) VALUES (?,?,?,?)',
+                (lid, vid, match.group(1), match.group(2))
+            )
+
+
+def comprehendDirectory(dn, con):
+    '''In and under the given directory ``dn`` ,look for XML files and their various references to other
+    files, populating tables in ``con``'''
+    for dirpath, dirnames, filenames in os.walk(dn):
+        for fn in filenames:
+            if fn.lower().endswith('.xml'):
+                xmlFile = os.path.join(dirpath, fn)
+                _logger.debug('📄 Deconstructing %s', xmlFile)
+                tree = parseXML(xmlFile)
+                lid, vid = getLogicalVersionIdentifier(tree)
+                if lid and vid:
+                    # OK, got an XML file we can work with
+                    con.execute('INSERT OR IGNORE INTO labels (lid, vid) VALUES (?, ?)', (lid, vid))
+                    con.execute(
+                        'INSERT OR IGNORE INTO label_file_references (lid, vid, filepath) VALUES (?,?,?)',
+                        (lid, vid, xmlFile)
+                    )
+
+                    # Now see if it refers to other XML files
+                    matches = tree.getroot().findall(f'./{{{PDS_NS_URI}}}Bundle_Member_Entry')
+                    for match in matches:
+                        lidRef = vidRef = None
+                        for child in match:
+                            if child.tag == f'{{{PDS_NS_URI}}}lid_reference':
+                                lidRef = child.text.strip()
+                            elif child.tag == f'{{{PDS_NS_URI}}}lidvid_reference':
+                                lidRef, vidRef = child.text.strip().split('::')
+                        if lidRef:
+                            if vidRef:
+                                con.execute(
+                                    'INSERT OR IGNORE INTO inter_label_references (lid, vid, to_lid, to_vid) VALUES (?,?,?,?)',
+                                    (lid, vid, lidRef, vidRef)
+                                )
+                            else:
+                                con.execute(
+                                    'INSERT OR IGNORE INTO inter_label_references (lid, vid, to_lid) VALUES (?,?,?)',
+                                    (lid, vid, lidRef)
+                                )
+
+                    # And see if it refers to other files
+                    matches = tree.getroot().findall(f'.//{{{PDS_NS_URI}}}file_name')
+                    for match in matches:
+                        # any sibling directory_path_name?
+                        dpnNode = match.getparent().find('./{http://pds.nasa.gov/pds4/pds/v1}directory_path_name')
+                        fn = match.text.strip()
+                        dn = None if dpnNode is None else dpnNode.text.strip()
+                        filepath = os.path.join(dirpath, dn, fn) if dn else os.path.join(dirpath, fn)
+                        if os.path.isfile(filepath):
+                            con.execute(
+                                'INSERT OR IGNORE INTO label_file_references (lid, vid, filepath) VALUES (?,?,?)',
+                                (lid, vid, filepath)
+                            )
+                            # Weird case: a <file_name> might refer to a ``.tab`` or ``.TAB`` file, which
+                            # means even more inter_label_references
+                            if fn.lower().endswith(PDS_TABLE_FILENAME_EXTENSION.lower()):
+                                _addInterLabelReferencesFromTabFile(lid, vid, filepath, con)
+                        else:
+                            _logger.warning('⚠️ File %s referenced by %s does not exist; ignoring', fn, xmlFile)
 
 
 @functools.lru_cache(maxsize=_xmlCacheSize)
@@ -76,35 +191,6 @@ def getDigest(url, hashName):
     return hashish.hexdigest()  # XXX We do not support hashes with varialbe-length digests
 
 
-def getPrimariesAndOtherInfo(bundle):
-    '''Get the "primaries" from the given bundle XML plus the logical identifier,
-    plus the title plus the version ID (this function does too much)'''
-    _logger.debug('Fetching primaries and other info by parsing XML in %r', bundle)
-    primaries = set()
-    tree = parseXML(bundle)
-    root = tree.getroot()
-    members = root.findall(f'.//{{{PDS_NS_URI}}}Bundle_Member_Entry')
-    for member in members:
-        lid = vid = kind = None
-        for elem in member:
-            if elem.tag == f'{{{PDS_NS_URI}}}lid_reference':
-                lid = elem.text.strip()
-            elif elem.tag == f'{{{PDS_NS_URI}}}lidvid_reference':
-                lid, vid = elem.text.strip().split('::')
-            elif elem.tag == f'{{{PDS_NS_URI}}}member_status':
-                kind = elem.text.strip().lower()
-        if kind == 'primary' and lid:
-            primaries.add(LogicalReference(lid, vid))
-    _logger.debug('XML parse done, got %d primaries', len(primaries))
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
-    logicalID = matches[0].text.strip()
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}title')
-    title = matches[0].text.strip()
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}version_id')
-    versionID = matches[0].text.strip()
-    return primaries, logicalID, title, versionID
-
-
 def getMD5(i):
     '''Compute an MD5 digest of the input stream ``i`` and return it as a hex string'''
     md5 = hashlib.new('md5')
@@ -113,31 +199,6 @@ def getMD5(i):
         if len(buf) == 0: break
         md5.update(buf)
     return md5.hexdigest()
-
-
-def getLogicalIdentifierAndFileInventory(xmlFile):
-    '''In the named local ``xmlFile ``, return a triple of its logical identifier via the XPath
-    expression ``Product_Collection/Identification_Area/logical_identifier``, its lidvid
-    (combination of logical identifier and version_id), and all ``file_name``
-    in ``File`` in ``File_Area_Inventory`` entries. If there's no logical identifier, just return
-    None, None, None
-    '''
-    _logger.debug('Getting logical IDs and file inventories by parsing XML in %s', xmlFile)
-    tree = parseXML(xmlFile)
-    root = tree.getroot()
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
-    if not matches: return None, None, None
-    lid = matches[0].text.strip()
-
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}version_id')
-    if not matches: return None, None, None
-    lidvid = lid + '::' + matches[0].text.strip()
-
-    if not lid: return None, None, None
-    dirname = os.path.dirname(xmlFile)
-    matches = root.findall(f'./{{{PDS_NS_URI}}}File_Area_Inventory/{{{PDS_NS_URI}}}File/{{{PDS_NS_URI}}}file_name')
-
-    return lid, lidvid, [os.path.join(dirname, i.text.strip()) for i in matches]
 
 
 def addLoggingArguments(parser):
@@ -153,57 +214,8 @@ def addLoggingArguments(parser):
     )
 
 
-def getBundleFiles(bundle):
-    files = {'file:' + bundle}
-
-    tree = parseXML(bundle)
-    root = tree.getroot()
-    matches = root.findall(f'./{{{PDS_NS_URI}}}File_Area_Text/{{{PDS_NS_URI}}}File/{{{PDS_NS_URI}}}file_name')
-
-    if matches:
-        for i in matches:
-            files.add('file:' + os.path.join(os.path.dirname(bundle), i.text.strip()))
-
-    return files
-
-
-# Classes
-# -------
-
-class LogicalReference(object):
-    def __init__(self, lid, vid=None):
-        if lid is None: raise TypeError('The logical identifier ``lid`` is required')
-        # TODO: We could also ensure lid and vid are str types
-        self.lid, self.vid = lid, vid
-    def match(self, urn):
-        '''```urn``` is a logical identifier like ``urn:nasa:pds:fish`` or a logical identifer
-        plus a version identifier like ``urn:nasa:pds:fish::1.0``.  Return True if ``urn``
-        matches this object (is the same lid and also the same vid if specified), or False
-        otherwise
-        '''
-        components = urn.split('::')
-        num = len(components)
-        if num not in (1, 2):
-            raise ValueError(f'Bad number of :: in urn «{urn}», expected none or one, got {len(components)-1}')
-        lid, vid = components[0], components[1] if num == 2 else None
-        if self.lid != lid: return False
-        if self.lid == lid and (self.vid is None or vid is None): return True
-        return self.lid == lid and self.vid == vid
-    def __repr__(self):
-        return f'<{self.__class__.__name__}(lid={self.lid},vid={self.vid})>'
-    def __str__(self):
-        if self.vid:
-            return f'{self.lid}::{self.vid}'
-        else:
-            return f'{self.lid}'
-    def __hash__(self):
-        return hash((self.lid, self.vid))
-    def __lt__(self, other):
-        if self.lid < other.lid:
-            return True
-        elif self.lid == other.lid:
-            return vparse(self.vid) < vparse(other.vid)
-        else:
-            return False
-    def __eq__(self, other):
-        return self.lid == other.lid and self.vid == other.vid
+def addBundleArguments(parser):
+    '''Add command-line parsing to the given argument ``parser`` to support handling of bundles
+    with ambiguous ``lid_reference`` without specific versions (#24)
+    '''
+    parser.add_argument('--include-all-collections', action='store_true', default=False, help=_allCollectionsHelp)

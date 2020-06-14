@@ -47,14 +47,14 @@ Environment)::
     # Now let's run pds-deep-archive
     # NOTE: This software must be run against data on your local filesystem
     (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
-                            -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE  \
+                            -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
                             test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 
 From this command-line execution, we are inputting the following information:
 
 •  ``-s PDS_ATM`` - uses ``-s`` flag to specify Atmospheres Node as the
    provider site for the manifest's label
-•  ``-b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE`` - uses ``-b`` flag Base
+•  ``-b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/`` - uses ``-b`` flag Base
    URL for Node data archive. This URL will be prepended to the bundle
    directory to form URLs to the products. For this case, this will allow us
    to form proper URLs in the output manifests based upon the valid online
@@ -66,34 +66,30 @@ From this command-line execution, we are inputting the following information:
 
 Once you complete this execution, the program will print::
 
-    INFO 👟 PDS Deep Archive, version 0.0.0
+    INFO 👟 PDS Deep Archive, version VERSION-NUMBER
     INFO 🏃‍♀️ Starting AIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
-
-    INFO 🎉  Success! AIP done, files generated:
-    INFO • Checksum manifest: ladee_mission_bundle_v1.0_checksum_manifest_v1.0.tab
-    INFO • Transfer manifest: ladee_mission_bundle_v1.0_transfer_manifest_v1.0.tab
-    INFO • XML label for them both: ladee_mission_bundle_v1.0_aip_v1.0.xml
-
+    INFO 🎉 Success! AIP done, files generated:
+    INFO 📄 Checksum manifest: ladee_mission_bundle_v1.0_checksum_manifest_v1.0_DATE.tab
+    INFO 📄 Transfer manifest: ladee_mission_bundle_v1.0_transfer_manifest_v1.0_DATE.tab
+    INFO 📄 XML label for them both: ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml
     INFO 🏃‍♀️ Starting SIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
-
-    INFO 🎉 Success! From /Users/jpadams/Documents/proj/pds/pdsen/workspace/pds-deep-archive/test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
-    INFO • SIP Manifest: ladee_mission_bundle_v1.0_sip_v1.0.tab
-    INFO • XML label for the SIP: ladee_mission_bundle_v1.0_sip_v1.0.xml
-
+    INFO 🎉 Success! From /SOME/DIR/test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
+    INFO 📄 SIP Manifest: ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab
+    INFO 📄 XML label for the SIP: ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml
     INFO 👋 That's it! Thanks for making an AIP and SIP with us today. Bye!
 
-This creates 5 output files in the current directory as part of the AIP and SIP Generation:
+This creates 5 output files in the current directory as part of the AIP and
+SIP Generation (with DATE replaced by the current date):
 
-•  ``ladee_mission_bundle_v1.0_checksum_manifest_v1.0.tab``, the checksum manifest
-•  ``ladee_mission_bundle_v1.0_transfer_manifest_v1.0.tab``, the transfer manifest
-•  ``ladee_mission_bundle_v1.0_aip_v1.0.xml``, the label for these two files
-
-•  ``ladee_mission_bundle_v1.0_sip_v1.0.tab``, the created SIP manifest as a
+•  ``ladee_mission_bundle_v1.0_checksum_manifest_v1.0_DATE.tab``, the checksum manifest
+•  ``ladee_mission_bundle_v1.0_transfer_manifest_v1.0_DATE.tab``, the transfer manifest
+•  ``ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml``, the label for these two files
+•  ``ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab``, the created SIP manifest as a
    tab-separated values file.
-•  ``ladee_mission_bundle_v1.0_sip_v1.0.xml``, an PDS label for the SIP file.
+•  ``ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml``, an PDS label for the SIP file.
 
 Be sure to check out the SIP Manifest,
-``ladee_mission_bundle_v1.0_sip_v1.0.tab``, to ensure the URLs included are
+``ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab``, to ensure the URLs included are
 valid URLs.
 
 If everything looks good to go, package them up into a PDS Deep Archive data

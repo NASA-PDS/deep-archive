@@ -53,6 +53,9 @@ XML_SCHEMA_INSTANCE_NS_URI = 'http://www.w3.org/2001/XMLSchema-instance'
 # Filename extension to use with PDS labels
 PDS_LABEL_FILENAME_EXTENSION = '.xml'
 
+# Filename extension for PDS tables
+PDS_TABLE_FILENAME_EXTENSION = '.tab'
+
 # Command-line names for hash algorithms mapped to Python *implementation*
 # name which are standardized (as lower case, no less) in the ``hashlib``.
 # There are a lot more possible message digest algorithms, but we choose

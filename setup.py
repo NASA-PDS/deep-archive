@@ -49,9 +49,7 @@ with open(path.join(here, 'src', 'pds', 'aipgen', 'version.txt'), encoding='utf-
 
 _requirements = [
     'setuptools',  # All modern setup.py's should require setuptools
-    'pysolr',      # In online mode, we look up products using Solr
     'lxml',        # Needed for generating XML labels (since ElementTree can't add XML PIs above the root elem!)
-    'packaging',   # To parse and compare version IDs
 ]
 
 

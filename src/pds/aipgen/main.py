@@ -31,13 +31,14 @@
 
 u'''AIP and SIP generation'''
 
+from . import VERSION
 from .aip import process as aipProcess
 from .constants import HASH_ALGORITHMS
 from .sip import addSIParguments
 from .sip import produce as sipProcess
-from .utils import addLoggingArguments
-from . import VERSION
-import argparse, sys, logging
+from .utils import addLoggingArguments, addBundleArguments, createSchema, comprehendDirectory
+from datetime import datetime
+import argparse, sys, logging, tempfile, sqlite3, os
 
 
 # Constants
@@ -46,15 +47,15 @@ import argparse, sys, logging
 # Module metadata:
 __version__ = VERSION
 
-# For ``--help``:
+# For ``--help``; note this is hand-formatted to wrap at 80 columns:
 _description = '''
 Generate an Archive Information Package (AIP) and a Submission Information
 Package (SIP). This creates three files for the AIP in the current directory
 (overwriting them if they already exist):
-➀ a "checksum manifest" which contains MD5 hashes of *all* files in a product
-➁ a "transfer manifest" which lists the "lidvids" for files within each XML
+① a "checksum manifest" which contains MD5 hashes of *all* files in a product
+② a "transfer manifest" which lists the "lidvids" for files within each XML
   label mentioned in a product
-➂ an XML label for these two files.
+③ an XML label for these two files.
 
 It also creates two files for the SIP (also overwriting them if they exist):
 ① A "SIP manifest" file; and an XML label of that file too. The names of
@@ -78,9 +79,9 @@ _logger = logging.getLogger(__name__)
 
 def main():
     '''Make an AIP and a SIP'''
-    parser = argparse.ArgumentParser(description=_description,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description=_description, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
+    addBundleArguments(parser)
     addSIParguments(parser)
     addLoggingArguments(parser)
     parser.add_argument(
@@ -90,23 +91,37 @@ def main():
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.info('👟 PDS Deep Archive, version %s', __version__)
     _logger.debug('⚙️ command line args = %r', args)
-    chksumFN = aipProcess(args.bundle)
-    with open(chksumFN, 'rb') as chksumStream:
-        sipProcess(
-            args.bundle,
-            # TODO: Temporarily hardcoding these values until other modes are available
-            # HASH_ALGORITHMS[args.algorithm],
-            # args.url,
-            # args.insecure,
-            HASH_ALGORITHMS['MD5'],
-            '',
-            '',
-            args.site,
-            args.offline,
-            args.bundle_base_url,
-            chksumStream,
-            args.include_all_collections
-        )
+    with tempfile.NamedTemporaryFile() as dbfile:
+        # Make a site survey
+        con = sqlite3.connect(dbfile.name)
+        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile.name)
+        with con:
+            createSchema(con)
+            comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
+
+        # Make a timestamp but without microseconds
+        ts = datetime.utcnow()
+        ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
+
+        chksumFN, dummy, dummy = aipProcess(args.bundle, args.include_all_collections, con, ts)
+        with open(chksumFN, 'rb') as chksumStream:
+            sipProcess(
+                args.bundle,
+                # TODO: Temporarily hardcoding these values until other modes are available
+                # HASH_ALGORITHMS[args.algorithm],
+                # args.url,
+                # args.insecure,
+                HASH_ALGORITHMS['MD5'],
+                '',
+                '',
+                args.site,
+                args.offline,
+                args.bundle_base_url,
+                chksumStream,
+                args.include_all_collections,
+                con,
+                ts
+            )
     _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!")
     sys.exit(0)
 

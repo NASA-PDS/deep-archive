@@ -53,7 +53,7 @@ Making Releases
 
 As mentioned in the parenthetical above, the official Python Package Index is
 updated with an official release of this software is created with a release tag.
-To ensure coherency with the GitHub release, first update the file
+To ensure coherency with the GitHub release, first update the file::
 
     src/pds/aipgen/version.txt
 
@@ -72,6 +72,8 @@ To deploy to the official PyPi manually:
 2. Create the package::
 
     python setup.py sdist
+    … or …
+    bin/buildout setup . sdist
 
 3. Deploy to PyPi::
 

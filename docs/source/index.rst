@@ -15,7 +15,8 @@ Currently, this package provides three executable programs:
 •  ``sipgen``, a subcomponent of ``pds-deep-archive`` to create Submission
    Information Packages (SIPs)
 
-from PDS bundles.
+from PDS bundles. You'll mostly just use ``pds-deep-archive`` but the other
+two are there if you ever *just* want an AIP or a SIP.
 
 
 .. toctree::
