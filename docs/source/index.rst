@@ -8,9 +8,12 @@ Archival Information System (OAIS_) standards.
 
 Currently, this package provides three executable programs:
 
-•  ``pds-deep-archive``, primary executable for creating both Archive Information Packages (AIPs) and Submission Information Packages (SIPs); and
-•  ``aipgen``, a subcomponent of ``pds-deep-archive`` to create Archive Information Packages (AIPs); and
-•  ``sipgen``, a subcomponent of ``pds-deep-archive`` to create Submission Information Packages (SIPs)
+•  ``pds-deep-archive``, primary executable for creating both Archive
+   Information Packages (AIPs) and Submission Information Packages (SIPs); and
+•  ``aipgen``, a subcomponent of ``pds-deep-archive`` to create Archive
+   Information Packages (AIPs); and
+•  ``sipgen``, a subcomponent of ``pds-deep-archive`` to create Submission
+   Information Packages (SIPs)
 
 from PDS bundles.
 
