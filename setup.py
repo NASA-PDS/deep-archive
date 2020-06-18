@@ -56,12 +56,12 @@ _requirements = [
 setup(
     name='pds.deeparchive',
     version=version,
-    description='SIP Generator',
+    description='PDS Deep Archive software for generating OAIS AIPs and SIPs for PDS4 Archives.',
     long_description=readme + '\n\n' + changes,
     keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',
     author='Sean Kelly',
     author_email='sean.kelly@jpl.nasa.gov',
-    url='https://github.com/NASA-PDS-Incubator/pds-deep-archive/',
+    url='https://github.com/NASA-PDS/pds-deep-archive/',
     entry_points={
         'console_scripts': [
             'sipgen=pds.aipgen.sip:main',

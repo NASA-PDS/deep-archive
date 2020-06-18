@@ -4,7 +4,7 @@
 The quickest way to get started developing this package is to clone it and
 build it out::
 
-    git clone https://github.com/NASA-PDS-Incubator/pds-deep-archive.git
+    git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
     python3 bootstrap.py
     bin/buildout
@@ -61,7 +61,7 @@ and enter the release version number you'd like to appear when running the
 commands with ``--version`` and on the official Python Package Index.  Commit
 and push this, then, on GitHub (and with appropriate permissions), visit:
 
-    https://github.com/NASA-PDS-Incubator/pds-deep-archive/releases/new
+    https://github.com/NASA-PDS/pds-deep-archive/releases/new
 
 and enter a release tag with the same version number plus any release notes.
 This will trigger a GitHub Actions release to the official PyPI 🤞.
@@ -84,12 +84,12 @@ To deploy to the official PyPi manually:
 Contribute
 ----------
 
-Source Code: https://github.com/NASA-PDS-Incubator/pds-deep-archive
+Source Code: https://github.com/NASA-PDS/pds-deep-archive
 
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _testing: https://test.pypi.org/
 .. _Actions: https://github.com/features/actions
-.. _website: https://nasa-pds-incubator.github.io/pds-deep-archive/
+.. _website: https://nasa-pds.github.io/pds-deep-archive/
 .. _Jenkins: https://jenkins-ci.org/

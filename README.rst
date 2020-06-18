@@ -21,28 +21,9 @@ Features
 Installation
 ============
 
-First, this requires Python 3.6, 3.7, or 3.8. Are you still using Python 2? It
-reached end-of-life on January 1st, 2020_.
-
-Make a virtualenv_ and run ``pip install pds-deep-archive`` into it. Or use a buildout_
-or, if you absolutely must, install it into your system python you monster.
-This software depends on the lxml_ library which your Python installer should
-take care of, but your *system* will require ``libxml2`` 2.9.2 or later as
-well as ``libxsl2`` 1.1.28 or later.
-
-1. Download the tar.gz distribution
-
-2. Create a virtualenv and activate::
-
-    bash> mkdir -p $HOME/.virtualenvs
-    bash> virtualenv $HOME/.virtualenvs/pds-deep-archive
-    bash> $HOME/.virtualenvs/pds-deep-archive/bin/activate
-
-3. Use the downloaded tar.gz from step 1 and pip to install pds-deep-archive and all of its dependencies::
-
-    (pds-deep-archive) bash> pip install pds.deeparchive-0.0.0.tar.gz
+See the online documentation for Installation_ instructions
     
-4. You should now be able to run the deep archive utilities::
+You should then be able to run the deep archive utilities::
 
     (pds-deep-archive) bash> pds-deep-archive --help
     (pds-deep-archive) bash> aipgen --help
@@ -52,24 +33,13 @@ well as ``libxsl2`` 1.1.28 or later.
 Build
 =====
 
-To build the software for distribution:
-
-1. Boostrap the buildout (if needed)::
-
-    bash> python3 bootstrap.py
-    bash> bin/buildout
-
-2. Create an install package::
-
-    bash> buildout setup . sdist
-
-3. A tar.gz should now be available in the ``dist/`` directory for distribution.
+See the Development_Guide_ for more information.
 
 
 Documentation
 =============
 
-Installation and Usage information can be found in the documentation online at https://nasa-pds-incubator.github.io/pds-deep-archive/ or the latest version is maintained under the ``docs`` directory.
+Installation and Usage information can be found in the documentation online at https://nasa-pds.github.io/pds-deep-archive/ or the latest version is maintained under the ``docs`` directory.
 
 
 
@@ -82,16 +52,17 @@ This product has not been translated into any other languages than US English.
 Contribute
 ==========
 
-• Issue Tracker: https://github.com/NASA-PDS-Incubator/pds-deep-archive/issues
-• Source Code: https://github.com/NASA-PDS-Incubator/pds-deep-archive
-• Wiki: https://github.com/NASA-PDS-Incubator/pds-deep-archive/wiki
+• Issue Tracker: https://github.com/NASA-PDS/pds-deep-archive/issues
+• Source Code: https://github.com/NASA-PDS/pds-deep-archive
+• Wiki: https://github.com/NASA-PDS/pds-deep-archive/wiki
 
 
 Support
 =======
 
-If you are having issues, please let us know.  You can reach us at
-https://pds.nasa.gov/?feedback=true
+If you are having issues file a bug report in Github: https://github.com/NASA-PDS/pds-deep-archive/issues
+
+Or you can reach us at https://pds.nasa.gov/?feedback=true
 
 
 License
@@ -107,6 +78,9 @@ LICENSE.txt file for details.
 .. _PDS: https://pds.nasa.gov/
 .. _virtualenv: https://docs.python.org/3/library/venv.html
 .. _lxml: https://lxml.de/
+.. _Installation: https://nasa-pds.github.io/pds-deep-archive/installation/
+.. _Development_Guide: https://nasa-pds.github.io/pds-deep-archive/development/
+
 
 
 .. Copyright © 2019–2020 California Institute of Technology ("Caltech").
