@@ -94,6 +94,7 @@ jobs:
                 ref: gh-pages
             - name: Create requirements report
               run: |
+                pip install pds-github-util
                 echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --dev)
                 echo ::set-env name=REQUIREMENT_HTML=$(echo $REQUIREMENT_FILE | sed s/\.md/\.html/g)
             - uses: docker://pandoc/core:2.9
