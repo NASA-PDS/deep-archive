@@ -32,27 +32,55 @@
 '''PDS AIP-GEN functional tests'''
 
 
+from datetime import datetime
 from lxml import etree
-from pds.aipgen.sip import produce
+from pds.aipgen.aip import process as produce_aip
 from pds.aipgen.constants import PDS_NS_URI
-import unittest, tempfile, shutil, os, pkg_resources, filecmp
+from pds.aipgen.sip import produce as produce_sip
+from pds.aipgen.utils import createSchema, comprehendDirectory
+import unittest, tempfile, shutil, os, pkg_resources, filecmp, codecs, sqlite3
 
 
-class SIPFunctionalTestCase(unittest.TestCase):
+class _FunctionalTestCase(unittest.TestCase):
+    '''Abstract test harness for functional tests.
+
+    This just sets up an input stream and temporary testing area for generated
+    files. Subclasses actually do the tests.
+    '''
+    def setUp(self):
+        super(_FunctionalTestCase, self).setUp()
+        bundleDir = pkg_resources.resource_filename(__name__, 'data/ladee_test/mission_bundle')
+        self.dbfile = tempfile.NamedTemporaryFile()
+        self.con = sqlite3.connect(self.dbfile.name)
+        with self.con:
+            createSchema(self.con)
+            comprehendDirectory(bundleDir, self.con)
+        self.input = pkg_resources.resource_stream(__name__, 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml')
+        self.cwd, self.testdir = os.getcwd(), tempfile.mkdtemp()
+        os.chdir(self.testdir)
+        ts = datetime.utcnow()
+        self.timestamp = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
+    def tearDown(self):
+        self.input.close()
+        self.con.close()
+        os.chdir(self.cwd)
+        shutil.rmtree(self.testdir, ignore_errors=True)
+        super(_FunctionalTestCase, self).tearDown()
+
+
+class SIPFunctionalTestCase(_FunctionalTestCase):
     '''Functional test case for SIP generation.
-
-    TODO: factor this out so we can generically do AIP and other file-based functional tests too.
     '''
     _urlXPath = f'./{{{PDS_NS_URI}}}Information_Package_Component_Deep_Archive/{{{PDS_NS_URI}}}manifest_url'
     def setUp(self):
         super(SIPFunctionalTestCase, self).setUp()
-        self.input = pkg_resources.resource_stream(__name__, 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml')
-        self.valid = pkg_resources.resource_filename(__name__, 'data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab')
-        self.cwd, self.testdir = os.getcwd(), tempfile.mkdtemp()
-        os.chdir(self.testdir)
+        self.valid = pkg_resources.resource_filename(
+            __name__,
+            'data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+        )
     def test_sip_of_a_ladee(self):
         '''Test if the SIP manifest of LADEE bundle works as expected'''
-        manifest, ignoredLabel = produce(
+        manifest, ignoredLabel = produce_sip(
             bundle=self.input,
             hashName='md5',
             registryServiceURL=None,
@@ -61,12 +89,14 @@ class SIPFunctionalTestCase(unittest.TestCase):
             offline=True,
             baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
             allCollections=True,
-            aipFile=None
+            aipFile=None,
+            con=self.con,
+            timestamp=self.timestamp
         )
         self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
     def test_label_url(self):
         '''Test if the label of a SIP manifest has the right ``manifest_url``'''
-        ignoredManifest, label = produce(
+        ignoredManifest, label = produce_sip(
             bundle=self.input,
             hashName='md5',
             registryServiceURL=None,
@@ -75,16 +105,49 @@ class SIPFunctionalTestCase(unittest.TestCase):
             offline=True,
             baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
             allCollections=True,
-            aipFile=None
+            aipFile=None,
+            con=self.con,
+            timestamp=self.timestamp
         )
         matches = etree.parse(label).getroot().findall(self._urlXPath)
         self.assertEqual(1, len(matches))
         self.assertTrue(matches[0].text.startswith('https://pds.nasa.gov/data/pds4/manifests/'))
-    def tearDown(self):
-        self.input.close()
-        os.chdir(self.cwd)
-        shutil.rmtree(self.testdir, ignore_errors=True)
-        super(SIPFunctionalTestCase, self).tearDown()
+
+
+class AIPFunctionalTestCase(_FunctionalTestCase):
+    '''Functional test case for AIP generation.
+    '''
+    def setUp(self):
+        super(AIPFunctionalTestCase, self).setUp()
+        base = 'data/ladee_test/valid/ladee_mission_bundle_v1.0_'
+        self.csum = pkg_resources.resource_filename(__name__, base + 'checksum_manifest_v1.0.tab')
+        self.xfer = pkg_resources.resource_filename(__name__, base + 'transfer_manifest_v1.0.tab')
+    def test_manifests(self):
+        '''See if the AIP generator makes the two manifest files'''
+        csum, xfer, ignoredLabel = produce_aip(
+            self.input,
+            allCollections=False,
+            con=self.con,
+            timestamp=self.timestamp
+        )
+
+        # Normally we'd just do:
+        #     self.assertTrue(filecmp.cmp(xfer, self.xfer, "AIP checksum manifest doesn't match the valid version"))
+        # but can't simply check the valid version by a file comparison because the so-called "valid" version
+        # has entries that are in a different (but still correct) order. So read them both in and see if their
+        # data structures match.
+
+        def _readTransferManifest(fn):
+            d = {}
+            with codecs.open(fn, encoding='utf-8') as f:
+                for line in f:
+                    uri, fn = line.split()
+                    fns = d.get(uri, set())
+                    fns.add(fn)
+                    d[uri] = fns
+            return d
+        xfers, valids = _readTransferManifest(xfer), _readTransferManifest(self.xfer)
+        self.assertEqual(xfers, valids, "AIP transfer manifest doesn't match the valid version")
 
 
 def test_suite():

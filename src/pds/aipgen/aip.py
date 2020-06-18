@@ -30,12 +30,18 @@
 '''Archive Information Package'''
 
 
-from .constants import PDS_NS_URI, XML_SCHEMA_INSTANCE_NS_URI, PDS_SCHEMA_URL, XML_MODEL_PI, INFORMATION_MODEL_VERSION
-from .utils import getPrimariesAndOtherInfo, getMD5, parseXML, addLoggingArguments
+from .constants import (
+    INFORMATION_MODEL_VERSION, PDS_LABEL_FILENAME_EXTENSION, PDS_NS_URI, PDS_SCHEMA_URL, PDS_TABLE_FILENAME_EXTENSION,
+    XML_MODEL_PI, XML_SCHEMA_INSTANCE_NS_URI
+)
+from .utils import (
+    addBundleArguments, addLoggingArguments, comprehendDirectory, createSchema, getLogicalVersionIdentifier,
+    getMD5, parseXML
+)
+from . import VERSION
 from datetime import datetime
 from lxml import etree
-from . import VERSION
-import argparse, logging, sys, os, os.path, hashlib
+import argparse, logging, sys, os, os.path, hashlib, tempfile, sqlite3
 
 
 # Constants
@@ -45,12 +51,16 @@ import argparse, logging, sys, os, os.path, hashlib
 
 __version__ = VERSION
 
-# For ``--help``:
-_description = '''Generate an Archive Information Package or AIP. An AIP consists of three files:
- ➀ a "checksum manifest" which contains MD5 hashes of *all* files in a product;
- ➁ a "transfer manifest" which lists the "lidvids" for files within each XML label mentioned in a product; and
- ➂ an XML label for these two files. You can use the checksum manifest file ➀ as input to ``sipgen`` in
- order to create a Submission Information Package.'''
+# For ``--help``; note this is hand-wrapped at 80 columns:
+_description = '''Generate an Archive Information Package or AIP. An AIP consists of three
+files:
+➀ a "checksum manifest" which contains MD5 hashes of *all* files in a
+  product;
+➁ a "transfer manifest" which lists the "lidvids" for files within each
+  XML label mentioned in a product; and
+➂ an XML label for these two files.
+You can use the checksum manifest file ➀ as input to ``sipgen`` in order
+to create a Submission Information Package.'''
 
 # Prefix to use for logical IDs for labels for AIPs
 _aipProductPrefix = 'urn:nasa:pds:system_bundle:product_aip:'
@@ -65,93 +75,6 @@ _logger = logging.getLogger(__name__)
 # Functions
 # ---------
 
-def _writeChecksumManifest(checksumManifestFN, dn):
-    '''Come up with a "checksum manifest"† for the files in the directory named by ``dn``
-    and write it to the file named ``checksumManifestFN``, overwriting any existing file.
-    Return the hex MD5 digest, byte size of the file we created, and the number of records
-    in the file.
-    '''
-    _logger.debug('🧾 Writing checksum manifest for %s to %s', dn, checksumManifestFN)
-    md5, size, count = hashlib.new('md5'), 0, 0
-    prefixLen = len(dn)
-    with open(checksumManifestFN, 'wb') as o:
-        for dirpath, dirnames, filenames in os.walk(dn):
-            for fn in filenames:
-                fileToHash = os.path.join(dirpath, fn)
-                with open(fileToHash, 'rb') as i:
-                    digest = getMD5(i)
-                    strippedFN = fileToHash[prefixLen + 1:]
-                    entry = f'{digest}\t{strippedFN}\r\n'.encode('utf-8')
-                    o.write(entry)
-                    md5.update(entry)
-                    size += len(entry)
-                    count += 1
-    return md5.hexdigest(), size, count
-
-
-def _getLIDVIDandFileInventory(xmlFile):
-    '''In the named local ``xmlFile ``, return a double of its logical identifier + double colon
-    + version identifier and all ``file_name`` entries. If there's no logical identifier or version
-    identifier, return None and None.
-    '''
-    _logger.debug('📜 Analyzing XML in %s', xmlFile)
-    tree = parseXML(xmlFile)
-    root = tree.getroot()
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}logical_identifier')
-    if not matches:
-        _logger.warning('📯 XML file %s lacks a logical_identifier; skipping it', xmlFile)
-        return None, None
-    lid = matches[0].text.strip()
-
-    matches = root.findall(f'./{{{PDS_NS_URI}}}Identification_Area/{{{PDS_NS_URI}}}version_id')
-    if not matches:
-        _logger.warning('📯 XML file %s lacks a version_id; skipping it', xmlFile)
-        return None, None
-    lidvid = lid + '::' + matches[0].text.strip()
-
-    if not lid: return None, None
-    dirname = os.path.dirname(xmlFile)
-    matches = root.findall(f'.//{{{PDS_NS_URI}}}file_name')
-    files = [os.path.join(dirname, i.text.strip()) for i in matches]
-
-    _logger.debug('🔍 For %s in %s we have %d files', lidvid, xmlFile, len(files))
-    return lidvid, files
-
-
-def _writeTransferManifest(transferManifestFN, dn):
-    '''Check for all ``.xml`` files in the directory tree rooted at ``dn`` and get each one's
-    "lidvid" and set of all files mentioned within.  Write a transfer manifest for every file
-    mentioned inlcuding the XML files too prefixed and grouped by "lidvid". Root paths in the
-    transfer manifest at the top level of the bundle file given and turn all ``/`` directory
-    separators into backslashes. Return a triple of the MD5 digest, byte size, and number of
-    entries in the transfer manifest we created.'''
-    _logger.debug('🚢 Writing transfer manifest for %s to %s', dn, transferManifestFN)
-    md5, size, count = hashlib.new('md5'), 0, 0
-    lidvidsToFiles = {}
-    for dirpath, dirnames, filenames in os.walk(dn):
-        for fn in filenames:
-            if fn.lower().endswith('.xml'):
-                xmlFile = os.path.join(dirpath, fn)
-                lidvid, inventory = _getLIDVIDandFileInventory(xmlFile)
-                if lidvid is None: continue
-                files = lidvidsToFiles.get(lidvid, set())
-                files |= set(inventory)
-                files.add(xmlFile)
-                lidvidsToFiles[lidvid] = files
-    prefixLen = len(dn)
-    with open(transferManifestFN, 'wb') as o:
-        for lidvid, filenames in lidvidsToFiles.items():
-            for fn in filenames:
-                # transformedFN = '\\' + fn[prefixLen + 1:].replace('/', '\\')
-                transformedFN = '/' + fn[prefixLen + 1:]
-                entry = f'{lidvid:255}{transformedFN:255}\r\n'.encode('utf-8')
-                o.write(entry)
-                md5.update(entry)
-                size += len(entry)
-                count += 1
-    return md5.hexdigest(), size, count
-
-
 def _writeLabel(
     labelOutputFile,
     logicalIDfragment,
@@ -165,6 +88,7 @@ def _writeLabel(
     xferMD5,
     xferSize,
     xferNum,
+    timestamp
 ):
     '''Create an XML label in ``labelOutputFile`` which will be overwritten and using the following
     information:
@@ -180,11 +104,13 @@ def _writeLabel(
     • ``xferMD5`` — the MD5 hash of the transfer manifest file
     • ``xferSize`` — size in bytes of the transfer manifest file
     • ``xferNum`` — count of records in the transfer manifest file
+    • ``timestamp`` — what to use for creation date + modification date, in the label
     '''
 
     _logger.debug('🏷  Writing AIP label to %s', labelOutputFile)
-    ts = datetime.utcnow()
-    ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
+
+    # Contrive the logical identifer of the label
+    labelLID = _aipProductPrefix + logicalIDfragment.split(':')[-1] + '_' + timestamp.date().strftime('%Y%m%d')
 
     # Set up convenient prefixes for XML namespaces
     nsmap = {
@@ -203,7 +129,7 @@ def _writeLabel(
     identificationArea = etree.Element(prefix + 'Identification_Area')
     root.append(identificationArea)
     identificationArea.append(etree.Comment(_iaComment))
-    etree.SubElement(identificationArea, prefix + 'logical_identifier').text = _aipProductPrefix + logicalIDfragment.split(':')[-1]
+    etree.SubElement(identificationArea, prefix + 'logical_identifier').text = labelLID
     etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
     identificationArea.append(etree.Comment('Use the title from the bundle label'))
     title = 'Archive Information Package for ' + logicalIDfragment + '::' + bundleVID
@@ -216,7 +142,7 @@ def _writeLabel(
     modificationDetail = etree.Element(prefix + 'Modification_Detail')
     modificationHistory.append(modificationDetail)
     modificationDetail.append(etree.Comment('Creation date in format YYYY-MM-DD'))
-    etree.SubElement(modificationDetail, prefix + 'modification_date').text = ts.date().isoformat()
+    etree.SubElement(modificationDetail, prefix + 'modification_date').text = timestamp.date().isoformat()
     etree.SubElement(modificationDetail, prefix + 'version_id').text = '1.0'
     etree.SubElement(modificationDetail, prefix + 'description').text = 'Archive Information Package was versioned and created'
 
@@ -239,7 +165,7 @@ def _writeLabel(
     chksum.append(f)
     etree.SubElement(f, prefix + 'file_name').text = chksumFN
     f.append(etree.Comment('Creation date time in formation YYYY-MM-DDTHH:mm:ss'))
-    etree.SubElement(f, prefix + 'creation_date_time').text = ts.isoformat()
+    etree.SubElement(f, prefix + 'creation_date_time').text = timestamp.isoformat()
     etree.SubElement(f, prefix + 'file_size', unit='byte').text = str(chksumSize)
     etree.SubElement(f, prefix + 'records').text = str(chksumNum)
     cm = etree.Element(prefix + 'Checksum_Manifest')
@@ -255,7 +181,7 @@ def _writeLabel(
     f = etree.Element(prefix + 'File')
     manifest.append(f)
     etree.SubElement(f, prefix + 'file_name').text = xferFN
-    etree.SubElement(f, prefix + 'creation_date_time').text = ts.isoformat()
+    etree.SubElement(f, prefix + 'creation_date_time').text = timestamp.isoformat()
     etree.SubElement(f, prefix + 'file_size', unit='byte').text = str(xferSize)
     etree.SubElement(f, prefix + 'records').text = str(xferNum)  # Do it once here
     tm = etree.Element(prefix + 'Transfer_Manifest')
@@ -294,34 +220,132 @@ def _writeLabel(
     tree.write(labelOutputFile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
-def process(bundle):
+def _getFiles(con, lid, vid, allCollections):
+    '''Get the files specified in the database at ``con`` referenced by the label ``lid``::``vid``.
+    Recursively find files specified by the labels references as bundle member entries in the label
+    for ``lid``::``vid``. Note that some references might be by ``lid`` only; when this is the case,
+    we choose only the latest version found in ``con`` except if ``allCollections`` is True, then
+    we put in *every* referenced version.
+
+    Returns a sequence of triples (lid, vid, filepath) where filepath is the full path of a
+    referenced file.
+    '''
+    _logger.debug('🕵️‍♀️ Finding files for %s::%s', lid, vid)
+    cursor = con.cursor()
+    cursor.execute('SELECT filepath FROM label_file_references WHERE lid = ? AND vid = ?', ((lid, vid)))
+    files = [(lid, vid, i[0]) for i in cursor.fetchall()]
+
+    _logger.debug('🕵️‍♂️ Finding inter-label references from %s::%s with allCollections=%r', lid, vid, allCollections)
+    cursor.execute('SELECT to_lid, to_vid FROM inter_label_references WHERE lid = ? AND vid = ?', ((lid, vid)))
+    for to_lid, to_vid in cursor.fetchall():
+        # For a lid-only reference, we can include all of the potential vids or just the latest
+        if to_vid is None:
+            # lid-only, so what's it gonna be, all or latest 🤷‍♀️
+            if allCollections:
+                cursor.execute('SELECT vid FROM labels WHERE lid = ?', (to_lid,))
+                for to_vid in [i[0] for i in cursor.fetchall()]:
+                    files.extend(_getFiles(con, to_lid, to_vid, allCollections))
+            else:
+                # Note that ``max(vid)`` doesn't cut it since it would make 2.0 > 10.0; however  to fix this
+                # we'd either have to make (major, minor) columns out of version IDs or provide a sqlite3 C
+                # extension with a version collator. But this is close enough for now. 🧐
+                cursor.execute('SELECT max(vid) FROM labels WHERE lid = ?', (to_lid,))
+                to_vid = cursor.fetchone()[0]
+                files.extend(_getFiles(con, to_lid, to_vid, allCollections))
+        else:
+            # full lid-vid reference
+            files.extend(_getFiles(con, to_lid, to_vid, allCollections))
+    return files
+
+
+def _writeChecksumManifest(chksumFN, lid, vid, con, prefixLen, allCollections):
+    '''Write the checksum manifest for the label ``lid``::``vid`` found in database ``con`` to the
+    file ``chksumFN``, stripping the prefixes of local filenames up to ``prefixLen`` characters,
+    and optionally including ``allCollections`` for labels that reference bundle member entries
+    by lid-only if True, otherwise the latest version only if False.
+    '''
+    _logger.debug('🧾 Writing checksum manifest for %s::%s to %s', lid, vid, chksumFN)
+    md5, size, count = hashlib.new('md5'), 0, 0
+    files = _getFiles(con, lid, vid, allCollections)
+    with open(chksumFN, 'wb') as o:
+        # The tuples are (lid, vid, filepath)—we care just about filepath
+        for f in [i[2] for i in files]:
+            with open(f, 'rb') as i:
+                digest = getMD5(i)
+                strippedFN = f[prefixLen:]
+                entry = f'{digest}\t{strippedFN}\r\n'.encode('utf-8')
+                o.write(entry)
+                md5.update(entry)
+                size += len(entry)
+                count += 1
+                if count % 100 == 0:
+                    _logger.debug('⏲ Wrote %d entries into the checksum manifest', count)
+    return md5.hexdigest(), size, count, files
+
+
+def _writeTransferManifest(xferFN, prefixLen, files):
+    '''Write the transfer manifest to the file ``xferFN`` for the given ``files``, stripping the prefix
+    of local file paths up to ``prefixLen`` characters away.  ``files`` is a sequence of triples of
+    (lid, vid, filepath).
+    '''
+    _logger.debug('🚢 Writing transfer manifest to %s', xferFN)
+    md5, size, count = hashlib.new('md5'), 0, 0
+
+    # First, organize by lid::vids → sequences of files
+    files.sort()  # this may give a slight optimiziation as we hash into a dict below
+    lidvidsToFiles = {}
+    for lid, vid, f in files:
+        lidvid, transformedFN = f'{lid}::{vid}', '/' + f[prefixLen:]
+        perLidvid = lidvidsToFiles.get(lidvid, [])
+        perLidvid.append(transformedFN)
+        lidvidsToFiles[lidvid] = perLidvid
+
+    # Now write those organized into groups of lidvids
+    with open(xferFN, 'wb') as o:
+        for lidvid, filenames in lidvidsToFiles.items():
+            for fn in filenames:
+                entry = f'{lidvid:255}{fn:255}\r\n'.encode('utf-8')
+                o.write(entry)
+                md5.update(entry)
+                size += len(entry)
+                count += 1
+                if count % 100 == 0:
+                    _logger.debug('⌚️ Wrote %d entries into the transfer manifest', count)
+    return md5.hexdigest(), size, count
+
+
+def process(bundle, allCollections, con, timestamp):
     '''Generate a "checksum manifest", a "transfer manifest", and a PDS label from the given
     ``bundle``, which is an open file stream (with a ``name`` atribute) on the local
-    filesystem. Return the name of the generated checksum manifest file.
+    filesystem. Return the name of the generated checksum manifest file. ``con`` is a sqlite3
+    database connection containing information about the bundle. The ``timestamp`` tells us
+    what to put into the label for thie AIP files about creation date and also to create
+    filenames of our generated files.
     '''
     _logger.info('🏃‍♀️ Starting AIP generation for %s', bundle.name)
-    d = os.path.dirname(os.path.abspath(bundle.name))
 
-    # Get the bundle's primary collections and other useful info
-    primaries, bundleLID, title, bundleVID = getPrimariesAndOtherInfo(bundle)
-    strippedLogicalID = bundleLID.split(':')[-1] + '_v' + bundleVID
+    prefixLen = len(os.path.dirname(os.path.abspath(bundle.name))) + 1
+    lid, vid = getLogicalVersionIdentifier(parseXML(bundle))
+    strippedLogicalID, slate = lid.split(':')[-1] + '_v' + vid, timestamp.date().strftime('%Y%m%d')
 
     # Easy one: the checksum† manifest
     # †It's actually an MD5 *hash*, not a checksum 😅
-    chksumFN = strippedLogicalID + '_checksum_manifest_v' + bundleVID + '.tab'
-    chksumMD5, chksumSize, chksumNum = _writeChecksumManifest(chksumFN, d)
+    chksumFN = strippedLogicalID + '_checksum_manifest_v' + vid + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
+    chksumMD5, chksumSize, chksumNum, files = _writeChecksumManifest(
+        chksumFN, lid, vid, con, prefixLen, allCollections
+    )
 
-    # Next: the transfer manifest.
-    xferFN = strippedLogicalID + '_transfer_manifest_v' + bundleVID + '.tab'
-    xferMD5, xferSize, xferNum = _writeTransferManifest(xferFN, d)
+    # Next: the transfer manifest
+    xferFN = strippedLogicalID + '_transfer_manifest_v' + vid + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
+    xferMD5, xferSize, xferNum = _writeTransferManifest(xferFN, prefixLen, files)
 
-    # Finally, the XML label.
-    labelFN = strippedLogicalID + '_aip_v' + bundleVID + '.xml'
+    # Finally, the XML label
+    labelFN = strippedLogicalID + '_aip_v' + vid + '_' + slate + PDS_LABEL_FILENAME_EXTENSION
     _writeLabel(
         labelFN,
         strippedLogicalID,
-        bundleLID,
-        bundleVID,
+        lid,
+        vid,
         chksumFN,
         chksumMD5,
         chksumSize,
@@ -329,28 +353,42 @@ def process(bundle):
         xferFN,
         xferMD5,
         xferSize,
-        xferNum
+        xferNum,
+        timestamp
     )
-    _logger.info('🎉  Success! AIP done, files generated:')
-    _logger.info('• Checksum manifest: %s', chksumFN)
-    _logger.info('• Transfer manifest: %s', xferFN)
-    _logger.info('• XML label for them both: %s', labelFN)
-    return chksumFN
+    _logger.info('🎉 Success! AIP done, files generated:')
+    _logger.info('📄 Checksum manifest: %s', chksumFN)
+    _logger.info('📄 Transfer manifest: %s', xferFN)
+    _logger.info('📄 XML label for them both: %s', labelFN)
+    return chksumFN, xferFN, labelFN
 
 
 def main():
     '''Check the command-line for options and create an AIP from the given bundle XML'''
-    parser = argparse.ArgumentParser(description=_description,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description=_description, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     addLoggingArguments(parser)
+    addBundleArguments(parser)
     parser.add_argument(
         'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Root bundle XML file to read'
     )
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
-    process(args.bundle)
+    with tempfile.NamedTemporaryFile() as dbfile:
+        # Scout the enemy line
+        con = sqlite3.connect(dbfile.name)
+        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile.name)
+        with con:
+            createSchema(con)
+            comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
+
+        # Make a timestamp but drop the microsecond resolution
+        ts = datetime.utcnow()
+        ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
+
+        # Here we go, daddy
+        process(args.bundle, args.include_all_collections, con, ts)
     _logger.info('👋 Thanks for using this program! Bye!')
     sys.exit(0)
 

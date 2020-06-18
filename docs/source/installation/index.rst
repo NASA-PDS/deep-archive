@@ -43,7 +43,8 @@ won't interfere with—or be interfered by—other packages.  To do so::
 It's also possible to use ``easy_install`` if you prefer, or to install it
 via a Buildout_, or (if you must) into the system Python.
 
-You can then run ``pds-deep-archive --help`` to get a usage message and ensure it's properly installed.
+You can then run ``pds-deep-archive --help`` to get a usage message and ensure
+it's properly installed.
 
 
 ..  note::
@@ -52,7 +53,8 @@ You can then run ``pds-deep-archive --help`` to get a usage message and ensure i
     Package Index ("Cheeseshop_"). The latest, cutting edge release is posted
     at the Test Package Index, but these releases may not be fully confirmed
     to be operational. If you like taking risks, run the following to create a
-    new virtual environment and install the latest development version of the software::
+    new virtual environment and install the latest development version of the
+    software::
     
       mkdir -p $HOME/.virtualenvs
       python3 -m venv $HOME/.virtualenvs/pds-deep-archive
@@ -62,6 +64,7 @@ You can then run ``pds-deep-archive --help`` to get a usage message and ensure i
 
 Upgrade Software
 ----------------
+
 To check and install an upgrade to the software, run the following command in your 
 virtual environment::
 
