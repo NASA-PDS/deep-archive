@@ -88,24 +88,32 @@ jobs:
                 with:
                     target_branch: gh-pages
                     build_dir: build/docs/html
-            # the changelog will be available on https://nasa-pds.github.io/<your repo>/CHANGELOG
+            # the changelog will be available on https://nasa-pds.github.io/<your repo>/pdsen-corral/CHANGELOG
             - uses: actions/checkout@v2
               with:
                 ref: gh-pages
+            - name: Create requirements report
+              run: |
+                echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --dev)
+                echo ::set-env name=REQUIREMENT_HTML=$(echo $REQUIREMENT_FILE | sed s/\.md/\.html/g)
+            - uses: docker://pandoc/core:2.9
+              with:
+                args: --standalone -f markdown -t html --output=${{ env.REQUIREMENT_HTML}} ${{ env.REQUIREMENT_FILE}}
             - name: Create changelog
               run: |
                 sudo gem install github_changelog_generator
-                github_changelog_generator --user NASA-PDS --project pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --configure-sections '{"improvements":{"prefix":"**Improvements:**","labels":["Epic"]},"defects":{"prefix":"**Defects:**","labels":["bug"]},"deprecations":{"prefix":"**Deprecations:**","labels":["deprecation"]}}' --no-pull-requests
+                github_changelog_generator --user NASA-PDS --project pds-deep-archive --output pdsen-corral/CHANGELOG.md --token ${{ secrets.GITHUB_TOKEN }} --configure-sections '{"improvements":{"prefix":"**Improvements:**","labels":["enhancement"]},"defects":{"prefix":"**Defects:**","labels":["bug"]},"deprecations":{"prefix":"**Deprecations:**","labels":["deprecation"]}}' --no-pull-requests
             # convert markdown file to html because jekyll is disabled in this repository
             - uses: docker://pandoc/core:2.9
               with:
-                args: --standalone -f markdown -t html --output=CHANGELOG.html CHANGELOG.md
-            - name: Commit CHANGELOG.md file
+                  args: --standalone -f markdown -t html --output=CHANGELOG.html CHANGELOG.md
+            - name: Commit CHANGELOG.md and requirement files
               run: |
                 git config --local user.email "action@github.com"
                 git config --local user.name "GitHub Action"
-                git add CHANGELOG.md CHANGELOG.html
-                git commit -m "update changelog" --allow-empty
+                echo "commit pdsen-corral/CHANGELOG.md and ${{ env.REQUIREMENT_FILE }}on gh-pages branch"
+                git add pdsen-corral/CHANGELOG.md pdsen-corral/CHANGELOG.html ${{ env.REQUIREMENT_FILE }} ${{ env.REQUIREMENT_HTML}}
+                git commit -m "update changelog and requirements" --allow-empty
             - name: Push changes
               uses: ad-m/github-push-action@master
               with:
