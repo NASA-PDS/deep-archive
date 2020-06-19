@@ -95,22 +95,14 @@ jobs:
             - name: Create requirements report for stable release
               run: |
                   pip install pds-github-util
-                  echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral)
+                  echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --format=html)
                   echo "{{ env.REQUIREMENT_FILE }} generated"
-                  echo ::set-env name=REQUIREMENT_HTML=$(echo {{ env.REQUIREMENT_FILE }} | sed s/\.md/\.html/g)
               if: startsWith(github.event.ref, 'refs/tags')
-            - uses: docker://pandoc/core:2.9
-              with:
-                args: --standalone -f markdown -t html --output=${{ env.REQUIREMENT_HTML}} ${{ env.REQUIREMENT_FILE}}
             - name: Create requirements report for dev
               run: |
                 pip install pds-github-util
-                echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --dev)
+                echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --dev --format=html)
                 echo "{{ env.REQUIREMENT_FILE }} generated"
-                echo ::set-env name=REQUIREMENT_HTML=$(echo {{ env.REQUIREMENT_FILE }} | sed s/\.md/\.html/g)
-            - uses: docker://pandoc/core:2.9
-              with:
-                args: --standalone -f markdown -t html --output=${{ env.REQUIREMENT_HTML}} ${{ env.REQUIREMENT_FILE}}
             - name: Create changelog
               run: |
                 sudo gem install github_changelog_generator
