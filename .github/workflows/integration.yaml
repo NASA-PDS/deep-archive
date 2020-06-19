@@ -117,7 +117,7 @@ jobs:
             # convert markdown file to html because jekyll is disabled in this repository
             - uses: docker://pandoc/core:2.9
               with:
-                  args: --standalone -f markdown -t html --output=CHANGELOG.html CHANGELOG.md
+                  args: --standalone -f markdown -t html --output=pdsen-corral/CHANGELOG.html pdsen-corral/CHANGELOG.md
             - name: Prepare for commit
               run: |    
                 echo "commit pdsen-corral/CHANGELOG.md and"
