@@ -481,7 +481,7 @@ def main():
             offline=args.offline,
             baseURL=args.bundle_base_url,
             aipFile=args.aip,
-            allCollections=args.include_all_collections,
+            allCollections=args.include_latest_collection_only,
             con=con,
             timestamp=ts
         )

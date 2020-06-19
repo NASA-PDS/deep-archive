@@ -48,9 +48,10 @@ _xmlCacheSize = 2**16                                    # XML files to cache in
 _digestCacheSize = 2**16                                 # Message digests to cache in memory
 _pLineMatcher = re.compile(r'^P,\s*([^\s]+)::([^\s]+)')  # Match separate lids and vids in "P" lines in ``.tab`` files
 
-# Help message for ``--include-all-collections``:
-_allCollectionsHelp = '''For bundles that reference collections by LID, this flag will include ALL versions of
-collections in the bundle. By default, the software only includes the latest version of the collection.
+# Help message for ``--include-latest-collection-only``:
+_allCollectionsHelp = '''For bundles that reference collections by LID, this flag will only include the latest version of
+collections in the bundle. By default, the software includes all versions of all collections located within the bundle 
+root directory.
 '''
 
 
@@ -218,4 +219,4 @@ def addBundleArguments(parser):
     '''Add command-line parsing to the given argument ``parser`` to support handling of bundles
     with ambiguous ``lid_reference`` without specific versions (#24)
     '''
-    parser.add_argument('--include-all-collections', action='store_true', default=False, help=_allCollectionsHelp)
+    parser.add_argument('--include-latest-collection-only', action='store_false', default=True, help=_allCollectionsHelp)

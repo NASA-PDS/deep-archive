@@ -30,8 +30,8 @@ Running ``pds-deep-archive --help`` will give a summary of the command-line
 invocation, its required arguments, and any options that refine the behavior.
 
 
-Example
--------
+Example 1: Basic Usage
+----------------------
 
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run the
@@ -98,6 +98,25 @@ package (e.g. ``ladee_mission_bundle_v1.0_pds_deep_archive.zip``).
 Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_.
 
 
+Example 2: Bundle Referencing Collections by LID
+------------------------------------------------
+
+For running the software on an accumulating bundle, you have two options:
+
+**Option 1: (preferred) Run ``pds-deep-archive`` against the entire bundle and all versions of all collections present beneath the bundle root directory.**
+
+This is the default functionality of ``pds-deep-archive``. See `Example 1: Basic Usage`_ to execute using this option.
+
+**Option 2: Run ``pds-deep-archive`` against the bundle with only the current versions of the collections present beneath the bundle root directory.**
+
+Execute the software with the ``--include-latest-collections-only`` flag enabled, for example::
+
+    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
+                            -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+                            test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+                            --include-latest-collection-only
+
+
 PDS Delivery Checklist
 ----------------------
 
@@ -105,14 +124,12 @@ The following is a checklist and procedure Discipline Node personnel should
 follow when delivering a PDS Deep Archive data package to the PDS Engineering
 Node upon a new release of data:
 
-•  ▶ START: New Bundle is ready for Delivery.
-•  Bundle has completed successful validation with PDS4 Validate Tool.
-•  Execute PDS Deep Archive software per usage instructions and example above.
-•  Check the SIP Manifest (``*._sip_v1.0.tab``) file to verify URLs indicated
-   are valid.
-•  Package up the five ``*.tab` and ``*.xml`` files into a ``.ZIP`` or
-   ``.TAR.GZ`` PDS Deep Archive Delivery package.
-•  Email PDS Deep Archive Delivery package to the
-   `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ for delivery to NSSDCA.
-•  Receive confirmation from PDS Operator once delivery has completed.
+•  ▶  START: New Bundle is ready for Delivery.
+•     Bundle has completed successful validation with PDS4 Validate Tool.
+•     Execute PDS Deep Archive software per usage instructions and example above.
+•     Check the SIP Manifest (``*._sip_v1.0.tab``) file to verify URLs indicated are valid.
+•     Package up the five ``*.tab` and ``*.xml`` files into a ``.ZIP`` or
+      ``.TAR.GZ`` PDS Deep Archive Delivery package.
+•     Email PDS Deep Archive Delivery package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ for delivery to NSSDCA.
+•     Receive confirmation from PDS Operator once delivery has completed.
 •  🎉 DONE
