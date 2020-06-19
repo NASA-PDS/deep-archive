@@ -103,7 +103,7 @@ jobs:
                     with:
                         args: --standalone -f markdown -t html --output=${{ env.REQUIREMENT_HTML}} ${{ env.REQUIREMENT_FILE}}
             - name: Create requirements report for dev
-              if: !startsWith(github.event.ref, 'refs/tags')
+              if: ! startsWith(github.event.ref, 'refs/tags')
               run: |
                 pip install pds-github-util
                 echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --dev)
