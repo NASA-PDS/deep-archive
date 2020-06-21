@@ -388,7 +388,7 @@ def main():
         ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
         # Here we go, daddy
-        process(args.bundle, args.include_all_collections, con, ts)
+        process(args.bundle, args.args.include_latest_collection_only, con, ts)
     _logger.info('👋 Thanks for using this program! Bye!')
     sys.exit(0)
 
