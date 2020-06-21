@@ -38,12 +38,13 @@ name: 📦 Continuous Integration & Delivery
 # Driving Event
 # -------------
 #
-# What event starts this workflow: a push. We could refine this to a specific
-# branch, except that we detect if we're pushing to a release tag in the flow
-# and can publish to the official PyPI in addition to the test PyPI. (We
-# always publish to the test PyPI.)
+# What event starts this workflow: a push of a stable tag .
+# A different workflow deals wit push on master for dev releases.
 
-on: push
+on:
+  push:
+    tags:
+      - '[0-9].[0-9].*'
 
 
 # What to Do
@@ -52,7 +53,6 @@ on: push
 # Once we get the event, what shall we do? Two things:
 # • Generate and publish documentation to the web
 # • Make an installable package
-#   • Always auto-publish to test.pypi.org
 #   • For tagged releases, auto-publish to the official pypi.org
 
 jobs:
@@ -93,25 +93,10 @@ jobs:
               with:
                 ref: gh-pages
             - name: Create requirements report for stable release
-              if: startsWith(github.event.ref, 'refs/tags')
               run: |
                   pip install pds-github-util
-                  echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral)
+                  echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --format html)
                   echo "{{ env.REQUIREMENT_FILE }} generated"
-                  echo ::set-env name=REQUIREMENT_HTML=$(echo {{ env.REQUIREMENT_FILE }} | sed s/\.md/\.html/g)
-                  - uses: docker://pandoc/core:2.9
-                    with:
-                        args: --standalone -f markdown -t html --output=${{ env.REQUIREMENT_HTML}} ${{ env.REQUIREMENT_FILE}}
-            - name: Create requirements report for dev
-              if: !startsWith(github.event.ref, 'refs/tags')
-              run: |
-                pip install pds-github-util
-                echo ::set-env name=REQUIREMENT_FILE::$(requirement-report --organization NASA-PDS --repository pds-deep-archive --token ${{ secrets.GITHUB_TOKEN }} --output pdsen-corral --dev)
-                echo "{{ env.REQUIREMENT_FILE }} generated"
-                echo ::set-env name=REQUIREMENT_HTML=$(echo {{ env.REQUIREMENT_FILE }} | sed s/\.md/\.html/g)
-            - uses: docker://pandoc/core:2.9
-              with:
-                args: --standalone -f markdown -t html --output=${{ env.REQUIREMENT_HTML}} ${{ env.REQUIREMENT_FILE}}
             - name: Create changelog
               run: |
                 sudo gem install github_changelog_generator
@@ -157,15 +142,7 @@ jobs:
                     python3 bootstrap.py
                     bin/buildout
                     bin/test
-                    bin/buildout setup . egg_info --tag-build $(date --utc '+%Y%m%d%H%M%S')  sdist --dist-dir testdist
                     bin/buildout setup . sdist --dist-dir proddist
-            -
-                name: 📇 Publishing to Test PyPI
-                uses: pypa/gh-action-pypi-publish@master
-                with:
-                    password: ${{secrets.test_pypi_upload_token}}
-                    repository_url: https://test.pypi.org/legacy/
-                    packages_dir: testdist/
             -
                 name: 🗂 Publishing to PyPI
                 uses: pypa/gh-action-pypi-publish@master
