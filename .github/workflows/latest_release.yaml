@@ -45,7 +45,7 @@ jobs:
       run: |
         git fetch --prune --unshallow --tags
         git tag -l | grep 'dev' | xargs -t -I arg sh -c 'git tag -d arg;git push --delete origin arg;'
-    - name: Publish new snapshot release on github (TBD find emoji)
+    - name: Publish new snapshot release on github (tbd find emoji)
       run: |
         pip install pds-github-util
         python-snapshot-release --token ${{ secrets.GITHUB_TOKEN }}
