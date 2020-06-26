@@ -30,7 +30,7 @@
 
 '''Utilities'''
 
-from .constants import PDS_NS_URI, PDS_TABLE_FILENAME_EXTENSION
+from .constants import PDS_NS_URI, PRODUCT_COLLECTION_TAG
 from lxml import etree
 import logging, hashlib, os.path, functools, urllib, re
 
@@ -122,6 +122,7 @@ def comprehendDirectory(dn, con):
                 xmlFile = os.path.join(dirpath, fn)
                 _logger.debug('📄 Deconstructing %s', xmlFile)
                 tree = parseXML(xmlFile)
+                isProductCollection = tree.getroot().tag == PRODUCT_COLLECTION_TAG
                 lid, vid = getLogicalVersionIdentifier(tree)
                 if lid and vid:
                     # OK, got an XML file we can work with
@@ -165,9 +166,10 @@ def comprehendDirectory(dn, con):
                                 'INSERT OR IGNORE INTO label_file_references (lid, vid, filepath) VALUES (?,?,?)',
                                 (lid, vid, filepath)
                             )
-                            # Weird case: a <file_name> might refer to a ``.tab`` or ``.TAB`` file, which
-                            # means even more inter_label_references
-                            if fn.lower().endswith(PDS_TABLE_FILENAME_EXTENSION.lower()):
+                            # Weird (to a certain degree of weird) case: <file_name> may refer to a file
+                            # that contains even more inter_label_references, but only if this label is
+                            # product collections.
+                            if isProductCollection:
                                 _addInterLabelReferencesFromTabFile(lid, vid, filepath, con)
                         else:
                             _logger.warning('⚠️ File %s referenced by %s does not exist; ignoring', fn, xmlFile)
