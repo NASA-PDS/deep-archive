@@ -40,6 +40,9 @@ INFORMATION_MODEL_VERSION = '1.13.0.0'
 # Namespace URI for PDS XML
 PDS_NS_URI = 'http://pds.nasa.gov/pds4/pds/v1'
 
+# XML tag for a PDS product collection
+PRODUCT_COLLECTION_TAG = f'{{{PDS_NS_URI}}}Product_Collection'
+
 # Where to find the PDS schema
 PDS_SCHEMA_URL = 'http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd'
 
