@@ -33,7 +33,8 @@
 
 from .constants import (
     AIP_PRODUCT_URI_PREFIX, HASH_ALGORITHMS, INFORMATION_MODEL_VERSION, PDS_LABEL_FILENAME_EXTENSION, PDS_NS_URI,
-    PDS_TABLE_FILENAME_EXTENSION, SIP_MANIFEST_URL, XML_MODEL_PI, PDS_SCHEMA_URL, XML_SCHEMA_INSTANCE_NS_URI
+    PDS_TABLE_FILENAME_EXTENSION, SIP_MANIFEST_URL, XML_MODEL_PI, PDS_SCHEMA_URL, XML_SCHEMA_INSTANCE_NS_URI,
+    AIP_SIP_DEFAULT_VERSION
 )
 from .utils import (
     addBundleArguments, addLoggingArguments, comprehendDirectory, createSchema, getDigest,
@@ -194,7 +195,7 @@ def _writeLabel(
         timestamp.date().strftime('%Y%m%d')
     )
     etree.SubElement(identificationArea, prefix + 'logical_identifier').text = logicalIdentifier
-    etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
+    etree.SubElement(identificationArea, prefix + 'version_id').text = AIP_SIP_DEFAULT_VERSION
     etree.SubElement(identificationArea, prefix + 'title').text = 'Submission Information Package for the ' + title
     etree.SubElement(identificationArea, prefix + 'information_model_version').text = INFORMATION_MODEL_VERSION
     etree.SubElement(identificationArea, prefix + 'product_class').text = 'Product_SIP_Deep_Archive'
@@ -204,8 +205,8 @@ def _writeLabel(
     modificationDetail = etree.Element(prefix + 'Modification_Detail')
     modificationHistory.append(modificationDetail)
     etree.SubElement(modificationDetail, prefix + 'modification_date').text = timestamp.date().isoformat()
-    etree.SubElement(modificationDetail, prefix + 'version_id').text = '1.0'
-    etree.SubElement(modificationDetail, prefix + 'description').text = 'SIP was verisoned and created'
+    etree.SubElement(modificationDetail, prefix + 'version_id').text = AIP_SIP_DEFAULT_VERSION
+    etree.SubElement(modificationDetail, prefix + 'description').text = 'SIP was versioned and created'
 
     deep = etree.Element(prefix + 'Information_Package_Component_Deep_Archive')
     root.append(deep)

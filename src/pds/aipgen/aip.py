@@ -32,7 +32,7 @@
 
 from .constants import (
     INFORMATION_MODEL_VERSION, PDS_LABEL_FILENAME_EXTENSION, PDS_NS_URI, PDS_SCHEMA_URL, PDS_TABLE_FILENAME_EXTENSION,
-    XML_MODEL_PI, XML_SCHEMA_INSTANCE_NS_URI
+    XML_MODEL_PI, XML_SCHEMA_INSTANCE_NS_URI, AIP_SIP_DEFAULT_VERSION
 )
 from .utils import (
     addBundleArguments, addLoggingArguments, comprehendDirectory, createSchema, getLogicalVersionIdentifier,
@@ -130,7 +130,7 @@ def _writeLabel(
     root.append(identificationArea)
     identificationArea.append(etree.Comment(_iaComment))
     etree.SubElement(identificationArea, prefix + 'logical_identifier').text = labelLID
-    etree.SubElement(identificationArea, prefix + 'version_id').text = '1.0'
+    etree.SubElement(identificationArea, prefix + 'version_id').text = AIP_SIP_DEFAULT_VERSION
     identificationArea.append(etree.Comment('Use the title from the bundle label'))
     title = 'Archive Information Package for ' + logicalIDfragment + '::' + bundleVID
     etree.SubElement(identificationArea, prefix + 'title').text = title
@@ -143,7 +143,7 @@ def _writeLabel(
     modificationHistory.append(modificationDetail)
     modificationDetail.append(etree.Comment('Creation date in format YYYY-MM-DD'))
     etree.SubElement(modificationDetail, prefix + 'modification_date').text = timestamp.date().isoformat()
-    etree.SubElement(modificationDetail, prefix + 'version_id').text = '1.0'
+    etree.SubElement(modificationDetail, prefix + 'version_id').text = AIP_SIP_DEFAULT_VERSION
     etree.SubElement(modificationDetail, prefix + 'description').text = 'Archive Information Package was versioned and created'
 
     ipc = etree.Element(prefix + 'Information_Package_Component')
@@ -329,17 +329,17 @@ def process(bundle, allCollections, con, timestamp):
 
     # Easy one: the checksum† manifest
     # †It's actually an MD5 *hash*, not a checksum 😅
-    chksumFN = strippedLogicalID + '_checksum_manifest_v' + vid + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
+    chksumFN = strippedLogicalID + '_checksum_manifest_v' + AIP_SIP_DEFAULT_VERSION + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
     chksumMD5, chksumSize, chksumNum, files = _writeChecksumManifest(
         chksumFN, lid, vid, con, prefixLen, allCollections
     )
 
     # Next: the transfer manifest
-    xferFN = strippedLogicalID + '_transfer_manifest_v' + vid + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
+    xferFN = strippedLogicalID + '_transfer_manifest_v' + AIP_SIP_DEFAULT_VERSION + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
     xferMD5, xferSize, xferNum = _writeTransferManifest(xferFN, prefixLen, files)
 
     # Finally, the XML label
-    labelFN = strippedLogicalID + '_aip_v' + vid + '_' + slate + PDS_LABEL_FILENAME_EXTENSION
+    labelFN = strippedLogicalID + '_aip_v' + AIP_SIP_DEFAULT_VERSION + '_' + slate + PDS_LABEL_FILENAME_EXTENSION
     _writeLabel(
         labelFN,
         strippedLogicalID,
