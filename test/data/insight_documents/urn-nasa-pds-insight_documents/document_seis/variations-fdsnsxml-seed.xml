@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch"
+  schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd">
+
+  <Identification_Area>
+    <logical_identifier>urn:nasa:pds:insight_documents:document_seis:variations-fdsnsxml-seed</logical_identifier>
+    <version_id>1.1</version_id>
+    <title>Variations Between SEED 2.4 and FDSN StationXML</title>
+    <information_model_version>1.11.0.0</information_model_version>
+    <product_class>Product_Document</product_class>
+    <Citation_Information>
+      <publication_year>2012</publication_year>
+      <description>
+        An outline of the variations between FDSN-StationXML and SEED 2.4.
+        From https://www.fdsn.org/xml/station/. 
+      </description>
+    </Citation_Information>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2020-01-02</modification_date>
+        <version_id>1.1</version_id>
+        <description>
+          The instrument name in this label was revised to match the name in the context product.
+        </description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+  <Context_Area>
+    <Investigation_Area>
+      <name>Insight</name>
+      <type>Mission</type>
+      <Internal_Reference>
+        <lid_reference>urn:nasa:pds:context:investigation:mission.insight</lid_reference>
+        <reference_type>document_to_investigation</reference_type>
+      </Internal_Reference>
+    </Investigation_Area>
+    <Observing_System>
+      <name>Insight</name>
+      <Observing_System_Component>
+        <name>Insight</name>
+        <type>Spacecraft</type>
+        <Internal_Reference>
+          <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.insight</lid_reference>
+          <reference_type>is_instrument_host</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+      <Observing_System_Component>
+        <name>SEISMIC EXPERIMENT FOR INTERIOR STRUCTURE</name>
+        <type>Instrument</type>
+        <Internal_Reference>
+          <lid_reference>urn:nasa:pds:context:instrument:seis.insight</lid_reference>
+          <reference_type>is_instrument</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+    </Observing_System>
+    <Target_Identification>
+      <name>Mars</name>
+      <type>Planet</type>
+      <Internal_Reference>
+        <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+        <reference_type>document_to_target</reference_type>
+      </Internal_Reference>
+    </Target_Identification>
+  </Context_Area>
+  <Document>
+    <author_list>International Federation of Digital Seismograph Networks</author_list>
+    <publication_date>2012-12-11</publication_date>
+    <description>
+      An outline of the variations between FDSN-StationXML and SEED 2.4.
+      From https://www.fdsn.org/xml/station/. 
+    </description>
+    <Document_Edition>
+      <edition_name>Text Version</edition_name>
+      <language>English</language>
+      <files>1</files>
+      <Document_File>
+        <file_name>variations-fdsnsxml-seed.txt</file_name>
+        <document_standard_id>7-Bit ASCII Text</document_standard_id>
+      </Document_File>
+    </Document_Edition>
+  </Document>
+</Product_Document>

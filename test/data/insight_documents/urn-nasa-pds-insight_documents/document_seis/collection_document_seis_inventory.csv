@@ -1,0 +1,8 @@
+P,urn:nasa:pds:insight_documents:document_seis:fdsn-station-1.0::1.1
+P,urn:nasa:pds:insight_documents:document_seis:fdsn-station-availability-1.0::1.1
+P,urn:nasa:pds:insight_documents:document_seis:seis_channel_naming::1.1
+P,urn:nasa:pds:insight_documents:document_seis:location_codes_only::1.1
+P,urn:nasa:pds:insight_documents:document_seis:seed_manual::1.1
+P,urn:nasa:pds:insight_documents:document_seis:seis_release_notes::5.0
+P,urn:nasa:pds:insight_documents:document_seis:seis_sis::1.2
+P,urn:nasa:pds:insight_documents:document_seis:variations-fdsnsxml-seed::1.1

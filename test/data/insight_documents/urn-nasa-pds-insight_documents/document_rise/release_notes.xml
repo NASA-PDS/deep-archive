@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron" ?>
+
+<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1900.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:insight_documents:document_rise:release_notes</logical_identifier>
+        <version_id>4.0</version_id>
+        <title>InSight RISE Release Notes</title>
+        <information_model_version>1.9.0.0</information_model_version>
+        <product_class>Product_Document</product_class>
+        <Citation_Information>
+            <publication_year>2020</publication_year>
+            <description>InSight RISE Release Notes</description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2020-02-05</modification_date>
+                <version_id>4.0</version_id>
+                <description>
+                    This document contains details of InSight RISE Release 4,
+                    covering products acquired between 2019-10-01 and 2019-12-31.
+                    This release includes raw data products only.
+                </description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-10-16</modification_date>
+                <version_id>3.0</version_id>
+                <description>
+                    This document contains details of InSight RISE Release 3,
+                    covering products acquired between 2019-07-01 and 2019-09-30.
+                    This release includes raw data products only.
+                </description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-07-23</modification_date>
+                <version_id>2.0</version_id>
+                <description>
+                    This document contains details of InSight RISE Release 2,
+                    covering products acquired between 2019-04-01 and 2019-06-30.
+                    This release includes raw data products only.
+                </description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-04-02</modification_date>
+                <version_id>1.0</version_id>
+                <description>
+                    This document contains details of InSight RISE Release 1,
+                    covering products acquired between 2018-11-26 and 2019-03-31.
+                    This release includes raw data products only.
+                </description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Reference_List>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:instrument:rise.insight</lid_reference>
+            <reference_type>document_to_instrument</reference_type>
+        </Internal_Reference>
+    </Reference_List>
+    <Document>
+        <publication_date>2020-04-01</publication_date>
+        <description>InSight RISE Release Notes</description>
+        <Document_Edition>
+            <edition_name>InSight RISE Release Notes, ASCII Text Edition</edition_name>
+            <language>English</language>
+            <files>1</files>
+            <Document_File>
+                <file_name>release_notes.txt</file_name>
+                <document_standard_id>7-Bit ASCII Text</document_standard_id>
+            </Document_File>
+        </Document_Edition>
+    </Document>
+</Product_Document>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1A10.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Document
+    xmlns="http://pds.nasa.gov/pds4/pds/v1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 
+                     https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1A10.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:insight_documents:document_hp3rad:hp3_rad_sis</logical_identifier>
+        <version_id>1.1</version_id>
+        <title>InSight HP3 and RAD Data Product SIS</title>
+        <information_model_version>1.10.1.0</information_model_version>
+        <product_class>Product_Document</product_class>
+        <Citation_Information>
+            <publication_year>2018</publication_year>
+            <description>InSight HP3 and RAD Data Product Software Interface Specification</description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2018-10-15</modification_date>
+                <version_id>0.9</version_id>
+                <description>Peer review approved version</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-04-22</modification_date>
+                <version_id>1.0</version_id>
+                <description>First release</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2020-01-02</modification_date>
+                <version_id>1.1</version_id>
+                <description>Spacecraft and instrument names in this label were updated to match names in context products</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Context_Area>
+        <Primary_Result_Summary>
+            <purpose>Science</purpose>
+            <processing_level>Raw</processing_level>
+            <processing_level>Calibrated</processing_level>
+            <processing_level>Derived</processing_level>
+            <Science_Facets>
+                <discipline_name>Geosciences</discipline_name>
+            </Science_Facets>
+        </Primary_Result_Summary>
+        <Investigation_Area>
+            <name>InSight</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:investigation:mission.insight</lid_reference>
+                <reference_type>document_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <Observing_System_Component>
+                <name>InSight</name>
+                <type>Spacecraft</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.insight</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>HEAT FLOW AND PHYSICAL PROPERTIES PACKAGE</name>
+                <type>Instrument</type>
+                <description>Heat Flow and Physical Properties Probe</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:hp3.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>RADIOMETER</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:radiometer.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Mars</name>
+            <type>Planet</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+                <reference_type>document_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    </Context_Area>
+    <Document>
+        <document_name>InSight HP3 and RAD Data Product Software Interface Specification</document_name>
+        <publication_date>2018-10-15</publication_date>
+        <description>This document describes the format and content of InSight HP3 and Radiometer data products.</description>
+        <Document_Edition>
+            <edition_name>InSight HP3 and RAD PDS Archive Software Interface Specification Rev. 1.0</edition_name>
+            <language>English</language>
+            <files>1</files>
+            <Document_File>
+                <file_name>hp3_rad_sis.pdf</file_name>
+                <document_standard_id>PDF/A</document_standard_id>
+            </Document_File>
+        </Document_Edition>
+    </Document>
+</Product_Document>

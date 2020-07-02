@@ -233,7 +233,7 @@ def _getFiles(con, lid, vid, allCollections):
     _logger.debug('🕵️‍♀️ Finding files for %s::%s', lid, vid)
     cursor = con.cursor()
     cursor.execute('SELECT filepath FROM label_file_references WHERE lid = ? AND vid = ?', ((lid, vid)))
-    files = [(lid, vid, i[0]) for i in cursor.fetchall()]
+    files = set([(lid, vid, i[0]) for i in cursor.fetchall()])
 
     _logger.debug('🕵️‍♂️ Finding inter-label references from %s::%s with allCollections=%r', lid, vid, allCollections)
     cursor.execute('SELECT to_lid, to_vid FROM inter_label_references WHERE lid = ? AND vid = ?', ((lid, vid)))
@@ -244,17 +244,17 @@ def _getFiles(con, lid, vid, allCollections):
             if allCollections:
                 cursor.execute('SELECT vid FROM labels WHERE lid = ?', (to_lid,))
                 for to_vid in [i[0] for i in cursor.fetchall()]:
-                    files.extend(_getFiles(con, to_lid, to_vid, allCollections))
+                    files |= _getFiles(con, to_lid, to_vid, allCollections)
             else:
                 # Note that ``max(vid)`` doesn't cut it since it would make 2.0 > 10.0; however  to fix this
                 # we'd either have to make (major, minor) columns out of version IDs or provide a sqlite3 C
                 # extension with a version collator. But this is close enough for now. 🧐
                 cursor.execute('SELECT max(vid) FROM labels WHERE lid = ?', (to_lid,))
                 to_vid = cursor.fetchone()[0]
-                files.extend(_getFiles(con, to_lid, to_vid, allCollections))
+                files |= _getFiles(con, to_lid, to_vid, allCollections)
         else:
             # full lid-vid reference
-            files.extend(_getFiles(con, to_lid, to_vid, allCollections))
+            files |= _getFiles(con, to_lid, to_vid, allCollections)
     return files
 
 
@@ -292,7 +292,6 @@ def _writeTransferManifest(xferFN, prefixLen, files):
     md5, size, count = hashlib.new('md5'), 0, 0
 
     # First, organize by lid::vids → sequences of files
-    files.sort()  # this may give a slight optimiziation as we hash into a dict below
     lidvidsToFiles = {}
     for lid, vid, f in files:
         lidvid, transformedFN = f'{lid}::{vid}', '/' + f[prefixLen:]

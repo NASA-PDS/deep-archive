@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1900.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:insight_documents:document_rise</logical_identifier>
+        <version_id>4.0</version_id>
+        <title>InSight RISE Document Collection</title>
+        <information_model_version>1.9.0.0</information_model_version>
+        <product_class>Product_Collection</product_class>
+        <Citation_Information>
+            <publication_year>2018</publication_year>
+            <description>InSight RISE Document Collection</description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2017-05-31</modification_date>
+                <version_id>1.0</version_id>
+                <description>First release</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-09-23</modification_date>
+                <version_id>2.0</version_id>
+                <description>Updated for InSight Release 2</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2020-01-02</modification_date>
+                <version_id>3.0</version_id>
+                <description>Updated for InSight Release 3</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2020-04-01</modification_date>
+                <version_id>4.0</version_id>
+                <description>Updated for InSight Release 4</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Context_Area>
+        <Investigation_Area>
+            <name>InSight</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:investigation:mission.insight</lid_reference>
+                <reference_type>collection_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <name>InSight</name>
+            <Observing_System_Component>
+                <name>InSight</name>
+                <type>Spacecraft</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.insight</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>RISE</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:rise.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>DSN</name>
+                <type>Observatory</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:facility:observatory.dsn</lid_reference>
+                    <reference_type>is_facility</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Mars</name>
+            <type>Planet</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+                <reference_type>collection_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    </Context_Area>
+    <Collection>
+        <collection_type>Document</collection_type>
+    </Collection>
+    <File_Area_Inventory>
+        <File>
+            <file_name>collection_document_inventory.csv</file_name>
+            <creation_date_time>2017-05-31</creation_date_time>
+        </File>
+        <Inventory>
+            <offset unit="byte">0</offset>
+            <parsing_standard_id>PDS DSV 1</parsing_standard_id>
+            <records>6</records>
+            <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
+            <field_delimiter>Comma</field_delimiter>
+            <Record_Delimited>
+                <fields>2</fields>
+                <groups>0</groups>
+                <Field_Delimited>
+                    <name>Member Status</name>
+                    <field_number>1</field_number>
+                    <data_type>ASCII_String</data_type>
+                    <maximum_field_length unit="byte">1</maximum_field_length>
+                </Field_Delimited>
+                <Field_Delimited>
+                    <name>LIDVID_LID</name>
+                    <field_number>2</field_number>
+                    <data_type>ASCII_LIDVID_LID</data_type>
+                    <maximum_field_length unit="byte">255</maximum_field_length>
+                </Field_Delimited>
+            </Record_Delimited>
+            <reference_type>inventory_has_member_product</reference_type>
+        </Inventory>
+    </File_Area_Inventory>
+</Product_Collection>

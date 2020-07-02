@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch"
+  schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mess="http://pds.nasa.gov/pds4/mission/mess/v1"
+    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:insight_documents:document_mission:insight_pip_final-2015_redacted_5-10-19reda</logical_identifier>
+        <version_id>1.1</version_id>
+        <title>Interior Exploration Using Seismic Investigations,
+            Geodesy, and Heat Transport (InSight) Summary</title>
+        <information_model_version>1.11.0.0</information_model_version>
+        <product_class>Product_Document</product_class>
+        <Citation_Information>
+            <publication_year>2015</publication_year>
+            <description>
+                This summary of the InSight Mission lander, instruments, and operations was 
+                compiled by the InSight Project Science Office. It has been redacted as noted
+                on the title page, and converted to PDF/A format for archiving.
+            </description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2019-03-15</modification_date>
+                <version_id>1.0</version_id>
+                <description>First release</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2020-01-02</modification_date>
+                <version_id>1.1</version_id>
+                <description>Revised names in Context_Area of this label to match context product names.</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Context_Area>
+        <Investigation_Area>
+            <name>Insight</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:investigation:mission.insight</lid_reference>
+                <reference_type>document_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <name>Insight</name>
+            <Observing_System_Component>
+                <name>Insight</name>
+                <type>Spacecraft</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.insight</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>InSight Fluxgate Magnetometer</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:apss-ifg.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>AUXILIARY PAYLOAD SENSOR SUBSYSTEM PRESSURE SENSOR</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:apss-ps.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>AUXILIARY PAYLOAD SENSOR SUBSYSTEM TEMPERATURES AND WIND SENSOR FOR INSIGHT</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:apss-twins.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>HEAT FLOW AND PHYSICAL PROPERTIES PACKAGE</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:hp3.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>INSIGHT CONTEXT CAMERA</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:icc.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>INSTRUMENT DEPLOYMENT ARM</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:ida.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>INSIGHT DEPLOYMENT CAMERA</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:idc.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>RADIOMETER</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:radiometer.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>RISE</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:rise.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>SEISMIC EXPERIMENT FOR INTERIOR STRUCTURE</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:seis.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Mars</name>
+            <type>Planet</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+                <reference_type>document_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    </Context_Area>
+    <Document>
+        <author_list>The InSight Project Science Office</author_list>
+        <publication_date>2015-11</publication_date>
+        <Document_Edition>
+            <edition_name>PDF Version</edition_name>
+            <language>English</language>
+            <files>1</files>
+            <Document_File>
+                <file_name>InSight_PIP_final-2015_Redacted_5-10-19reda.pdf</file_name>
+                <document_standard_id>PDF</document_standard_id>
+            </Document_File>
+        </Document_Edition>
+    </Document>
+</Product_Document>
+
+    

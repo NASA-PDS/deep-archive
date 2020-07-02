@@ -32,123 +32,98 @@
 '''PDS AIP-GEN functional tests'''
 
 
-from datetime import datetime
-from lxml import etree
-from pds.aipgen.aip import process as produce_aip
-from pds.aipgen.constants import PDS_NS_URI
-from pds.aipgen.sip import produce as produce_sip
-from pds.aipgen.utils import createSchema, comprehendDirectory
-import unittest, tempfile, shutil, os, pkg_resources, filecmp, codecs, sqlite3
+from .base import SIPFunctionalTestCase, AIPFunctionalTestCase
+import unittest
 
 
-class _FunctionalTestCase(unittest.TestCase):
-    '''Abstract test harness for functional tests.
-
-    This just sets up an input stream and temporary testing area for generated
-    files. Subclasses actually do the tests.
+class LADEESIPTest(SIPFunctionalTestCase):
+    '''Test case for SIP generation for all collections from the LADEE test bundle, produced on behalf of
+    the PDS Atmospheres node and using an ``atmost.nmsu.edu``-style base URL.
     '''
-    def setUp(self):
-        super(_FunctionalTestCase, self).setUp()
-        bundleDir = pkg_resources.resource_filename(__name__, 'data/ladee_test/mission_bundle')
-        self.dbfile = tempfile.NamedTemporaryFile()
-        self.con = sqlite3.connect(self.dbfile.name)
-        with self.con:
-            createSchema(self.con)
-            comprehendDirectory(bundleDir, self.con)
-        self.input = pkg_resources.resource_stream(__name__, 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml')
-        self.cwd, self.testdir = os.getcwd(), tempfile.mkdtemp()
-        os.chdir(self.testdir)
-        ts = datetime.utcnow()
-        self.timestamp = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
-    def tearDown(self):
-        self.input.close()
-        self.con.close()
-        os.chdir(self.cwd)
-        shutil.rmtree(self.testdir, ignore_errors=True)
-        super(_FunctionalTestCase, self).tearDown()
+    def getBundleFile(self):
+        return 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml'
+    def getAllCollectionsFlag(self):
+        return True
+    def getValidSIPFileName(self):
+        return 'data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+    def getBaseURL(self):
+        return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
+    def getSiteID(self):
+        return 'PDS_ATM'
 
 
-class SIPFunctionalTestCase(_FunctionalTestCase):
-    '''Functional test case for SIP generation.
-    '''
-    _urlXPath = f'./{{{PDS_NS_URI}}}Information_Package_Component_Deep_Archive/{{{PDS_NS_URI}}}manifest_url'
-    def setUp(self):
-        super(SIPFunctionalTestCase, self).setUp()
-        self.valid = pkg_resources.resource_filename(
-            __name__,
-            'data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
-        )
-    def test_sip_of_a_ladee(self):
-        '''Test if the SIP manifest of LADEE bundle works as expected'''
-        manifest, ignoredLabel = produce_sip(
-            bundle=self.input,
-            hashName='md5',
-            registryServiceURL=None,
-            insecureConnectionFlag=True,
-            site='PDS_ATM',
-            offline=True,
-            baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
-            allCollections=True,
-            aipFile=None,
-            con=self.con,
-            timestamp=self.timestamp
-        )
-        self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
-    def test_label_url(self):
-        '''Test if the label of a SIP manifest has the right ``manifest_url``'''
-        ignoredManifest, label = produce_sip(
-            bundle=self.input,
-            hashName='md5',
-            registryServiceURL=None,
-            insecureConnectionFlag=True,
-            site='PDS_ATM',
-            offline=True,
-            baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
-            allCollections=True,
-            aipFile=None,
-            con=self.con,
-            timestamp=self.timestamp
-        )
-        matches = etree.parse(label).getroot().findall(self._urlXPath)
-        self.assertEqual(1, len(matches))
-        self.assertTrue(matches[0].text.startswith('https://pds.nasa.gov/data/pds4/manifests/'))
-
-
-class AIPFunctionalTestCase(_FunctionalTestCase):
-    '''Functional test case for AIP generation.
-    '''
-    def setUp(self):
-        super(AIPFunctionalTestCase, self).setUp()
+class LADEAIPTest(AIPFunctionalTestCase):
+    '''Test case for AIP generation for all collections from the LADEE test bundle'''
+    def getBundleFile(self):
+        return 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml'
+    def getAllCollectionsFlag(self):
+        return True
+    def getManifests(self):
         base = 'data/ladee_test/valid/ladee_mission_bundle_v1.0_'
-        self.csum = pkg_resources.resource_filename(__name__, base + 'checksum_manifest_v1.0.tab')
-        self.xfer = pkg_resources.resource_filename(__name__, base + 'transfer_manifest_v1.0.tab')
-    def test_manifests(self):
-        '''See if the AIP generator makes the two manifest files'''
-        csum, xfer, ignoredLabel = produce_aip(
-            self.input,
-            allCollections=False,
-            con=self.con,
-            timestamp=self.timestamp
-        )
+        return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
 
-        # Normally we'd just do:
-        #     self.assertTrue(filecmp.cmp(xfer, self.xfer, "AIP checksum manifest doesn't match the valid version"))
-        # but can't simply check the valid version by a file comparison because the so-called "valid" version
-        # has entries that are in a different (but still correct) order. So read them both in and see if their
-        # data structures match.
 
-        def _readTransferManifest(fn):
-            d = {}
-            with codecs.open(fn, encoding='utf-8') as f:
-                for line in f:
-                    uri, fn = line.split()
-                    fns = d.get(uri, set())
-                    fns.add(fn)
-                    d[uri] = fns
-            return d
-        xfers, valids = _readTransferManifest(xfer), _readTransferManifest(self.xfer)
-        self.assertEqual(xfers, valids, "AIP transfer manifest doesn't match the valid version")
+class _InsightSIPTest(SIPFunctionalTestCase):
+    '''Abstract test case for SIP generation for the Insight Documents test bundle, produced on behalf of
+    the Geo node and using a ``pds.nasa.gov``-style base URL. Subclasses further make concrete test cases
+    that use either all collections or just the latest.
+    '''
+    def getBundleFile(self):
+        return 'data/insight_documents/urn-nasa-pds-insight_documents/bundle_insight_documents.xml'
+    def getBaseURL(self):
+        return 'https://pds.nasa.gov/data/pds4/test-bundles/'
+    def getSiteID(self):
+        return 'PDS_GEO'
+
+
+class _InsightAIPTest(AIPFunctionalTestCase):
+    '''Abstract test case for AIP generation for the Insight Documents test bundle. Subclasses make
+    concrete test cases for either all collections or just the latest when lid-only references appear.
+    '''
+    def getBundleFile(self):
+        return 'data/insight_documents/urn-nasa-pds-insight_documents/bundle_insight_documents.xml'
+
+
+class InsightAllSIPTest(_InsightSIPTest):
+    '''Test case for SIP generation for all collections for the Insight Documents test bundle.'''
+    def getValidSIPFileName(self):
+        return 'data/insight_documents/valid/all/insight_documents_v2.0_sip_v1.0_20200702.tab'
+    def getAllCollectionsFlag(self):
+        return True
+
+
+class InsightAllAIPTest(_InsightAIPTest):
+    '''Test case for AIP generation for all collections for the Insight Documents test bundle.'''
+    def getAllCollectionsFlag(self):
+        return True
+    def getManifests(self):
+        base, suffix = 'data/insight_documents/valid/all/insight_documents_v2.0_', '_manifest_v2.0_20200702.tab'
+        return (base + 'checksum' + suffix, base + 'transfer' + suffix)
+
+
+class InsightLatestSIPTest(_InsightSIPTest):
+    '''Test case for SIP generation for the latest versions for the Insight Documents test bundle.'''
+    def getValidSIPFileName(self):
+        return 'data/insight_documents/valid/latest/insight_documents_v2.0_sip_v1.0_20200702.tab'
+    def getAllCollectionsFlag(self):
+        return False
+
+
+class InsightLatestAIPTest(_InsightAIPTest):
+    '''Test case for AIP generation for the latest versions for the Insight Documents test bundle.'''
+    def getAllCollectionsFlag(self):
+        return False
+    def getManifests(self):
+        base, suffix = 'data/insight_documents/valid/latest/insight_documents_v2.0_', '_manifest_v2.0_20200702.tab'
+        return (base + 'checksum' + suffix, base + 'transfer' + suffix)
 
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return unittest.TestSuite([
+        unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(LADEAIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllSIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
+    ])

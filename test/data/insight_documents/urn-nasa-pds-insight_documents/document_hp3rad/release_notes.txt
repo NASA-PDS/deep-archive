@@ -1,0 +1,225 @@
+InSight HP3/RAD Release Notes 
+
+Users are encouraged to provide comments to the PDS Geosciences Node
+if errors are found either in data or in documentation in this archive.
+Please send comments by e-mail or U.S. mail to:
+
+          PDS Geosciences Node
+          Washington University
+          Dept. of Earth and Planetary Sciences
+          1 Brookings Drive
+          St. Louis, MO 63130
+          U.S.A.
+
+          Web:   http://pds-geosciences.wustl.edu
+          Email: geosci@wunder.wustl.edu
+
+This document, release_notes.txt, contains release notes and errata concerning the
+InSight HP3 and RAD archives. It is updated with each release of HP3 and RAD data.
+
+Section A of this document contains an entry for each HP3/RAD release with
+general information about the contents of the release, in order from newest
+to oldest.  Updates to previously released files are reported in these
+entries, along with any known errata.
+
+Section B of this file contains general notes, if any, concerning the archive
+as a whole.
+
+
+******** SECTION A ********
+
+
+------------------------------------------------------------
+
+Release Number: 4 
+Release Date: 2020-04-01
+Data Coverage: 2019-10-01 through 2019-12-31 (Sols 300-390)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rad:data_calibrated
+    urn:nasa:pds:insight_rad:data_derived
+    urn:nasa:pds:insight_rad:data_raw
+
+
+Comments:
+
+On of the radiometer sensors (2C, field of view 2 broadband sensor) experienced a 
+significant drift of its calibration. On about sol 325 the brightness temperatures 
+derived from this sensor started to progressively diverge from expected seasonal 
+trends and the trends observed by the other sensors. The normal self-calibrations 
+are run once per four weeks while new commands are uplinked once per week. The 
+next performed self-calibration on sol 340 confirmed an increase in sensitivity. 
+Following, more frequently scheduled calibrations showed that the drift continued
+to increase sensitivity and reached an apparently stable state at some point after 
+sol 355. The exact timeline of the drift is however not well resolved by the 
+self-calibrations and we assume that the sensitivity exponentially decays to 
+the new state with a half life of 18 sols, starting on sol 325.
+It is possibly that better understanding of the root cause of this drift would 
+lead us to modifying this timeline. This would result in an update of the 
+calibrated and derived datasets in this release, however any changes will likely 
+stay within the range of uncertainty provided in this release.
+
+------------------------------------------------------------
+
+Release Number: 3 
+Release Date: 2020-01-01
+Data Coverage: 2019-07-01 through 2019-09-30 (Sols 210-299)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rad:data_calibrated
+    urn:nasa:pds:insight_rad:data_derived
+    urn:nasa:pds:insight_rad:data_raw
+
+
+Comments:
+
+Due to the conjunction the radiometer was off after sol 263. A typographical error 
+in the release number 2 comments data coverage has been corrected. The table in the release 
+notes for release 1A provided operation mode codes that are inconsistent with those in the raw data files.
+The raw data files provide the operation mode codes as they are used by the flight software, which are:
+
+Ops mode # | Description
+-----------|--------------------------------------------------------------
+0          | no operation mode, controlled by ground commands
+65-66      | standard mode - not used due to technical issues
+33-34      | hourly mode
+97-98      | single mode
+129-130    | calibration mode - only usable for science under certain conditions 
+           |(Temperature calibration target = Temperature Sensorhead)
+------------------------------------------------------------
+
+Release Number: 2 
+Release Date: 2019-09-26
+Data Coverage: 2019-04-01 through 2019-06-30 (Sols 122-210)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rad:data_calibrated
+    urn:nasa:pds:insight_rad:data_derived
+    urn:nasa:pds:insight_rad:data_raw
+
+
+Comments:
+
+On about Sol 150 a jump in measured voltages about +4 microvolt has been 
+observed in all channels of ADC-1 in the RAD Sensorhead. This offset has 
+been corrected in all calibrated and derived data from sol 150 on, but 
+not in the raw data.
+
+------------------------------------------------------------
+
+Release Number: 1, part 2
+Release Date: 2019-06-26
+Data Coverage: 2018-11-26 through 2019-03-31 (Sols 1-122)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rad:data_calibrated
+    urn:nasa:pds:insight_rad:data_derived
+
+Products have been revised in these collections:
+    urn:nasa:pds:insight_rad:data_raw
+
+
+Comments:
+The raw data table has been updated to extend through 2019-03-31
+as well. 
+
+For the calibrated and derived data products only those data vectors are used that
+can be calibrated. That means only data with operation modes 1-7 (see table below) and 
+acquired while the instrument is within 0.1 K of its target temperature setpoint are used.
+Also, all data before 2018-12-11T07:30:42.598Z have been excluded because the dust cover 
+was still closed. 
+
+During ground calibration it was discovered that calibration uncertainties are larger 
+than expected. The calibration coefficient also had to be updated using data gathered 
+after landing on Mars, before the opening of the dust cover/calibration target.
+This results in large systematic errors in the sensors using narrow 
+spectral bandpasses, i.e. sensors 1A, 1C, 2A, 2B. 
+
+The derived data products are based on the calibrated data of sensors 1B and 2C. Assumed
+is a surface emissivity of 0.98 with an uncertainty of 0.02. 
+(Morgan et al., A Pre-Landing Assessment of Regolith Properties
+at the InSight Landing Site. Space Sci Rev (2018) 214:104. doi:10.1007/s11214-018-0537-y.)
+
+The documentation (SIS) currently (2018-03-06) does not provide which of the three 
+spectral filters is used in each of the six thermopile sensors. 
+The spectral bandpasses are described in section 2.6.3.5 of the HP3 PDS SIS 
+are given for each sensor in the following table:
+
+ Sensor |   Spectral Filter
+--------+------------------------
+    1A  |   8-10µm Bandpass
+    1B  |   8-14µm Bandpass
+    1C  |   16-19µm Bandpass
+    2A  |   16-19µm Bandpass
+    2B  |   8-10µm Bandpass
+    2C  |   8-14µm Bandpass
+
+	
+Raw data tables include a number indicating what operation mode was used. 
+The modes are the following:
+
+Ops mode # | Description
+-----------|--------------------------------------------------------------
+0          | no operation mode, controlled by ground commands
+1-3        | standard mode - not used due to technical issues
+4-5        | hourly mode
+6-7        | single mode
+8-9        | calibration mode - only usable for science under certain conditions 
+           |(Temperature calibration target = Temperature Sensorhead)
+	
+
+
+
+------------------------------------------------------------
+
+
+Release Number: 1, part 1
+Release Date: 2019-04-22
+Data Coverage: 2018-11-26 through 2019-02-28 (Sols 1-92)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rad:data_raw
+Products have been revised in these collections:
+    none
+
+Comments:
+    The first release of InSight data by PDS takes place
+in two parts. In Part 1 only raw data products are released. 
+In Part 2, one month later, the calibrated versions of those products 
+are released. Subsequent InSight releases are scheduled for every
+three months and will include both raw and calibrated products.
+
+
+
+******** SECTION B ********
+
+
+The documentation (SIS) does not provide which of the three 
+spectral filters is used in each of the six thermopile sensors. 
+The spectral bandpasses are described in section 2.6.3.5 of the HP3 PDS SIS 
+are given for each sensor in the following table:
+
+Table B 1: Identification of spectral bandpasses for the different sensors
+
+ Sensor |   Spectral Filter
+--------+------------------------
+    1A  |   8-10µm Bandpass
+    1B  |   8-14µm Bandpass
+    1C  |   16-19µm Bandpass
+    2A  |   16-19µm Bandpass
+    2B  |   8-10µm Bandpass
+    2C  |   8-14µm Bandpass
+	
+The SIS further does not clarify what the RAD operation mode codes provided in the raw 
+data files mean. This information is provided in the following table.
+
+Table B 2: Identification codes of RAD software operation modes provided in the RAD raw data tables
+
+Ops mode # | Description
+-----------|--------------------------------------------------------------
+0          | no operation mode, controlled by ground commands
+65-66      | standard mode - not used due to technical issues
+33-34      | hourly mode
+97-98      | single mode
+129-130    | calibration mode - only usable for science under certain conditions 
+           |(Temperature calibration target = Temperature Sensorhead)
