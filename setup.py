@@ -83,7 +83,7 @@ setup(
     extras_require={'test': []},
     license='ALv2',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Science/Research',
         'License :: Other/Proprietary License',

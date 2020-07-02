@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+0.1.3 (released)
+------------------
+
+• Stable release + bug fixes [kelly].
+
+
 0.0.0 (unreleased)
 ------------------
 
