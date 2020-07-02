@@ -59,6 +59,9 @@ PDS_LABEL_FILENAME_EXTENSION = '.xml'
 # Filename extension for PDS tables
 PDS_TABLE_FILENAME_EXTENSION = '.tab'
 
+# Defaut AIP / SIP Version
+AIP_SIP_DEFAULT_VERSION = '1.0'
+
 # Command-line names for hash algorithms mapped to Python *implementation*
 # name which are standardized (as lower case, no less) in the ``hashlib``.
 # There are a lot more possible message digest algorithms, but we choose
