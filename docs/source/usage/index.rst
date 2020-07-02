@@ -75,6 +75,7 @@ Once you complete this execution, the program will print::
     INFO 🏃‍♀️ Starting SIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
     INFO 🎉 Success! From /SOME/DIR/test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
     INFO 📄 SIP Manifest: ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab
+            allCollections=args.include_latest_collection_only,
     INFO 📄 XML label for the SIP: ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml
     INFO 👋 That's it! Thanks for making an AIP and SIP with us today. Bye!
 
@@ -95,7 +96,7 @@ valid URLs.
 If everything looks good to go, package them up into a PDS Deep Archive data
 package (e.g. ``ladee_mission_bundle_v1.0_pds_deep_archive.zip``).
 
-Email the data package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_.
+Create a new `PDS4 NSSDCA Delivery Github Issue <https://github.com/NASA-PDS/pdsen-operations/issues/new/choose>`_ for the PDS Engineering Node to submit the package to NSSDCA
 
 
 Example 2: Bundle Referencing Collections by LID
@@ -124,12 +125,30 @@ The following is a checklist and procedure Discipline Node personnel should
 follow when delivering a PDS Deep Archive data package to the PDS Engineering
 Node upon a new release of data:
 
-•  ▶  START: New Bundle is ready for Delivery.
-•     Bundle has completed successful validation with PDS4 Validate Tool.
-•     Execute PDS Deep Archive software per usage instructions and example above.
-•     Check the SIP Manifest (``*._sip_v1.0.tab``) file to verify URLs indicated are valid.
-•     Package up the five ``*.tab` and ``*.xml`` files into a ``.ZIP`` or
-      ``.TAR.GZ`` PDS Deep Archive Delivery package.
-•     Email PDS Deep Archive Delivery package to the `PDS Operator <mailto:pds-operator@jpl.nasa.gov>`_ for delivery to NSSDCA.
-•     Receive confirmation from PDS Operator once delivery has completed.
-•  🎉 DONE
+1.  ▶  START: New Bundle is ready for Delivery.
+
+2.     Verify the Bundle has completed successful validation with PDS4 Validate Tool (no ERRORS).
+
+3.     Execute PDS Deep Archive software per usage instructions and example above.
+
+4.     Check the SIP Manifest (e.g. ``ladee_mission_bundle_v1.0_sip_v1.0_20200618.tab``) file to verify URLs indicated are valid. For example::
+    
+        # Example of a bad URL
+        https://this.url.does.not.exist.com/LADEE_Bundle_1101.xml
+
+        # Example of  GOOD URL (file exists online)
+        https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml
+
+5.     Package up the five ``*.tab` and ``*.xml`` files into a ``.ZIP`` or ``.TAR.GZ`` PDS Deep Archive Delivery package. For example::
+
+        tar -cvzf ladee_mission_bundle_v1.0_NSSDCA_20200702.tar.gz ladee_mission_bundle_v1.0_*.tab ladee_mission_bundle_v1.0_*.xml
+
+6.     Create a new `PDS4 NSSDCA Delivery Github Issue <https://github.com/NASA-PDS/pdsen-operations/issues/new/choose>`_ for the PDS Engineering Node to submit the package to NSSDCA.
+
+7.     You can then follow along with status in the Github Issue.
+
+8.     The PDS Engineering Node Operations Team will notify you once delivery has been completed.
+
+8.  🎉 DONE
+
+.. _PDS4_NSSDCA_Delivery_issue: 
