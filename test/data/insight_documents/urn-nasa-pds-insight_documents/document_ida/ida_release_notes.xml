@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B10.sch" schematypens="http://purl.oclc.org/dsdl/schematron" ?>
+
+<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B10.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:insight_documents:document_ida:ida_release_notes</logical_identifier>
+        <version_id>3.0</version_id>
+        <title>InSight IDA Release Notes</title>
+        <information_model_version>1.11.1.0</information_model_version>
+        <product_class>Product_Document</product_class>
+        <Citation_Information>
+            <publication_year>2019</publication_year>
+            <description>InSight IDA Release Notes</description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2019-09-23</modification_date>
+                <version_id>1.0</version_id>
+                <description>
+                    This document contains details of each release of InSight IDA products.
+                    The first IDA data were released with InSight Release 2.
+                </description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-12-20</modification_date>
+                <version_id>2.0</version_id>
+                <description>
+                    Updated for InSight Release 3.
+                </description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2020-03-19</modification_date>
+                <version_id>3.0</version_id>
+                <description>
+                    Updated for InSight Release 4.
+                </description>
+            </Modification_Detail>
+        </Modification_History>        
+    </Identification_Area>
+    <Reference_List>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:instrument:ida.insight</lid_reference>
+            <reference_type>document_to_instrument</reference_type>
+        </Internal_Reference>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:investigation:mission.insight</lid_reference>
+            <reference_type>document_to_investigation</reference_type>
+        </Internal_Reference>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+            <reference_type>document_to_target</reference_type>
+        </Internal_Reference>
+    </Reference_List>
+    <Document>
+        <publication_date>2019-09-23</publication_date>
+        <description>InSight IDA Release Notes</description>
+        <Document_Edition>
+            <edition_name>InSight IDA Release Notes, ASCII Text Edition</edition_name>
+            <language>English</language>
+            <files>1</files>
+            <Document_File>
+                <file_name>ida_release_notes.txt</file_name>
+                <document_standard_id>7-Bit ASCII Text</document_standard_id>
+            </Document_File>
+        </Document_Edition>
+    </Document>
+</Product_Document>

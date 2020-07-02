@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Bundle
+    xmlns="http://pds.nasa.gov/pds4/pds/v1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:insight_documents</logical_identifier>
+        <version_id>2.0</version_id>
+        <title>Mars InSight Lander Document Archive</title>
+        <information_model_version>1.11.0.0</information_model_version>
+        <product_class>Product_Bundle</product_class>
+        <Citation_Information>
+            <author_list>
+                Abarca, H.;
+                Deen, R.;
+                Grott, M.; 
+                Hollins, G.;
+                Joy, S. P.; 
+                Kahan, D.; 
+                Lim, G.;
+                Maki, J.;
+                Mafi, J. N.; 
+                Marteau, E.;
+                Mueller, N.; 
+                Semenov, B.; 
+                Slavney, S.;
+                Spohn, T.; 
+                Udomkesmalee, N.;
+                Weber, R.; 
+                Zamani, P.;
+                The InSight Project Science Office</author_list>
+            <publication_year>2018</publication_year>
+            <doi>10.17189/1517566</doi>
+            <description>
+                The Mars InSight Lander document bundle includes a collection
+                of documents for each of the InSight science experiments and
+                a collection of documents pertaining to the mission as a 
+                whole. 
+            </description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2019-05-22</modification_date>
+                <version_id>0.1</version_id>
+                <description>First release</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-05-31</modification_date>
+                <version_id>1.1</version_id>
+                <description>Label modified to make Observing_System_Component names match context product names</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2019-09-12</modification_date>
+                <version_id>2.0</version_id>
+                <description>Collection document_ida added to the bundle</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Context_Area>
+        <Investigation_Area>
+            <name>INSIGHT</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:investigation:mission.insight</lid_reference>
+                <reference_type>bundle_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <name>InSight</name>
+            <Observing_System_Component>
+                <name>InSight</name>
+                <type>Spacecraft</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.insight</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>AUXILIARY PAYLOAD SENSOR SUBSYSTEM TEMPERATURES AND WIND SENSOR FOR INSIGHT</name>
+                <type>Instrument</type>
+                <description>Auxiliary Payload Sensor Subsystem - Temperature and Wind Instruments</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:apss-twins.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>AUXILIARY PAYLOAD SENSOR SUBSYSTEM PRESSURE SENSOR</name>
+                <type>Instrument</type>
+                <description>Auxiliary Payload Sensor Subsystem - Pressure Sensor</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:apss-ps.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>InSight Fluxgate Magnetometer</name>
+                <type>Instrument</type>
+                <description>Auxiliary Payload Sensor Subsystem - InSight Flux Gate</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:apss-ifg.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>Heat Flow and Physical Properties Package</name>
+                <type>Instrument</type>
+                <description>Heat Flow and Physical Properties Probe</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:hp3.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>Radiometer</name>
+                <type>Instrument</type>
+                <description>Radiometer</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:radiometer.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>Seismic Experiment for Interior Structure</name>
+                <type>Instrument</type>
+                <description>Seismic Experiment for Investigating the Subsurface</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:seis.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>Instrument Deployment Arm</name>
+                <type>Instrument</type>
+                <description>Instrument Deployment Arm</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:ida.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>InSight Deployment Camera</name>
+                <type>Instrument</type>
+                <description>Instrument Deployment Camera</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:idc.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>InSight Context Camera</name>
+                <type>Instrument</type>
+                <description>Instrument Context Camera</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:icc.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>RISE</name>
+                <type>Instrument</type>
+                <description>Rotation and Interior Structure Experiment</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:rise.insight</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Mars</name>
+            <type>Planet</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:target:planet.mars</lid_reference>
+                <reference_type>bundle_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    </Context_Area>
+    <Reference_List>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0563-9</doi>
+            <reference_text>
+                Smrekar, S. E., Lognonne, P., Spohn, T. et al., Pre-mission InSights on
+                the Interior of Mars, Space Sci. Rev. (2019) 215:3. 
+            </reference_text>
+        </External_Reference>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0570-x</doi>
+            <reference_text>
+                Banfield, D., Rodriguez-Manfredi, J. A., Russell, C. T. et al., InSight
+                Auxiliary Payload Sensor Suite (APSS), Space Sci. Rev. (2019) 215:4. 
+            </reference_text>
+        </External_Reference>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0531-4</doi>
+            <reference_text>
+                Spohn, T., Grott, M., Smrekar, S. E. et al., The Heat Flow and Physical 
+                Properties Package (HP3) for the InSight Mission, Space Sci. Rev. 
+                (2018) 214:96.
+            </reference_text>
+        </External_Reference>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0530-5</doi>
+            <reference_text>
+                Folkner, W. M., Dehant, V., Le Maistre, S. et al., The Rotation 
+                and Interior Structure Experiment on the InSight Mission to Mars, Space Sci.
+                Rev. (2018) 214:100.
+            </reference_text>
+        </External_Reference>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0574-6</doi>
+            <reference_text>
+                Lognonne, P., Banerdt, W. B., Giardini, D., et al., SEIS: InSight's 
+                Seismic Experiment for Internal Structure of Mars, Space Sci. Rev. (2019) 
+                215:12.
+            </reference_text>
+        </External_Reference>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0536-z</doi>
+            <reference_text>
+                Maki, J. N., Golombek, M., Deen, R. et al., The Color Cameras on
+                the InSight Lander, Space Sci. Rev. (2018) 214:105. 
+            </reference_text>
+        </External_Reference>
+        <External_Reference>
+            <doi>10.1007/s11214-018-0520-7</doi>
+            <reference_text>
+                Trebi-Ollennu, A., Kim, W., Ali, K. et al., InSight Mars Lander
+                Robotics Instrument Deployment System, Space Sci. Rev. (2018) 214:93.
+            </reference_text>
+        </External_Reference>
+    </Reference_List>
+    <Bundle>
+        <bundle_type>Archive</bundle_type>
+    </Bundle>
+    <File_Area_Text>
+        <File>
+            <file_name>readme.txt</file_name>
+            <comment>Introduction to the bundle</comment>
+        </File>
+        <Stream_Text>
+            <name>Introduction to the InSight Document Bundle</name>
+            <local_identifier>BUNDLE.DESCRIPTION</local_identifier>
+            <offset unit="byte">0</offset>
+            <parsing_standard_id>7-Bit ASCII Text</parsing_standard_id>
+            <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
+        </Stream_Text>
+    </File_Area_Text>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_documents:document_mission</lid_reference>
+        <member_status>Primary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_twins:document</lid_reference>
+        <member_status>Secondary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_ps:document</lid_reference>
+        <member_status>Secondary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_cameras:document</lid_reference>
+        <member_status>Secondary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_documents:document_hp3rad</lid_reference>
+        <member_status>Primary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_documents:document_ida</lid_reference>
+        <member_status>Primary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight-ifg-cruise:document</lid_reference>
+        <member_status>Secondary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight-ifg-mars:document</lid_reference>
+        <member_status>Secondary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_documents:document_rise</lid_reference>
+        <member_status>Primary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight_documents:document_seis</lid_reference>
+        <member_status>Primary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+    <Bundle_Member_Entry>
+        <lid_reference>urn:nasa:pds:insight.spice:document</lid_reference>
+        <member_status>Secondary</member_status>
+        <reference_type>bundle_has_document_collection</reference_type>
+    </Bundle_Member_Entry>
+</Product_Bundle>

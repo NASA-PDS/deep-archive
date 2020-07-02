@@ -1,0 +1,102 @@
+InSight RISE Release Notes
+
+Users are encouraged to provide comments to the PDS Geosciences Node
+if errors are found either in data or in documentation in this archive.
+Please send comments by e-mail or U.S. mail to:
+
+          PDS Geosciences Node
+          Washington University
+          Dept. of Earth and Planetary Sciences
+          1 Brookings Drive
+          St. Louis, MO 63130
+          U.S.A.
+
+          Web:   http://pds-geosciences.wustl.edu
+          Email: geosci@wunder.wustl.edu
+
+This document, release_notes.txt, contains release notes and errata concerning the
+InSight RISE archives. It is updated with each release of RISE data.
+
+Section A of this document contains an entry for each RISE release with
+general information about the contents of the release, in order from newest
+to oldest.  Updates to previously released files are reported in these
+entries, along with any known errata.
+
+Section B of this file contains general notes, if any, concerning the archive
+as a whole.
+
+
+******** SECTION A ********
+
+------------------------------------------------------------
+Release Number: 1
+Release Date: 2019-05-24
+Data Coverage: 2018-11-26 through 2019-03-31
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rise_raw:trk234_trknav
+    urn:nasa:pds:insight_rise_raw:trk223_ionosphere
+    urn:nasa:pds:insight_rise_raw:trk223_troposphere
+    urn:nasa:pds:insight_rise_raw:trk224_weather
+
+Products have been revised in these collections:
+    None.
+
+Comments:
+    This is the first delivery of raw RISE data from the
+InSight lander to the PDS.
+
+Release Number: 2
+Release Date: 2019-09-23
+Data Coverage: 2019-04-01 through 2019-06-30
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rise_raw:trk234_trknav
+    urn:nasa:pds:insight_rise_raw:trk223_ionosphere
+    urn:nasa:pds:insight_rise_raw:trk223_troposphere
+    urn:nasa:pds:insight_rise_raw:trk224_weather
+
+Products have been revised in these collections:
+    None.
+
+Comments:
+    This is the second delivery of raw RISE data from the
+InSight lander to the PDS.
+
+Release Number: 3
+Release Date: 2020-01-02
+Data Coverage: 2019-07-01 through 2019-09-30
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rise_raw:trk234_trknav
+    urn:nasa:pds:insight_rise_raw:trk223_ionosphere
+    urn:nasa:pds:insight_rise_raw:trk223_troposphere
+    urn:nasa:pds:insight_rise_raw:trk224_weather
+
+Products have been revised in these collections:
+    None.
+
+Comments:
+    This is the third delivery of raw RISE data from the
+InSight lander to the PDS.
+
+Release Number: 4
+Release Date: 2020-04-01
+Data Coverage: 2019-10-01 through 2019-12-31
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_rise_raw:trk234_trknav
+    urn:nasa:pds:insight_rise_raw:trk223_ionosphere
+    urn:nasa:pds:insight_rise_raw:trk223_troposphere
+    urn:nasa:pds:insight_rise_raw:trk224_weather
+
+Products have been revised in these collections:
+    None.
+
+Comments:
+    This is the fourth delivery of raw RISE data from the
+InSight lander to the PDS.
+
+******** SECTION B ********
+
+Nothing to report.

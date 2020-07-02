@@ -1,0 +1,330 @@
+InSight SEIS Release Notes
+
+Users are encouraged to provide comments to the PDS Geosciences Node
+if errors are found either in data or in documentation in this archive.
+Please send comments by e-mail or U.S. mail to:
+
+          PDS Geosciences Node
+          Washington University
+          Dept. of Earth and Planetary Sciences
+          1 Brookings Drive
+          St. Louis, MO 63130
+          U.S.A.
+
+          Web:   https://pds-geosciences.wustl.edu
+          Email: geosci@wunder.wustl.edu
+
+This document, seis_release_notes.txt, contains release notes and errata 
+concerning the InSight SEIS archives. It is updated with each release.
+
+Section A of this document contains an entry for each SEIS release with
+general information about the contents of the release, in order from newest
+to oldest.  Updates to previously released files are reported in these
+entries, along with any known errata.
+
+Section B of this file contains general notes, if any, concerning the archive
+as a whole.
+
+
+******** SECTION A ********
+------------------------------------------------------------
+Release Number: 4
+Release Date: 2020-04-01
+Data Coverage: 2019-10-01 through 2019-12-31 (Sols 300-389)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+    urn:nasa:pds:insight_seis:document
+
+Products have been revised in these collections:
+    
+* SEIS miniseed data of ELYSE and ELYHK from previous releases that have
+been modified by the IPGP team since Nov 29, 2019. The following nine data 
+products have been revised:
+
+xb.elyse.17.blw.2019.207.2::2.0
+xb.elyse.02.bhu.2019.208.6::2.0
+xb.elyse.02.bhv.2019.208.6::2.0
+xb.elyse.02.bhw.2019.208.6::2.0
+xb.elyse.03.bhv.2019.138.24::3.0
+xb.elyse.03.bhu.2019.138.24::3.0
+xb.elyse.02.bhw.2019.233.11::2.0
+xb.elyse.02.bhu.2019.233.10::2.0
+xb.elyse.02.bhv.2019.233.11::2.0
+
+
+Metadata
+
+Updated metadata files were included for ELYSE and ELYSK:
+dataless.xb.elyhk.2020.062.seed	
+dataless.xb.elyse.2020.062.seed
+
+Comments on metadata:
+
+    * metadata (dataless SEED and stationXML files) of ELYSE and ELYHK
+    correspond to the release 2020.062.1 . These files were
+    produced by B13 software version 3.10 2019-8-28. This software version
+    is now included into the stationXML (See Source element) and is always
+    included into the dataless SEED Files.
+
+    * stationXML files: converted with IRIS-DMC conversion tool version
+    2.0.10 (indicated also into stationXML files), but these files do not
+    validate with IRIS-DMC validator 1.5.9.5.
+
+    * the latest modifications on SP instrumental responses are not included
+    in this version
+
+Comments:
+
+In PDS labels for SEIS products in releases 1a, 1b, and 2 (sols 181 
+and earlier) the value for insight:stop_sol_number is incorrect; it 
+should be 1 less than the value given. The labels will be corrected 
+in a future release.
+
+------------------------------------------------------------
+Release Number: 3
+Release Date: 2020-01-02
+Data Coverage: 2019-07-01 through 2019-09-30 (Sols 210-300)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+    urn:nasa:pds:insight_seis:document
+
+Products have been revised in these collections:
+    None.
+
+Comments:
+
+Replacement products are provided for 2019 Day 138  for ELYSE 03.BHU 
+(vbb 1 velocity high gain science mode) and 03.BHV (vbb 2 velocity 
+high gain science mode). Previous files were truncated.
+IDs:
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhu.2019.138.24.a::1.0
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhv.2019.138.24.a::1.0
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhu.2019.138.24::1.0
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhv.2019.138.24::1.0
+
+Note: no data are included for:
+sols 241-256 for ELYHK
+sols 242-256 for ELYSE
+due to solar conjunction when SEIS was switched off. 
+
+In PDS labels for SEIS products in releases 1a, 1b, and 2 (sols 181 
+and earlier) the value for insight:stop_sol_number is incorrect; it 
+should be 1 less than the value given. The labels will be corrected 
+in a future release.
+
+------------------------------------------------------------
+Release Number: 2
+Release Date: 2019-09-23
+Data Coverage: 2019-04-01 through 2019-06-30 (Sols 122-210)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+    urn:nasa:pds:insight_seis:document
+
+Products have been revised in these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+
+Comments:
+    None.
+
+------------------------------------------------------------
+Release Number: 1b
+Release Date: 2019-06-26
+Data Coverage: 2018-11-26 through 2019-03-31 (Sols 1-122)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+    urn:nasa:pds:insight_seis:document
+
+Products have been revised in these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+
+Comments:
+The first release of InSight data by PDS takes place
+in two parts. In part A only raw data products are released. 
+In part B, one month later, the calibrated versions of those products 
+are released. Subsequent InSight releases are scheduled for every
+three months and will include both raw and calibrated products.
+For SEIS, the calibration of the raw data results in revisions to the 
+transfer function specified in the metadata files. The raw data files 
+are not changed; rather, revised metadata files are provided as better 
+calibration information becomes available throughout the mission.
+
+Products updated in Release 1B to have overlaps removed, replacing those 
+delivered in Release 1A:
+
+xb/continuous_waveform/elyse/2019/054/xb.elyse.05.lmu.2019.054.6.mseed
+xb/continuous_waveform/elyse/2019/054/xb.elyse.05.lmv.2019.054.6.mseed
+xb/continuous_waveform/elyse/2019/054/xb.elyse.05.lmw.2019.054.6.mseed
+xb/continuous_waveform/elyse/2019/055/xb.elyse.05.lmu.2019.055.4.mseed
+xb/continuous_waveform/elyse/2019/055/xb.elyse.05.lmw.2019.055.4.mseed
+xb/continuous_waveform/elyse/2019/055/xb.elyse.15.lmv.2019.055.4.mseed 
+xb/continuous_waveform/elyse/2019/056/xb.elyse.05.lmu.2019.056.8.mseed
+xb/continuous_waveform/elyse/2019/056/xb.elyse.05.lmv.2019.056.6.mseed
+xb/continuous_waveform/elyse/2019/056/xb.elyse.05.lmw.2019.056.8.mseed
+
+New products in the time period covered by Release 1a that were not previously
+delivered:
+ 
+xb/continuous_waveform/elyse/2019/058/xb.elyse.67.shu.2019.058.1.mseed
+xb/continuous_waveform/elyse/2019/058/xb.elyse.67.shv.2019.058.2.mseed
+
+Products with timing corrections (kept in addition to files in Release 1A,
+with unique filenames)
+ 
+xb/continuous_waveform/elyse/2019/059/xb.elyse.02.bhu.2019.059.3.mseed
+xb/continuous_waveform/elyse/2019/059/xb.elyse.02.bhv.2019.059.3.mseed
+xb/continuous_waveform/elyse/2019/059/xb.elyse.67.shu.2019.059.6.mseed
+xb/continuous_waveform/elyse/2019/059/xb.elyse.67.shv.2019.059.6.mseed 
+
+
+Metadata
+
+Updated metadata files were included for ELYSE and ELYS0:
+dataless.XB.ELYS0.2019.144.seed
+dataless.XB.ELYSE.2019.151.seed
+
+The metadata files delivered for ELYHK and ELYH0 under Release 1A are still
+valid for Release 1B:
+dataless.XB.ELYH0.2019.032.seed
+dataless.XB.ELYHK.2019.077.seed
+
+------------------------------------------------------------
+Release Number: 1a
+Release Date: 2019-05-24
+Data Coverage: 2018-11-26 through 2019-02-28 (Sols 1-92)
+
+New products have been added to these collections:
+    urn:nasa:pds:insight_seis:data_seed
+    urn:nasa:pds:insight_seis:data_table
+    urn:nasa:pds:insight_seis:document
+
+Products have been revised in these collections:
+    None.
+
+Comments:
+    The first release of InSight data by PDS takes place
+in two parts. In part A only raw data products are released. 
+In part B, one month later, the calibrated versions of those products 
+are released. Subsequent InSight releases are scheduled for every
+three months and will include both raw and calibrated products.
+
+******** SECTION B ********
+
+The following notes provide new information and outline some minor issues which
+will be corrected in future releases.
+
+A detailed description of the SEIS network codes, station codes, location IDs,
+and channel IDs can be found in the Channel Naming Spreadsheet included with
+this and all future releases.
+filename: "INS-ST-GRDS-1500-IPGP_SEED_ChannelNaming.xlsx"
+
+
+1/Timing
+
+Issue: Metadata currently do not encode LOBT and AOBT.
+
+Solution: SISMOC and MSDS incorporated a change request to metadata generation
+process. 
+
+Impact to Release 3: None. SEIS team requested LOBT and AOBT to be encoded in
+the SEIS metadata as a means to track clock drift. Future releases will include
+new header fields to encode LOBT and AOBT in the waveform headers and corresponding 
+labels.
+
+
+2/Metadata conversion from dataless SEED to StationXML [RESOLVED WITH RELEASE 2]
+
+Issue: There was a problem preventing converting the most recent
+dataless.XB.ELYH0.2019.087.seed and XB.ELYHK.2019.109.seed to stationXML. The
+problem appeared after a new SEED version was provided by SISMOC. A change
+request was initiated, but not in place in time for the first release. The
+latest versions that can be converted are still valid for Release 1B:
+
+dataless.XB.ELYH0.2019.032.seed
+dataless.XB.ELYHK.2019.077.seed
+
+Solution: SISMOC is incorporating a change request to the SEED file generation
+process. Start/end times will be updated in the dataless SEED channel
+descriptions, and new dataless SEED files will be produced.
+
+Impact to Release 1B: Some miniseed files have small segments that do not have
+metadata in dataless SEED. What happens is that the channel begins just after
+the segment start or ends just before the segment end, as identified in the
+metadata. 
+
+
+3/ELYS0 and ELYSE station coordinates
+
+There was some inconsistency in the locations (physical coordinates) reported in
+the metadata for different station and channel codes for previous releases. These
+fields were initially populated with the pre-landing coordinates, and then updated 
+with post-landing determined coordinates. However, the update was made inconsistently
+between the sensor field and the station field. This was corrected for this release.
+
+The listed coordinates currently reflect the location of the lander:
+latitude: 4.502384, longitude: 135.623447, elevation: -2613.426
+
+After a bit more georeferencing of lander images, the team will report different 
+physical coordinates for the on-deck (ELYH0 and ELYS0) vs. deployed (ELYHK and
+ELYSE) configurations. This change will be indicated in future metadata and
+release notes when the coordinates are available.
+
+
+4/Lander activity files
+
+Lander activity files record information on times when the lander was performing
+certain functions that may show up as fluctuations in the signals recorded by
+SEIS. These are xml files containing times and descriptions of the activity,
+including such items as VBB calibration, centering, & leveling, SP acquisition
+rate changes, lander wakeup, communication passes, arm movements, and other
+similar activities. These files will be made available in a future release.
+
+
+5/Events
+
+The event "mqs2019fddj" reported in Release 1b is no longer considered a candidate
+by the team and will be deleted from the final event catalog delivered at the end of
+the project.
+
+After Release 1b, the SEIS team decided not to archive separate waveform files for
+events. A catalog listing event start and stop times will be included at the end
+of the active mission.
+
+
+6/Updated files in the time period covered by previous releases:
+
+Replacement products are provided for 2019 Day 138  for ELYSE 03.BHU 
+(vbb 1 velocity high gain science mode) and 03.BHV (vbb 2 velocity 
+high gain science mode). Previous files were truncated.
+IDs:
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhu.2019.138.24.a::1.0
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhv.2019.138.24.a::1.0
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhu.2019.138.24::1.0
+urn:nasa:pds:insight_seis:data_table:xb.elyse.03.bhv.2019.138.24::1.0
+
+These should not be considered revised files as the error was part of the
+archive assembly process, not a spacecraft issue.
+
+
+7/Metadata
+
+Updated metadata files were included for ELYSE and ELYHK:
+dataless.xb.elyse.2019.333.seed
+dataless.xb.elyhk.2019.333.seed
+
+
+
+
+
+
+
+
