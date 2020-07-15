@@ -46,7 +46,7 @@ todo_include_todos = True
 
 html_theme_options = {
     'logo': 'PDS_Planets.png',
-    'github_user': 'NASA-PDS-Incubator',
+    'github_user': 'NASA-PDS',
     'github_repo': 'pds-deep-archive'
 }
 
