@@ -329,17 +329,17 @@ def process(bundle, allCollections, con, timestamp):
 
     # Easy one: the checksum† manifest
     # †It's actually an MD5 *hash*, not a checksum 😅
-    chksumFN = strippedLogicalID + '_checksum_manifest_v' + AIP_SIP_DEFAULT_VERSION + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
+    chksumFN = strippedLogicalID + '_' + slate + '_checksum_manifest_v' + AIP_SIP_DEFAULT_VERSION + PDS_TABLE_FILENAME_EXTENSION
     chksumMD5, chksumSize, chksumNum, files = _writeChecksumManifest(
         chksumFN, lid, vid, con, prefixLen, allCollections
     )
 
     # Next: the transfer manifest
-    xferFN = strippedLogicalID + '_transfer_manifest_v' + AIP_SIP_DEFAULT_VERSION + '_' + slate + PDS_TABLE_FILENAME_EXTENSION
+    xferFN = strippedLogicalID + '_' + slate + '_transfer_manifest_v' + AIP_SIP_DEFAULT_VERSION + PDS_TABLE_FILENAME_EXTENSION
     xferMD5, xferSize, xferNum = _writeTransferManifest(xferFN, prefixLen, files)
 
     # Finally, the XML label
-    labelFN = strippedLogicalID + '_aip_v' + AIP_SIP_DEFAULT_VERSION + '_' + slate + PDS_LABEL_FILENAME_EXTENSION
+    labelFN = strippedLogicalID + '_' + slate + '_aip_v' + AIP_SIP_DEFAULT_VERSION + PDS_LABEL_FILENAME_EXTENSION
     _writeLabel(
         labelFN,
         strippedLogicalID,

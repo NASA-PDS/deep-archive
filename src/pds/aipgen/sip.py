@@ -128,7 +128,7 @@ def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, basePathToRep
     written.
 
     If ``offline`` mode, we transform all URLs written to the table by stripping off
-    everything except the last component (the file) and prepending the given ``baseURL``.
+    everything except the last componeent (the file) and prepending the given ``baseURL``.
     '''
     _logger.debug('⎍ Writing SIP table with hash %s', hashName)
     hashish, size, hashName, count = hashlib.new('md5'), 0, hashName.upper(), 0
@@ -405,7 +405,7 @@ def produce(
     lid, vid          = getLogicalVersionIdentifier(tree)
     title             = _getTitle(tree)
     strippedLogicalID = lid.split(':')[-1] + '_v' + vid
-    filename          = strippedLogicalID + '_sip_v1.0' + '_' + timestamp.date().strftime('%Y%m%d')
+    filename          = strippedLogicalID + '_' + timestamp.date().strftime('%Y%m%d') + '_sip_v' + AIP_SIP_DEFAULT_VERSION 
     manifestFileName  = filename + PDS_TABLE_FILENAME_EXTENSION
     labelFileName     = filename + PDS_LABEL_FILENAME_EXTENSION
     bundle            = os.path.abspath(bundle.name)
