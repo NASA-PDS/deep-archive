@@ -147,10 +147,10 @@ For more formalized details on the NSSDCA Delivery Process, see the following `p
 
 6.     Create a new `PDS4 NSSDCA Delivery Github Issue <https://github.com/NASA-PDS/pdsen-operations/issues/new/choose>`_ for the PDS Engineering Node to submit the package to NSSDCA.
 
+7.     EN will then complete `validation and submission to NSSDCA <https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process>`_.
+
 7.     You can then follow along with status in the Github Issue.
 
 8.     The PDS Engineering Node Operations Team will notify you once delivery has been completed.
 
 8.  🎉 DONE
-
-.. _PDS4_NSSDCA_Delivery_issue: 
