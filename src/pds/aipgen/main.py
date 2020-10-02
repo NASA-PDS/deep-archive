@@ -38,7 +38,7 @@ from .sip import addSIParguments
 from .sip import produce as sipProcess
 from .utils import addLoggingArguments, addBundleArguments, createSchema, comprehendDirectory
 from datetime import datetime
-import argparse, sys, logging, tempfile, sqlite3, os
+import argparse, sys, logging, tempfile, sqlite3, os, shutil
 
 
 # Constants
@@ -91,10 +91,12 @@ def main():
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.info('👟 PDS Deep Archive, version %s', __version__)
     _logger.debug('⚙️ command line args = %r', args)
-    with tempfile.NamedTemporaryFile() as dbfile:
+    tempdir = tempfile.mkdtemp(suffix='.dir', prefix='deep')
+    try:
         # Make a site survey
-        con = sqlite3.connect(dbfile.name)
-        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile.name)
+        dbfile = os.path.join(tempdir, 'pds-deep-archive.sqlite3')
+        con = sqlite3.connect(dbfile)
+        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile)
         with con:
             createSchema(con)
             comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
@@ -122,6 +124,8 @@ def main():
                 con,
                 ts
             )
+    finally:
+        shutil.rmtree(tempdir, ignore_errors=True)
     _logger.info("👋 That's it! Thanks for making an AIP and SIP with us today. Bye!")
     sys.exit(0)
 

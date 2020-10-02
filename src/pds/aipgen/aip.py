@@ -41,7 +41,7 @@ from .utils import (
 from . import VERSION
 from datetime import datetime
 from lxml import etree
-import argparse, logging, sys, os, os.path, hashlib, tempfile, sqlite3
+import argparse, logging, sys, os, os.path, hashlib, tempfile, sqlite3, shutil
 
 
 # Constants
@@ -374,10 +374,12 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
-    with tempfile.NamedTemporaryFile() as dbfile:
+    tempdir = tempfile.mkdtemp(suffix='.dir', prefix='aip')
+    try:
         # Scout the enemy line
-        con = sqlite3.connect(dbfile.name)
-        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile.name)
+        dbfile = os.path.join(tempdir, 'pds-deep-archive.sqlite3')
+        con = sqlite3.connect(dbfile)
+        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile)
         with con:
             createSchema(con)
             comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
@@ -387,7 +389,10 @@ def main():
         ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
         # Here we go, daddy
-        process(args.bundle, args.args.include_latest_collection_only, con, ts)
+        process(args.bundle, args.include_latest_collection_only, con, ts)
+    finally:
+        shutil.rmtree(tempdir, ignore_errors=True)
+
     _logger.info('👋 Thanks for using this program! Bye!')
     sys.exit(0)
 
