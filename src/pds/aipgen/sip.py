@@ -44,7 +44,7 @@ from . import VERSION
 from datetime import datetime
 from lxml import etree
 from urllib.parse import urlparse
-import argparse, logging, hashlib, urllib.request, os.path, sys, sqlite3, tempfile
+import argparse, logging, hashlib, urllib.request, os.path, sys, sqlite3, tempfile, shutil
 
 
 # Defaults & Constants
@@ -456,10 +456,12 @@ def main():
     if args.offline and not args.bundle_base_url:
         parser.error('--bundle-base-url is required when in offline mode (--offline).')
 
-    with tempfile.NamedTemporaryFile() as dbfile:
+    tempdir = tempfile.mkdtemp(suffix='.dir', prefix='sip')
+    try:
         # Survey the surgical field
-        con = sqlite3.connect(dbfile.name)
-        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile.name)
+        dbfile = os.path.join(tempdir, 'pds-deep-archive.sqlite3')
+        con = sqlite3.connect(dbfile)
+        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile)
         with con:
             createSchema(con)
             comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
@@ -486,6 +488,8 @@ def main():
             con=con,
             timestamp=ts
         )
+    finally:
+        shutil.rmtree(tempdir, ignore_errors=True)
     _logger.info('👋 All done. Thanks for making a SIP. Bye!')
     sys.exit(0)
 
