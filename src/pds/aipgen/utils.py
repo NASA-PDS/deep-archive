@@ -129,7 +129,7 @@ def comprehendDirectory(dn, con):
                     con.execute('INSERT OR IGNORE INTO labels (lid, vid) VALUES (?, ?)', (lid, vid))
                     con.execute(
                         'INSERT OR IGNORE INTO label_file_references (lid, vid, filepath) VALUES (?,?,?)',
-                        (lid, vid, xmlFile)
+                        (lid, vid, xmlFile.replace('\\', '/'))
                     )
 
                     # Now see if it refers to other XML files
@@ -164,7 +164,7 @@ def comprehendDirectory(dn, con):
                         if os.path.isfile(filepath):
                             con.execute(
                                 'INSERT OR IGNORE INTO label_file_references (lid, vid, filepath) VALUES (?,?,?)',
-                                (lid, vid, filepath)
+                                (lid, vid, filepath.replace('\\', '/'))
                             )
                             # Weird (to a certain degree of weird) case: <file_name> may refer to a file
                             # that contains even more inter_label_references, but only if this label is
