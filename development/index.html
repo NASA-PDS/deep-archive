@@ -1,0 +1,202 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>👩‍💻 Development &#8212; PDS Deep Archive 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="🚑 Support" href="../support/index.html" />
+    <link rel="prev" title="🏃‍♀️ Usage" href="../usage/index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="development">
+<h1>👩‍💻 Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
+<p>The quickest way to get started developing this package is to clone it and
+build it out:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">NASA</span><span class="o">-</span><span class="n">PDS</span><span class="o">/</span><span class="n">pds</span><span class="o">-</span><span class="n">deep</span><span class="o">-</span><span class="n">archive</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">pds</span><span class="o">-</span><span class="n">deep</span><span class="o">-</span><span class="n">archive</span>
+<span class="n">python3</span> <span class="n">bootstrap</span><span class="o">.</span><span class="n">py</span>
+<span class="nb">bin</span><span class="o">/</span><span class="n">buildout</span>
+</pre></div>
+</div>
+<p>At this point, you’ll have the <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>, <code class="docutils literal notranslate"><span class="pre">aipgen</span></code>, <code class="docutils literal notranslate"><span class="pre">sipgen</span></code>
+programs ready to run as <code class="docutils literal notranslate"><span class="pre">bin/pds-deep-archive</span></code>, <code class="docutils literal notranslate"><span class="pre">bin/aipgen</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">bin/sipgen</span></code> that’s set up to use source Python code under <code class="docutils literal notranslate"><span class="pre">src</span></code>.
+Changes you make to the code are reflected in <code class="docutils literal notranslate"><span class="pre">bin/sipgen</span></code> immediately.</p>
+<p>The documentation is in <code class="docutils literal notranslate"><span class="pre">docs/source</span></code>, formatted as <a class="reference external" href="https://docutils.sourceforge.io/rst.html">reStructuredText</a> and
+structured with <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.  To build the HTML from the documentation, run
+<code class="docutils literal notranslate"><span class="pre">bin/docbuilder</span></code>. It will write HTML output to <code class="docutils literal notranslate"><span class="pre">build/docs/html</span></code>.</p>
+<p>You can also build local distributions or run any <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> command via
+the buildout refrain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">bin</span><span class="o">/</span><span class="n">buildout</span> <span class="n">setup</span> <span class="o">.</span> <span class="o">--</span><span class="n">help</span><span class="o">-</span><span class="n">commands</span>
+</pre></div>
+</div>
+<p>Commits back to GitHub will trigger workflows in GitHub <a class="reference external" href="https://github.com/features/actions">Actions</a> that
+re-publish the project <a class="reference external" href="https://nasa-pds.github.io/pds-deep-archive/">website</a> as well as send artifacts to the <a class="reference external" href="https://test.pypi.org/">testing</a>
+Python Package Index. (The official Python Package Index gets updated only
+with official release tags.)</p>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>The code base finally includes unit and functional tests. Once you’ve built
+out, you can run the entire test suite easily with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">bin</span><span class="o">/</span><span class="n">test</span>
+</pre></div>
+</div>
+<p>If you’d like to integrate test data output with a CI/CD system such as
+<a class="reference external" href="https://jenkins-ci.org/">Jenkins</a>, add the <code class="docutils literal notranslate"><span class="pre">--xml</span></code> option to make a machine-readable reports in the
+<code class="docutils literal notranslate"><span class="pre">parts/test</span></code> directory.  Try <code class="docutils literal notranslate"><span class="pre">bin/test</span> <span class="pre">--help</span></code> for lots of other options.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Integration testing is not yet implemented, but could be if the need
+arises.</p>
+</div>
+</div>
+<div class="section" id="making-releases">
+<h2>Making Releases<a class="headerlink" href="#making-releases" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned in the parenthetical above, the official Python Package Index is
+updated with an official release of this software is created with a release tag.
+To ensure coherency with the GitHub release, first update the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">src</span><span class="o">/</span><span class="n">pds</span><span class="o">/</span><span class="n">aipgen</span><span class="o">/</span><span class="n">version</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>and enter the release version number you’d like to appear when running the
+commands with <code class="docutils literal notranslate"><span class="pre">--version</span></code> and on the official Python Package Index.  Commit
+and push this, then, on GitHub (and with appropriate permissions), visit:</p>
+<blockquote>
+<div><a class="reference external" href="https://github.com/NASA-PDS/pds-deep-archive/releases/new">https://github.com/NASA-PDS/pds-deep-archive/releases/new</a></div></blockquote>
+<p>and enter a release tag with the same version number plus any release notes.
+This will trigger a GitHub Actions release to the official PyPI 🤞.</p>
+<p>To deploy to the official PyPi manually:</p>
+<ol class="arabic">
+<li><p class="first">Place the appropriate credentials in <code class="docutils literal notranslate"><span class="pre">~/.pypirc</span></code></p>
+</li>
+<li><p class="first">Create the package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>python setup.py sdist
+… or …
+bin/buildout setup . sdist
+</pre></div>
+</div>
+</li>
+<li><p class="first">Deploy to PyPi:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">twine</span>
+<span class="n">twine</span> <span class="n">upload</span> <span class="n">dist</span><span class="o">/*.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="contribute">
+<h2>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline">¶</a></h2>
+<p>Source Code: <a class="reference external" href="https://github.com/NASA-PDS/pds-deep-archive">https://github.com/NASA-PDS/pds-deep-archive</a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/PDS_Planets.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=NASA-PDS&repo=pds-deep-archive&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../usage/index.html" title="previous chapter">🏃‍♀️ Usage</a></li>
+      <li>Next: <a href="../support/index.html" title="next chapter">🚑 Support</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">📦 Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">🏃‍♀️ Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">👩‍💻 Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#making-releases">Making Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contribute">Contribute</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../support/index.html">🚑 Support</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020 California Institute of Technology.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/development/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

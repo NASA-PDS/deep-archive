@@ -1,0 +1,271 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>🏃‍♀️ Usage &#8212; PDS Deep Archive 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="👩‍💻 Development" href="../development/index.html" />
+    <link rel="prev" title="📦 Installation" href="../installation/index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="usage">
+<h1>🏃‍♀️ Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This package provides one primary executable, <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code> that
+generates both and Archive Information Package (AIP) and a Submission
+Information Package (SIP). The SIP is what is delivered by the PDS to the NASA
+Space Science Data Coordinated Archive (NSSDCA). For more information about
+the products produced, see the following references:</p>
+<ul class="simple">
+<li>OAIS Information - <a class="reference external" href="http://www.oais.info/">http://www.oais.info/</a></li>
+<li>AIP Information - <a class="reference external" href="https://www.iasa-web.org/tc04/archival-information-package-aip">https://www.iasa-web.org/tc04/archival-information-package-aip</a></li>
+<li>SIP Information - <a class="reference external" href="https://www.iasa-web.org/tc04/submission-information-package-sip">https://www.iasa-web.org/tc04/submission-information-package-sip</a></li>
+</ul>
+<p>This package also comes with the two sub-components of <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>
+that can be ran individually:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">aipgen</span></code> that generates Archive Information Packages from a PDS4 bundle</li>
+<li><code class="docutils literal notranslate"><span class="pre">sipgen</span></code> that generates Submission Information from a PDS4 bundle</li>
+</ul>
+</div>
+<div class="section" id="usage-information">
+<h2>Usage Information<a class="headerlink" href="#usage-information" title="Permalink to this headline">¶</a></h2>
+<p>Running <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span> <span class="pre">--help</span></code> will give a summary of the command-line
+invocation, its required arguments, and any options that refine the behavior.</p>
+</div>
+<div class="section" id="example-1-basic-usage">
+<h2>Example 1: Basic Usage<a class="headerlink" href="#example-1-basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
+<code class="docutils literal notranslate"><span class="pre">test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml</span></code> run the
+following (NOTE: assumes you followed the default Installation into a Virtual
+Environment):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Prep your environment by sourcing your Python virtual environment
+$ source $HOME/.virtualenvs/pds-deep-archive/bin/activate
+
+# The (pds-deep-archive) prefix indicates your virtual environment is active
+(pds-deep-archive) $
+
+# Now let&#39;s run pds-deep-archive
+# NOTE: This software must be run against data on your local filesystem
+(pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \
+                        -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+                        test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+</pre></div>
+</div>
+<p>From this command-line execution, we are inputting the following information:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">PDS_ATM</span></code> - uses <code class="docutils literal notranslate"><span class="pre">-s</span></code> flag to specify Atmospheres Node as the
+provider site for the manifest’s label</li>
+<li><code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/</span></code> - uses <code class="docutils literal notranslate"><span class="pre">-b</span></code> flag Base
+URL for Node data archive. This URL will be prepended to the bundle
+directory to form URLs to the products. For this case, this will allow us
+to form proper URLs in the output manifests based upon the valid online
+products, e.g.
+<a class="reference external" href="https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml">https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml</span></code> - this is the
+final positional argument input to the software that specifies the bundle
+product file on the local filesystem.</li>
+</ul>
+<p>Once you complete this execution, the program will print:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>INFO 👟 PDS Deep Archive, version VERSION-NUMBER
+INFO 🏃‍♀️ Starting AIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+INFO 🎉 Success! AIP done, files generated:
+INFO 📄 Checksum manifest: ladee_mission_bundle_v1.0_checksum_manifest_v1.0_DATE.tab
+INFO 📄 Transfer manifest: ladee_mission_bundle_v1.0_transfer_manifest_v1.0_DATE.tab
+INFO 📄 XML label for them both: ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml
+INFO 🏃‍♀️ Starting SIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+INFO 🎉 Success! From /SOME/DIR/test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
+INFO 📄 SIP Manifest: ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab
+        allCollections=args.include_latest_collection_only,
+INFO 📄 XML label for the SIP: ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml
+INFO 👋 That&#39;s it! Thanks for making an AIP and SIP with us today. Bye!
+</pre></div>
+</div>
+<p>This creates 5 output files in the current directory as part of the AIP and
+SIP Generation (with DATE replaced by the current date):</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_checksum_manifest_v1.0_DATE.tab</span></code>, the checksum manifest</li>
+<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_transfer_manifest_v1.0_DATE.tab</span></code>, the transfer manifest</li>
+<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml</span></code>, the label for these two files</li>
+<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab</span></code>, the created SIP manifest as a
+tab-separated values file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</li>
+</ul>
+<p>Be sure to check out the SIP Manifest,
+<code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab</span></code>, to ensure the URLs included are
+valid URLs.</p>
+<p>If everything looks good to go, package them up into a PDS Deep Archive data
+package (e.g. <code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_pds_deep_archive.zip</span></code>).</p>
+<p>Create a new <a class="reference external" href="https://github.com/NASA-PDS/pdsen-operations/issues/new/choose">PDS4 NSSDCA Delivery Github Issue</a> for the PDS Engineering Node to submit the package to NSSDCA</p>
+</div>
+<div class="section" id="example-2-bundle-referencing-collections-by-lid">
+<h2>Example 2: Bundle Referencing Collections by LID<a class="headerlink" href="#example-2-bundle-referencing-collections-by-lid" title="Permalink to this headline">¶</a></h2>
+<p>For running the software on an accumulating bundle, you have two options:</p>
+<p><strong>Option 1: (preferred) Run ``pds-deep-archive`` against the entire bundle and all versions of all collections present beneath the bundle root directory.</strong></p>
+<p>This is the default functionality of <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>. See <a class="reference internal" href="#example-1-basic-usage">Example 1: Basic Usage</a> to execute using this option.</p>
+<p><strong>Option 2: Run ``pds-deep-archive`` against the bundle with only the current versions of the collections present beneath the bundle root directory.</strong></p>
+<p>Execute the software with the <code class="docutils literal notranslate"><span class="pre">--include-latest-collections-only</span></code> flag enabled, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \
+                        -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+                        test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+                        --include-latest-collection-only
+</pre></div>
+</div>
+</div>
+<div class="section" id="pds-delivery-checklist">
+<h2>PDS Delivery Checklist<a class="headerlink" href="#pds-delivery-checklist" title="Permalink to this headline">¶</a></h2>
+<p>The following is a checklist and procedure Discipline Node personnel should
+follow when delivering a PDS Deep Archive data package to the PDS Engineering
+Node upon a new release of data.</p>
+<p>For more formalized details on the NSSDCA Delivery Process, see the following <a class="reference external" href="https://github.com/NASA-PDS/pds-deep-archive/tree/master/docs/PDS4_Submission_Process_v1.0.docx">process document</a>.</p>
+<ol class="arabic">
+<li><p class="first">▶  START: New Bundle is ready for Delivery.</p>
+</li>
+<li><p class="first">Verify the Bundle has completed successful validation with PDS4 Validate Tool (no ERRORS).</p>
+</li>
+<li><p class="first">Execute PDS Deep Archive software per usage instructions and example above.</p>
+</li>
+<li><p class="first">Check the SIP Manifest (e.g. <code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_20200618.tab</span></code>) file to verify URLs indicated are valid. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of a bad URL</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">this</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">does</span><span class="o">.</span><span class="ow">not</span><span class="o">.</span><span class="n">exist</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">LADEE_Bundle_1101</span><span class="o">.</span><span class="n">xml</span>
+
+<span class="c1"># Example of  GOOD URL (file exists online)</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">atmos</span><span class="o">.</span><span class="n">nmsu</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">PDS</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">PDS4</span><span class="o">/</span><span class="n">LADEE</span><span class="o">/</span><span class="n">mission_bundle</span><span class="o">/</span><span class="n">LADEE_Bundle_1101</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Package up the five <code class="docutils literal notranslate"><span class="pre">*.tab`</span> <span class="pre">and</span> <span class="pre">``*.xml</span></code> files into a <code class="docutils literal notranslate"><span class="pre">.ZIP</span></code> or <code class="docutils literal notranslate"><span class="pre">.TAR.GZ</span></code> PDS Deep Archive Delivery package. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tar</span> <span class="o">-</span><span class="n">cvzf</span> <span class="n">ladee_mission_bundle_v1</span><span class="o">.</span><span class="mi">0</span><span class="n">_NSSDCA_20200702</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span> <span class="n">ladee_mission_bundle_v1</span><span class="o">.</span><span class="mi">0</span><span class="n">_</span><span class="o">*.</span><span class="n">tab</span> <span class="n">ladee_mission_bundle_v1</span><span class="o">.</span><span class="mi">0</span><span class="n">_</span><span class="o">*.</span><span class="n">xml</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a new <a class="reference external" href="https://github.com/NASA-PDS/pdsen-operations/issues/new/choose">PDS4 NSSDCA Delivery Github Issue</a> for the PDS Engineering Node to submit the package to NSSDCA.</p>
+</li>
+<li><p class="first">EN will then complete <a class="reference external" href="https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process">validation and submission to NSSDCA</a>.</p>
+</li>
+</ol>
+<ol class="arabic simple" start="7">
+<li>You can then follow along with status in the Github Issue.</li>
+<li>The PDS Engineering Node Operations Team will notify you once delivery has been completed.</li>
+</ol>
+<ol class="arabic simple" start="8">
+<li>🎉 DONE</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/PDS_Planets.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=NASA-PDS&repo=pds-deep-archive&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../installation/index.html" title="previous chapter">📦 Installation</a></li>
+      <li>Next: <a href="../development/index.html" title="next chapter">👩‍💻 Development</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">📦 Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">🏃‍♀️ Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-information">Usage Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-1-basic-usage">Example 1: Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-2-bundle-referencing-collections-by-lid">Example 2: Bundle Referencing Collections by LID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pds-delivery-checklist">PDS Delivery Checklist</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">👩‍💻 Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support/index.html">🚑 Support</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020 California Institute of Technology.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
