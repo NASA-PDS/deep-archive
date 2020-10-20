@@ -120,23 +120,23 @@ def _getDigests(lidvidsToFiles, hashName):
     return withDigests
 
 
-def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, basePathToReplace):
+def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, bp):
     '''For each file in ``hashedFiles`` (a triple of file URL, digest, and lidvid), write a tab
     separated sequence of lines onto ``manifest`` with the columns containing the digest,
     the name of the hasing algorithm that produced the digest, the URL to the file, and the
     lidvid. Return a hex conversion of the MD5 digest of the manifest plus the total bytes
-    written.
+    written.  ``bp`` is the base path that'll get stripped from URLs before writing.
 
     If ``offline`` mode, we transform all URLs written to the table by stripping off
     everything except the last componeent (the file) and prepending the given ``baseURL``.
     '''
     _logger.debug('⎍ Writing SIP table with hash %s', hashName)
-    hashish, size, hashName, count = hashlib.new('md5'), 0, hashName.upper(), 0
+    hashish, size, hashName, count, bp = hashlib.new('md5'), 0, hashName.upper(), 0, bp.replace('\\', '/')
     for url, digest, lidvid in sorted(hashedFiles):
         if offline:
             if baseURL.endswith('/'):
                 baseURL = baseURL[:-1]
-            url = baseURL + urlparse(url).path.replace(basePathToReplace, '')
+            url = baseURL + urlparse(url).path.replace(bp, '')
 
         entry = f'{digest}\t{hashName}\t{url}\t{lidvid.strip()}\r\n'.encode('utf-8')
         hashish.update(entry)
