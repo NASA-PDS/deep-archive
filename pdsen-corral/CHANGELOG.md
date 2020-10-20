@@ -1,6 +1,14 @@
 # Changelog
 
-## [0.3.0-dev](https://github.com/NASA-PDS/pds-deep-archive/tree/0.3.0-dev) (2020-10-09)
+## [Unreleased](https://github.com/NASA-PDS/pds-deep-archive/tree/HEAD)
+
+[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/0.3.0-dev...HEAD)
+
+**Defects:**
+
+- Output SIP manifest has invalid URLs [\#85](https://github.com/NASA-PDS/pds-deep-archive/issues/85)
+
+## [0.3.0-dev](https://github.com/NASA-PDS/pds-deep-archive/tree/0.3.0-dev) (2020-10-20)
 
 [Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/0.2.1...0.3.0-dev)
 
