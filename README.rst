@@ -2,7 +2,7 @@
  PDS Deep Archive Utilities
 ****************************
 
-|Unstable Build|
+|Stable Build| |Unstable Build|
 
 Software for the Planetary Data System (PDS_) to generate Archive Information
 Package (AIP) and Submission Information Package (SIP) products, based upon Open
@@ -85,6 +85,9 @@ LICENSE.txt file for details.
 
 .. |Unstable Build| image:: https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%A4%AA%20Unstable%20integration%20&%20delivery/badge.svg
    :target: https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%A4%AA+Unstable+integration+%26+delivery%22
+
+.. |Stable Build| image:: https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%98%8C%20Stable%20integration%20&%20delivery/badge.svg
+   :target: https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%98%8C+Stable+integration+%26+delivery%22
 
 
 .. Copyright © 2019–2020 California Institute of Technology ("Caltech").
