@@ -122,6 +122,7 @@ def comprehendDirectory(dn, con):
                 xmlFile = os.path.join(dirpath, fn)
                 _logger.debug('📄 Deconstructing %s', xmlFile)
                 tree = parseXML(xmlFile)
+                if tree is None: continue
                 isProductCollection = tree.getroot().tag == PRODUCT_COLLECTION_TAG
                 lid, vid = getLogicalVersionIdentifier(tree)
                 if lid and vid:
@@ -178,7 +179,11 @@ def comprehendDirectory(dn, con):
 @functools.lru_cache(maxsize=_xmlCacheSize)
 def parseXML(f):
     '''Parse the XML in object ``f``'''
-    return etree.parse(f)
+    try:
+        return etree.parse(f)
+    except etree.XMLSyntaxError:
+        _logger.warning('👀 Cannot parse XML document at «%s»; ignoring it', f)
+        return None
 
 
 @functools.lru_cache(maxsize=_digestCacheSize)
