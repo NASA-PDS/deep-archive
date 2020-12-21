@@ -36,15 +36,13 @@
 from codecs import open
 from os import path
 from setuptools import setup, find_packages
-
+import versioneer
 
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as readme_file:
     readme = readme_file.read()
 with open(path.join(here, 'CHANGES.rst'), encoding='utf-8') as changes_file:
     changes = changes_file.read()
-with open(path.join(here, 'src', 'pds', 'aipgen', 'version.txt'), encoding='utf-8') as version_file:
-    version = version_file.read().strip()
 
 
 _requirements = [
@@ -54,8 +52,9 @@ _requirements = [
 
 
 setup(
-    name='pds.deeparchive',
-    version=version,
+    name='sk.deeparchive',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='PDS Deep Archive software for generating OAIS AIPs and SIPs for PDS4 Archives.',
     long_description=readme + '\n\n' + changes,
     keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',

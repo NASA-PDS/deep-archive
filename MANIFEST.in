@@ -5,3 +5,5 @@ graft src/pds
 graft docs
 include *.rst *.tab *.TAB *.xml *.xsd *.pdf *.txt
 global-exclude *.pyc *.pyo
+include versioneer.py
+include src/pds/aipgen/_version.py
