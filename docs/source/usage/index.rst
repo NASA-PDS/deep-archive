@@ -110,7 +110,7 @@ This is the default functionality of ``pds-deep-archive``. See `Example 1: Basic
 
 **Option 2: Run ``pds-deep-archive`` against the bundle with only the current versions of the collections present beneath the bundle root directory.**
 
-Execute the software with the ``--include-latest-collections-only`` flag enabled, for example::
+Execute the software with the ``--include-latest-collection-only`` flag enabled, for example::
 
     (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
                             -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
