@@ -1,0 +1,5 @@
+5f1b0e580ea8210d9239f14f9bfc16af	MD5	https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml	urn:nasa:pds:ladee_mission_bundle::1.0
+2466f69593b27f0ef575b534ec8f6b78	MD5	https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/collection_mission_xml_schema.xml	urn:nasa:pds:ladee_mission:xml_schema_collection::1.0
+5dc1469ab53dfd726b0233cfa03c697f	MD5	https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/collection_mission_xml_schema_inventory.tab	urn:nasa:pds:ladee_mission:xml_schema_collection::1.0
+b3a6c88ebb369993bd6e3737b1accda3	MD5	https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/ladee_1100.xml	urn:nasa:pds:ladee_mission:xml_schema:ladee_1100::1.1
+98946dc2ccd1613a86a8cdef8aa48203	MD5	https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/xml_schema/ladee_1100.xsd	urn:nasa:pds:ladee_mission:xml_schema:ladee_1100::1.1

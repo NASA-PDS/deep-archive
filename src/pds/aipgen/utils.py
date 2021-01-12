@@ -136,13 +136,18 @@ def comprehendDirectory(dn, con):
                     # Now see if it refers to other XML files
                     matches = tree.getroot().findall(f'./{{{PDS_NS_URI}}}Bundle_Member_Entry')
                     for match in matches:
-                        lidRef = vidRef = None
+                        # Do "primary" references only (https://github.com/NASA-PDS/pds-deep-archive/issues/92)
+                        lidRef = vidRef = ordinality = None
                         for child in match:
                             if child.tag == f'{{{PDS_NS_URI}}}lid_reference':
                                 lidRef = child.text.strip()
                             elif child.tag == f'{{{PDS_NS_URI}}}lidvid_reference':
                                 lidRef, vidRef = child.text.strip().split('::')
-                        if lidRef:
+                            elif child.tag == f'{{{PDS_NS_URI}}}member_status':
+                                ordinality = child.text.strip()
+                        if ordinality is None:
+                            raise ValueError(f'Bundle {xmlFile} contains a <Bundle_Member_Entry> with no <member_status>')
+                        if lidRef and ordinality == 'Primary':
                             if vidRef:
                                 con.execute(
                                     'INSERT OR IGNORE INTO inter_label_references (lid, vid, to_lid, to_vid) VALUES (?,?,?,?)',
