@@ -118,6 +118,31 @@ class InsightLatestAIPTest(_InsightAIPTest):
         return (base + 'checksum' + suffix, base + 'transfer' + suffix)
 
 
+class SecondaryCollectionSIPTest(SIPFunctionalTestCase):
+    '''Test case for SIP generation when there are secondary collections in the bundle.'''
+    def getBundleFile(self):
+        return 'data/secondary_test/mission_bundle/LADEE_Bundle_1101.xml'
+    def getAllCollectionsFlag(self):
+        return True
+    def getValidSIPFileName(self):
+        return 'data/secondary_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+    def getBaseURL(self):
+        return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
+    def getSiteID(self):
+        return 'PDS_ATM'
+
+
+class SecondaryCollectionAIPTest(AIPFunctionalTestCase):
+    '''Test case for AIP generation when there are secondary collections in the bundle.'''
+    def getBundleFile(self):
+        return 'data/secondary_test/mission_bundle/LADEE_Bundle_1101.xml'
+    def getAllCollectionsFlag(self):
+        return True
+    def getManifests(self):
+        base = 'data/secondary_test/valid/ladee_mission_bundle_v1.0_'
+        return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
+
+
 def test_suite():
     return unittest.TestSuite([
         unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
@@ -126,4 +151,6 @@ def test_suite():
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
     ])

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Product_Collection  xmlns="http://pds.nasa.gov/pds4/pds/v1" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/schema/released/pds/v1/PDS4_PDS_1101.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:ladee_mission:document_collection</logical_identifier>
+        <version_id>1.0</version_id>
+        <title>PDS4 LADEE Mission Document Collection</title>
+        <information_model_version>1.1.0.1</information_model_version>
+        <product_class>Product_Collection</product_class>
+        <Citation_Information>
+            <publication_year>2014</publication_year>
+            <description>LADEE Mission Document Collection created by ATMOS in 2014</description>
+        </Citation_Information>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2014-07-01</modification_date>
+                <version_id>1.0</version_id>
+                <description>Coordinating document collection for the LADEE mission</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Context_Area>
+        <Investigation_Area>
+            <name>LADEE</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:investigation:mission.ladee</lid_reference>
+                <reference_type>collection_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <name>LADEE</name>
+            <Observing_System_Component>
+                <name>LADEE</name>
+                <type>Spacecraft</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.ladee</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>UVS</name>
+                <type>Instrument</type>
+                <description>Ultra Violet Spectrometer</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:instrument.uvs__ladee</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>NMS</name>
+                <type>Instrument</type>
+                <description>Neutral Mass Spectrometer</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:instrument.nms__ladee</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>LDEX</name>
+                <type>Instrument</type>
+                <description>Lunar Dust Experiment</description>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:instrument.ldex__ladee</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Moon</name>
+            <type>Satellite</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:target:satellite.moon</lid_reference>
+                <reference_type>data_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+        <Target_Identification>
+            <name>Dust</name>
+            <type>Dust</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:target:dust.dust</lid_reference>
+                <reference_type>data_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    </Context_Area>
+    <Collection>
+        <collection_type>Document</collection_type>
+    </Collection>
+    <File_Area_Inventory>
+        <File>
+            <file_name>collection_mission_document_inventory.TAB</file_name>
+            <local_identifier>collection_mission_document_inventory_file</local_identifier>
+            <creation_date_time>2014-07-01T10:15</creation_date_time>
+        </File>
+        <Inventory>
+            <local_identifier>collection_mission_document_inventory</local_identifier>
+            <offset unit="byte">0</offset>
+            <parsing_standard_id>PDS DSV 1</parsing_standard_id>
+            <records>5</records>
+            <record_delimiter>carriage-return line-feed</record_delimiter>
+            <field_delimiter>comma</field_delimiter>
+            <Record_Delimited>
+                <fields>2</fields>
+                <groups>0</groups>
+                <maximum_record_length unit="byte">121</maximum_record_length>
+                <Field_Delimited>
+                    <name>Member_Status</name>
+                    <field_number>1</field_number>
+                    <data_type>ASCII_String</data_type>
+                    <maximum_field_length unit="byte">1</maximum_field_length>
+                    <description>This column specifies the LID of the files that comprise the collection.</description>
+                </Field_Delimited>
+                <Field_Delimited>
+                    <name>LIDVID_LID</name>
+                    <field_number>2</field_number>
+                    <data_type>ASCII_LIDVID_LID</data_type>
+                    <maximum_field_length unit="byte">67</maximum_field_length>
+                    <description>This column specifies the LID of the files that comprise the collection.</description>
+                </Field_Delimited>
+            </Record_Delimited>
+            <reference_type>inventory_has_member_product</reference_type>
+        </Inventory>
+    </File_Area_Inventory>
+</Product_Collection>

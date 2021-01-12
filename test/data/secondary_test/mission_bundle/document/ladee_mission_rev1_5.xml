@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1101.sch"?>
+<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/schema/released/pds/v1/PDS4_PDS_1101.xsd">
+  <Identification_Area>
+    <logical_identifier>urn:nasa:pds:ladee_mission:document:ladee_mission</logical_identifier>
+    <version_id>1.5</version_id>
+    <title>LADEE MISSION DESCRIPTION</title>
+    <information_model_version>1.1.0.1</information_model_version>
+    <product_class>Product_Document</product_class>
+    <Citation_Information>
+      <publication_year>2014</publication_year>
+      <description>Mission description for the Lunar       
+        Atmosphere and Dust Environment Explorer (LADEE) mission, revision    
+        1.5.</description>
+    </Citation_Information>
+  </Identification_Area>
+  <Document>
+    <document_name>LADEE MISSION DESCRIPTION</document_name>
+    <publication_date>2014-05-12</publication_date>
+    <description>Mission description for the Lunar       
+        Atmosphere and Dust Environment Explorer (LADEE) mission, revision    
+        1.5.</description>
+  </Document>
+  <Document_Format_Set>
+    <Document_Format>
+      <format_type>single file</format_type>
+    </Document_Format>
+    <Document_File>
+      <file_name>ladee_mission_rev1_5.pdf</file_name>
+      <document_standard_id>PDF</document_standard_id>
+    </Document_File>
+  </Document_Format_Set>
+</Product_Document>
+
