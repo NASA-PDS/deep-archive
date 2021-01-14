@@ -31,11 +31,16 @@ You should then be able to run the deep archive utilities::
     (pds-deep-archive) bash> aipgen --help
     (pds-deep-archive) bash> sipgen --help
 
+.. note:: The above commands demonstrate typical usage with a command-line
+    prompt, such as that provided by the popular ``bash`` shell; your own
+    prompt may appear differently and may vary depending on operating system,
+    shell choice, and so forth.
+
 
 Build
 =====
 
-See the Development_Guide_ for more information.
+See the `Development Guide`_ for more information.
 
 
 Documentation
@@ -81,7 +86,7 @@ LICENSE.txt file for details.
 .. _virtualenv: https://docs.python.org/3/library/venv.html
 .. _lxml: https://lxml.de/
 .. _Installation: https://nasa-pds.github.io/pds-deep-archive/installation/
-.. _Development_Guide: https://nasa-pds.github.io/pds-deep-archive/development/
+.. _`Development Guide`: https://nasa-pds.github.io/pds-deep-archive/development/
 
 .. |Unstable Build| image:: https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%A4%AA%20Unstable%20integration%20&%20delivery/badge.svg
    :target: https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%A4%AA+Unstable+integration+%26+delivery%22
