@@ -9,6 +9,11 @@ build it out::
     python3 bootstrap.py
     bin/buildout
 
+.. note:: The above series of commands assume you have the corresponding
+    development tools and familiarity with invoking them from the
+    command line or "terminal". Shells, operating systems, and command
+    invocation varies.
+
 At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen``
 programs ready to run as ``bin/pds-deep-archive``, ``bin/aipgen``, and
 ``bin/sipgen`` that's set up to use source Python code under ``src``.
@@ -80,6 +85,8 @@ To deploy to the official PyPi manually:
     pip install twine
     twine upload dist/*.tar.gz
 
+.. note:: The same admonitions mentioned earlier about command line
+    invocations also apply to the above example.
 
 Contribute
 ----------
