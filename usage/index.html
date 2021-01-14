@@ -67,19 +67,46 @@ invocation, its required arguments, and any options that refine the behavior.</p
 <p>For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 <code class="docutils literal notranslate"><span class="pre">test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml</span></code> run the
 following (NOTE: assumes you followed the default Installation into a Virtual
-Environment):</p>
+Environment); note that lines starting with the octothorp <code class="docutils literal notranslate"><span class="pre">#</span></code> are comments
+to help explain what follows and need not be typed in:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Prep your environment by sourcing your Python virtual environment
 $ source $HOME/.virtualenvs/pds-deep-archive/bin/activate
-
-# The (pds-deep-archive) prefix indicates your virtual environment is active
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">source</span></code> command and the location of your Python virtual
+environment may vary depending on the command-line interpreter (terminal)
+you’re using and the installation of Python. You may wish to consult a
+system administrator for clarification. In some cases, it may involve
+simply replacing <code class="docutils literal notranslate"><span class="pre">source</span></code> with a single period <code class="docutils literal notranslate"><span class="pre">.</span></code>; in others, it
+may be more involved, especially the location of your Python virtual
+environment.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># The (pds-deep-archive) prefix indicates your virtual environment is active
 (pds-deep-archive) $
-
-# Now let&#39;s run pds-deep-archive
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The changes the the prompt may not necessarily appear depending on
+the local machine environment, command interpreter, etc.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Now let&#39;s run pds-deep-archive
 # NOTE: This software must be run against data on your local filesystem
 (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \
-                        -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
-                        test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+    -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+    test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The trailing backslashes above are “continuation characters” to
+indicate to the command shell that the entire command line spans multiple
+physical lines. You may choose to enter the command on a single long
+physical line without the backslashes. Regardless, please consult your
+documentation regarding what the proper continuation character is for
+your shell; in the most common cases, it is a backslash.</p>
 </div>
 <p>From this command-line execution, we are inputting the following information:</p>
 <ul class="simple">
@@ -133,12 +160,17 @@ package (e.g. <code class="docutils literal notranslate"><span class="pre">ladee
 <p><strong>Option 1: (preferred) Run ``pds-deep-archive`` against the entire bundle and all versions of all collections present beneath the bundle root directory.</strong></p>
 <p>This is the default functionality of <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>. See <a class="reference internal" href="#example-1-basic-usage">Example 1: Basic Usage</a> to execute using this option.</p>
 <p><strong>Option 2: Run ``pds-deep-archive`` against the bundle with only the current versions of the collections present beneath the bundle root directory.</strong></p>
-<p>Execute the software with the <code class="docutils literal notranslate"><span class="pre">--include-latest-collections-only</span></code> flag enabled, for example:</p>
+<p>Execute the software with the <code class="docutils literal notranslate"><span class="pre">--include-latest-collection-only</span></code> flag enabled, for example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \
-                        -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
-                        test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
-                        --include-latest-collection-only
+    -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+    test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+    --include-latest-collection-only
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The same admonitions about the command prompt and continuation
+characters mentioned earlier applies to the above example.</p>
 </div>
 </div>
 <div class="section" id="pds-delivery-checklist">
@@ -158,7 +190,7 @@ Node upon a new release of data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of a bad URL</span>
 <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">this</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">does</span><span class="o">.</span><span class="ow">not</span><span class="o">.</span><span class="n">exist</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">LADEE_Bundle_1101</span><span class="o">.</span><span class="n">xml</span>
 
-<span class="c1"># Example of  GOOD URL (file exists online)</span>
+<span class="c1"># Example of GOOD URL (file exists online)</span>
 <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">atmos</span><span class="o">.</span><span class="n">nmsu</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">PDS</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">PDS4</span><span class="o">/</span><span class="n">LADEE</span><span class="o">/</span><span class="n">mission_bundle</span><span class="o">/</span><span class="n">LADEE_Bundle_1101</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>

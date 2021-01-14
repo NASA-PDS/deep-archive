@@ -36,19 +36,43 @@ Example 1: Basic Usage
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run the
 following (NOTE: assumes you followed the default Installation into a Virtual
-Environment)::
+Environment); note that lines starting with the octothorp ``#`` are comments
+to help explain what follows and need not be typed in::
 
     # Prep your environment by sourcing your Python virtual environment
     $ source $HOME/.virtualenvs/pds-deep-archive/bin/activate
 
+.. note:: The ``source`` command and the location of your Python virtual
+    environment may vary depending on the command-line interpreter (terminal)
+    you're using and the installation of Python. You may wish to consult a
+    system administrator for clarification. In some cases, it may involve
+    simply replacing ``source`` with a single period ``.``; in others, it
+    may be more involved, especially the location of your Python virtual
+    environment.
+
+::
+
     # The (pds-deep-archive) prefix indicates your virtual environment is active
     (pds-deep-archive) $
+
+.. note:: The changes the the prompt may not necessarily appear depending on
+    the local machine environment, command interpreter, etc.
+
+::
 
     # Now let's run pds-deep-archive
     # NOTE: This software must be run against data on your local filesystem
     (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
-                            -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
-                            test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+        -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+        test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+
+.. note:: The trailing backslashes above are "continuation characters" to
+    indicate to the command shell that the entire command line spans multiple
+    physical lines. You may choose to enter the command on a single long
+    physical line without the backslashes. Regardless, please consult your
+    documentation regarding what the proper continuation character is for
+    your shell; in the most common cases, it is a backslash.
+
 
 From this command-line execution, we are inputting the following information:
 
@@ -110,12 +134,15 @@ This is the default functionality of ``pds-deep-archive``. See `Example 1: Basic
 
 **Option 2: Run ``pds-deep-archive`` against the bundle with only the current versions of the collections present beneath the bundle root directory.**
 
-Execute the software with the ``--include-latest-collections-only`` flag enabled, for example::
+Execute the software with the ``--include-latest-collection-only`` flag enabled, for example::
 
     (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
-                            -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
-                            test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
-                            --include-latest-collection-only
+        -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
+        test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
+        --include-latest-collection-only
+
+.. note:: The same admonitions about the command prompt and continuation
+    characters mentioned earlier applies to the above example.
 
 
 PDS Delivery Checklist
@@ -138,7 +165,7 @@ For more formalized details on the NSSDCA Delivery Process, see the following `p
         # Example of a bad URL
         https://this.url.does.not.exist.com/LADEE_Bundle_1101.xml
 
-        # Example of  GOOD URL (file exists online)
+        # Example of GOOD URL (file exists online)
         https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml
 
 5.     Package up the five ``*.tab` and ``*.xml`` files into a ``.ZIP`` or ``.TAR.GZ`` PDS Deep Archive Delivery package. For example::

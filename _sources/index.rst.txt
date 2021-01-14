@@ -6,6 +6,11 @@ handling *deep* archives. It includes software for Archive Information Package
 (AIP) and Submission Information Package (SIP) products, based on Open
 Archival Information System (OAIS_) standards.
 
+This software is used to generate the necessary packages for delivery of PDS4
+archives to the NASA Space Science Data Coordinated Archive (NSSDCA).
+
+For delivering PDS3 data, see `documentation at the Engineering Node <https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process#pds3>`_.
+
 Currently, this package provides three executable programs:
 
 •  ``pds-deep-archive``, primary executable for creating both Archive
