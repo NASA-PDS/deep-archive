@@ -35,6 +35,20 @@ using a Miniconda_ installation.
 Doing the Installation
 ----------------------
 
+
+.. note::
+
+    Some things to be aware of regarding examples below:
+
+    * The octothorp characters `#` below indicate comments and need not be typed in.
+
+    * The location of where you choose to create a Python virtual environment is entirely your preference.
+
+    * The examples below should be seen only as suggestions. Invoking command lines below are demonstrative.
+
+    * Please consult your system documentation for the appropriate invocations for your operating system, command shell (or "terminal"), and so forth.
+
+
 The easiest way to install this software is to use Pip_, the Python Package
 Installer. If you have Python on your system, you probably already have Pip;
 you can run ``pip3 --help`` to check.
@@ -43,6 +57,7 @@ It's best install the PDS Deep Archive into a `virtual environment`_ so it
 won't interfere with—or be interfered by—other packages.  To do so::
 
     # For Linux / Mac / other Unix systems
+    # Example assumes bash command shell. For others, consult shell documentation.
     mkdir -p $HOME/.virtualenvs
     python3 -m venv $HOME/.virtualenvs/pds-deep-archive
     source $HOME/.virtualenvs/pds-deep-archive/bin/activate
@@ -53,13 +68,6 @@ won't interfere with—or be interfered by—other packages.  To do so::
     python -m venv virtualenvs\\pds-deep-archive
     virtualenvs\\pds-deep-archive\\Scripts\\activate
     pip3 install pds.deeparchive
-
-.. note:: The octothorp characters `#` above indicate comments and need not be
-    typed in. The location of where you choose to create a Python virtual
-    environment is entirely your preference; the above should be seen only as
-    suggestions. Invoking command lines above are demonstrative; please consult
-    your system documentation for the appropriate invocations for your operating
-    system, command shell (or "terminal"), and so forth.
 
 It's also possible to use ``easy_install`` if you prefer, or to install it
 via a Buildout_, or (if you must) into the system Python.
