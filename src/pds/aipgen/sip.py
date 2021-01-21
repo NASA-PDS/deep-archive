@@ -213,7 +213,7 @@ def _writeLabel(
     deep.append(etree.Comment('MD5 digest checksum for the manifest file'))
     etree.SubElement(deep, prefix + 'manifest_checksum').text = digest
     etree.SubElement(deep, prefix + 'checksum_type').text = 'MD5'
-    etree.SubElement(deep, prefix + 'manifest_url').text = SIP_MANIFEST_URL + manifestFile
+    etree.SubElement(deep, prefix + 'manifest_url').text = SIP_MANIFEST_URL + str(timestamp.year) + '/' + manifestFile
     etree.SubElement(deep, prefix + 'aip_lidvid').text = AIP_PRODUCT_URI_PREFIX + logicalID.split(':')[-1] + '_v' + versionID + '_' + timestamp.date().strftime('%Y%m%d') + '::1.0'
 
     aipMD5 = getMD5(aipFile) if aipFile else '00000000000000000000000000000000'
