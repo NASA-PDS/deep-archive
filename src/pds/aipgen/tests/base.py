@@ -32,7 +32,7 @@
 '''PDS AIP-GEN test base classes'''
 
 
-from datetime import datetime
+from datetime import datetime, date
 from lxml import etree
 from pds.aipgen.aip import process as produce_aip
 from pds.aipgen.constants import PDS_NS_URI
@@ -123,7 +123,14 @@ class SIPFunctionalTestCase(_FunctionalTestCase):
         )
         matches = etree.parse(label).getroot().findall(self._urlXPath)
         self.assertEqual(1, len(matches))
-        self.assertTrue(matches[0].text.startswith('https://pds.nasa.gov/data/pds4/manifests/'))
+        url = matches[0].text
+        self.assertTrue(url.startswith('https://pds.nasa.gov/data/pds4/manifests/'))
+        # https://github.com/NASA-PDS/pds-deep-archive/issues/93
+        currentYear = date.today().year
+        # Account for the possibility that it's "Happy New Year 🍾" between label generation and testing
+        legalYears = str(currentYear), str(currentYear + 1)
+        urlEnd = url.split('/')[-2]
+        self.assertTrue(urlEnd in legalYears, f"Expected {url} to contain either {legalYears} but didn't")
 
 
 class AIPFunctionalTestCase(_FunctionalTestCase):
