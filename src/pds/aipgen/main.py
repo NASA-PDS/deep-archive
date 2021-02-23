@@ -105,8 +105,8 @@ def main():
         ts = datetime.utcnow()
         ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
-        chksumFN, dummy, dummy = aipProcess(args.bundle, args.include_latest_collection_only, con, ts)
-        with open(chksumFN, 'rb') as chksumStream:
+        dummy, dummy, labelFN = aipProcess(args.bundle, args.include_latest_collection_only, con, ts)
+        with open(labelFN, 'rb') as chksumStream:
             sipProcess(
                 args.bundle,
                 # TODO: Temporarily hardcoding these values until other modes are available
