@@ -6,13 +6,22 @@ build it out::
 
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
-    python3 bootstrap.py
+    python3 -m venv venv
+    venv/bin/pip install setuptools==51.3.3
+    venv/bin/python3 bootstrap.py --allow-site-packages
     bin/buildout
 
 .. note:: The above series of commands assume you have the corresponding
     development tools and familiarity with invoking them from the
     command line or "terminal". Shells, operating systems, and command
     invocation varies.
+
+.. note:: Using both ``buildout`` and ``venv``? Short answer: don't worry
+    about it. Long nerdy answer 🤓: ``setuptools`` has advanced such that
+    ``zc.buildout`` is no longer compatible with it, and even specifiying
+    ``--setuptools-version`` to the ``bootstrap.py`` can't retreive it
+    (gets a zero byte zip file). All the more reason we should dump
+    ``zc.buildout`` some day.
 
 At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen``
 programs ready to run as ``bin/pds-deep-archive``, ``bin/aipgen``, and

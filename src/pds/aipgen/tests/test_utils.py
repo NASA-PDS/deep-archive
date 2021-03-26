@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright © 2020 California Institute of Technology ("Caltech").
+# Copyright © 2020–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,11 @@
 
 '''PDS AIP-GEN: Unit tests of the Utilities package'''
 
-
-from pds.aipgen.utils import addLoggingArguments, getDigest, getLogicalVersionIdentifier, getMD5, parseXML
-import unittest, tempfile, os, pkg_resources, argparse, logging
+from pds.aipgen.utils import (
+    addLoggingArguments, getDigest, getLogicalVersionIdentifier, getMD5, parseXML, URLValidator
+)
+from pds.aipgen.interfaces import IURLValidator
+import unittest, tempfile, os, pkg_resources, argparse, logging, zope.component
 
 
 EMPTY_SHA1 = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
@@ -85,6 +87,41 @@ class ArgumentTestCase(unittest.TestCase):
         self.assertEqual(logging.DEBUG, parser.parse_args(['--debug']).loglevel)
         self.assertEqual(logging.WARNING, parser.parse_args(['--quiet']).loglevel)
         self.assertRaises(ValueError, parser.parse_args, ['--debug', '--quiet'])
+
+
+# https://github.com/NASA-PDS/pds-deep-archive/issues/102
+class URLValidatorTest(unittest.TestCase):
+    '''Check if the URL validator singleton works'''
+    def setUp(self):
+        super(URLValidatorTest, self).setUp()
+        self.singleton = URLValidator()
+        zope.component.provideUtility(self.singleton)
+
+    def tearDown(self):
+        del self.singleton
+        super(URLValidatorTest, self).tearDown()
+
+    def test_state(self):
+        '''Ensure the state of URL checking is consistent'''
+        validator = zope.component.getUtility(IURLValidator)
+
+        # First, try with a valid URL
+        url = 'file:' + pkg_resources.resource_filename(
+            __name__, 'data/ladee_test/mission_bundle/context/collection_mission_context.xml'
+        )
+        self.assertTrue(not self.singleton._checked)
+        validator.validate(url)
+        self.assertTrue(self.singleton._checked)
+
+        # Now that we've checked, let's try an invalid one. This should succeed because the singleton
+        # only ever checks the first URL generated—even with the purposely bad URL of ``?``.
+        validator.validate('?')
+
+    def test_invalid_url(self):
+        '''Ensure an invalid URL is caught early'''
+        validator = zope.component.getUtility(IURLValidator)
+        with self.assertRaises(ValueError):
+            validator.validate('?')
 
 
 def test_suite():
