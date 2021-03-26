@@ -258,5 +258,13 @@ class URLValidator(object):
             with urllib.request.urlopen(url) as response:
                 data = response.read(1)
                 assert len(data) == 1
+        except (ValueError, urllib.error.URLError) as ex:
+            _logger.info('💥 I encountered an error while attempting to validate a URL!')
+            _logger.info("🗺 The URL that did't work: «%s»", url)
+            if getattr(ex, 'reason', None) is not None:
+                _logger.info("📖 The reason it didn't work is: «%s»", ex.reason)
+            _logger.info('💁‍♀️ This probably means that the bundle base URL is incorrect. You might want to check that!')
+            _logger.info("🤓 If you'd like the full stack trace, re-run with the ``--debug`` option.")
+            raise
         finally:
             self._checked = True

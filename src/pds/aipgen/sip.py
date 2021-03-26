@@ -512,9 +512,12 @@ def main():
             con=con,
             timestamp=ts
         )
+    except Exception as ex:
+        _logger.critical('🛑 Cannot proceed as a critical problem has occurred; re-run with --debug for more info.')
+        _logger.debug('🖥 Here is the exception: %r', ex, exc_info=ex)
     finally:
         shutil.rmtree(tempdir, ignore_errors=True)
-    _logger.info('👋 All done. Thanks for making a SIP. Bye!')
+    _logger.info('👋 All done for now.')
     sys.exit(0)
 
 
