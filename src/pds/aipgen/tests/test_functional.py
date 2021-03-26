@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright © 2020 California Institute of Technology ("Caltech").
+# Copyright © 2020–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@
 
 
 from .base import SIPFunctionalTestCase, AIPFunctionalTestCase
+from urllib.error import URLError
 import unittest
 
 
@@ -50,6 +51,28 @@ class LADEESIPTest(SIPFunctionalTestCase):
         return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
     def getSiteID(self):
         return 'PDS_ATM'
+
+
+class LADEESIPWithBadBaseURLTest(LADEESIPTest):
+    def setUp(self):
+        super(LADEESIPWithBadBaseURLTest, self).setUp()
+        from zope.component import provideUtility
+        from pds.aipgen.utils import URLValidator
+        self.validator = URLValidator()
+        provideUtility(self.validator)
+    def tearDown(self):
+        del self.validator
+        super(LADEESIPWithBadBaseURLTest, self).tearDown()
+    def getBaseURL(self):
+        # This should always be a non-existent path no matter where this test is being run.
+        # If you go out of your way to actually create this path on your system, please take
+        # a moment to question your other life choices 🧐
+        return 'file:/definitely/a/non/exist/int/path/prefix/'
+    # https://github.com/NASA-PDS/pds-deep-archive/issues/102
+    def test_sip(self):
+        '''Make sure that the SIP generation fails with a URLError due to a non-existent base URL'''
+        with self.assertRaises(URLError):
+            super(LADEESIPWithBadBaseURLTest, self).test_sip()
 
 
 class LADEAIPTest(AIPFunctionalTestCase):
@@ -153,4 +176,5 @@ def test_suite():
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPWithBadBaseURLTest),
     ])

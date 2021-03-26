@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright © 2019–2020 California Institute of Technology ("Caltech").
+# Copyright © 2019–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,14 +36,16 @@ from .constants import (
     PDS_TABLE_FILENAME_EXTENSION, SIP_MANIFEST_URL, XML_MODEL_PI, PDS_SCHEMA_URL, XML_SCHEMA_INSTANCE_NS_URI,
     AIP_SIP_DEFAULT_VERSION
 )
+from .interfaces import IURLValidator
 from .utils import (
     addBundleArguments, addLoggingArguments, comprehendDirectory, createSchema, getDigest,
-    getLogicalVersionIdentifier, getMD5, parseXML
+    getLogicalVersionIdentifier, getMD5, parseXML, URLValidator
 )
 from . import VERSION
 from datetime import datetime
 from lxml import etree
 from urllib.parse import urlparse
+from zope.component import queryUtility, provideUtility
 import argparse, logging, hashlib, urllib.request, os.path, sys, sqlite3, tempfile, shutil
 
 
@@ -137,6 +139,16 @@ def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, bp):
             if baseURL.endswith('/'):
                 baseURL = baseURL[:-1]
             url = baseURL + urlparse(url).path.replace(bp, '')
+
+            # https://github.com/NASA-PDS/pds-deep-archive/issues/102:
+            #
+            # Normally I wouldn't have the guard for ``None`` in here, but many, many tests in the
+            # functional test suite use bad URLs. Rather than try to modify every last test to use
+            # always-available URLs, we simply don't install a URL validator.
+            #
+            # Oh and I added a command-line flag to disable validation, ``--disable-url-validation`` 😉
+            validator = queryUtility(IURLValidator)
+            if validator is not None: validator.validate(url)
 
         entry = f'{digest}\t{hashName}\t{url}\t{lidvid.strip()}\r\n'.encode('utf-8')
         hashish.update(entry)
@@ -319,6 +331,14 @@ def addSIParguments(parser):
              ' the URL in the SIP will be https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml.'
     )
 
+    # https://github.com/NASA-PDS/pds-deep-archive/issues/102
+    parser.add_argument(
+        '-D', '--disable-url-validation', required=False, action='store_true',
+        help='SIP generation will check if URLs generated from the ``bundle-base-url`` are valid'
+             ' by attempting to retrieve the first such URL and failing (early) if it cannot; this'
+             ' flag disables such validation.'
+    )
+
 
 def _populate(lid, vid, lidvidsToFiles, allCollections, con):
     '''Populate the ``lidvidsToFiles`` dict (which maps ``lid::vid`` → set of ``file:`` URLs) with
@@ -455,6 +475,10 @@ def main():
     _logger.debug('⚙️ command line args = %r', args)
     if args.offline and not args.bundle_base_url:
         parser.error('--bundle-base-url is required when in offline mode (--offline).')
+
+    # https://github.com/NASA-PDS/pds-deep-archive/issues/102
+    if not args.disable_url_validation:
+        provideUtility(URLValidator())
 
     tempdir = tempfile.mkdtemp(suffix='.dir', prefix='sip')
     try:

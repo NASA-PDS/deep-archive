@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright © 2020 California Institute of Technology ("Caltech").
+# Copyright © 2020–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,15 +29,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-u'''AIP and SIP generation'''
+'''AIP and SIP generation'''
 
 from . import VERSION
 from .aip import process as aipProcess
 from .constants import HASH_ALGORITHMS
 from .sip import addSIParguments
 from .sip import produce as sipProcess
-from .utils import addLoggingArguments, addBundleArguments, createSchema, comprehendDirectory
+from .utils import addLoggingArguments, addBundleArguments, createSchema, comprehendDirectory, URLValidator
 from datetime import datetime
+from zope.component import provideUtility
 import argparse, sys, logging, tempfile, sqlite3, os, shutil
 
 
@@ -91,6 +92,11 @@ def main():
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.info('👟 PDS Deep Archive, version %s', __version__)
     _logger.debug('⚙️ command line args = %r', args)
+
+    # https://github.com/NASA-PDS/pds-deep-archive/issues/102
+    if not args.disable_url_validation:
+        provideUtility(URLValidator())
+
     tempdir = tempfile.mkdtemp(suffix='.dir', prefix='deep')
     try:
         # Make a site survey

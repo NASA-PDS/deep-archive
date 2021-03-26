@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2019–2020 California Institute of Technology ("Caltech").
+# Copyright © 2019–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -48,8 +48,11 @@ with open(path.join(here, 'src', 'pds', 'aipgen', 'version.txt'), encoding='utf-
 
 
 _requirements = [
-    'setuptools',  # All modern setup.py's should require setuptools
-    'lxml',        # Needed for generating XML labels (since ElementTree can't add XML PIs above the root elem!)
+    'setuptools',      # All modern setup.py's should require setuptools
+    'lxml',            # Needed for generating XML labels (since ElementTree can't add XML PIs above the root elem!)
+    # The next two packages are to support https://github.com/NASA-PDS/pds-deep-archive/issues/102
+    'zope.component',  # To support singleton utilities
+    'zope.interface',  # Interfaces and their implementations
 ]
 
 
