@@ -7,15 +7,20 @@
 Overview
 --------
 
-This package provides one primary executable, ``pds-deep-archive`` that
-generates both and Archive Information Package (AIP) and a Submission
-Information Package (SIP). The SIP is what is delivered by the PDS to the NASA
-Space Science Data Coordinated Archive (NSSDCA). For more information about
-the products produced, see the following references:
+This package provides two primary executables, ``pds-deep-archive`` and
+``pds-deep-registry-archive``, that generate both and Archive Information
+Package (AIP) and a Submission Information Package (SIP). The SIP is what is
+delivered by the PDS to the NASA Space Science Data Coordinated Archive
+(NSSDCA). For more information about the products produced, see the following
+references:
 
 •   OAIS Information - http://www.oais.info/
 •   AIP Information - https://www.iasa-web.org/tc04/archival-information-package-aip
 •   SIP Information - https://www.iasa-web.org/tc04/submission-information-package-sip
+
+You use ``pds-deep-archive`` for PDS data on your hard drive, network
+filesystem, etc.; you use ``pds-deep-registry-archive`` for PDS data in a
+PDS Registry.
 
 This package also comes with the two sub-components of ``pds-deep-archive``
 that can be ran individually:
@@ -23,15 +28,19 @@ that can be ran individually:
 •  ``aipgen`` that generates Archive Information Packages from a PDS4 bundle
 •  ``sipgen`` that generates Submission Information from a PDS4 bundle
 
+These work just with local files, not the PDS Registry.
+
+
 Usage Information
 -----------------
 
-Running ``pds-deep-archive --help`` will give a summary of the command-line
-invocation, its required arguments, and any options that refine the behavior.
+Running ``pds-deep-archive --help`` or ``pds-deep-registry-archive --help`` to
+get summaries of the command-line invocations, required arguments, and any
+options that refine the behavior.
 
 
-Example 1: Basic Usage
-----------------------
+Example 1: Basic Usage on Local Files
+-------------------------------------
 
 For example, to create a SIP and AIP from the LADEE 1101 Bundle located at
 ``test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml`` run the
@@ -130,7 +139,7 @@ For running the software on an accumulating bundle, you have two options:
 
 **Option 1: (preferred) Run ``pds-deep-archive`` against the entire bundle and all versions of all collections present beneath the bundle root directory.**
 
-This is the default functionality of ``pds-deep-archive``. See `Example 1: Basic Usage`_ to execute using this option.
+This is the default functionality of ``pds-deep-archive``. See `Example 1: Basic Usage on Local Files`_ to execute using this option.
 
 **Option 2: Run ``pds-deep-archive`` against the bundle with only the current versions of the collections present beneath the bundle root directory.**
 
@@ -143,6 +152,48 @@ Execute the software with the ``--include-latest-collection-only`` flag enabled,
 
 .. note:: The same admonitions about the command prompt and continuation
     characters mentioned earlier applies to the above example.
+
+
+Example 3: Generating Deep Archives of Remote Data in a PDS Registry
+--------------------------------------------------------------------
+
+Assuming the software is installed properly and the virtual Python environment
+is still set up as above, then the following invocation will generate the AIP
+checksum and transfer manifests and the SIP manifest for the bundle
+``urn:nasa:pds:insight_documents::2.0`` using the PDS Registry API at
+``https://pds-gamma.jpl.nasa.gov/api/`` for the site ``PDS_ATM``::
+
+    (pds-deep-archive) $ bin/pds-deep-registry-archive \
+        --site PDS_ATM \
+        urn:nasa:pds:insight_documents::2.0
+
+.. note:: The same admonitions about the command prompt and continuation
+    characters mentioned earlier applies to the above examples.
+
+This writes 5 output files in the current directory as part of the AIP and
+SIP Generation, but without needing to read any local files; these files
+include:
+
+•  ``insight_documents_v2.0_checksum_manifest_v1.0_DATE.tab``, the checksum manifest
+•  ``insight_documents_v2.0_transfer_manifest_v1.0_DATE.tab``, the transfer manifest
+•  ``insight_documents_v2.0_aip_v1.0_DATE.xml``, the label for these two files
+•  ``insight_documents_v2.0_sip_v1.0_DATE.tab``, the created SIP manifest as a
+   tab-separated values file.
+•  ``insight_documents_v2.0_sip_v1.0_DATE.xml``, an PDS label for the SIP file.
+
+As of this writing, there may be a couple of issues with PDS Registry APIs
+that may affect ``pds-deep-registry-archive``:
+
+•  A `pagination bug`_ may cause some performance issues when making deep
+   archives of large bundles. By default, ``pds-deep-registry-archive``
+   works around the bug—but if you know the PDS Registry you're using is
+   free of the bug, you can add ``--disable-pagination-workaround`` to the
+   command. It doesn't hurt if you use it regardless.
+•  An `internal server error`_ may appear when certain data is loaded into a
+   PDS Registry. By default, though, ``pds-deep-registry-archive`` will treat
+   such errors as "not found" instead of as serious errors. However, if you
+   prefer to treat the problem as the serious error it really is, add the
+   ``--disable-bad-documents-workaround`` option to the command.
 
 
 PDS Delivery Checklist
@@ -181,3 +232,8 @@ For more formalized details on the NSSDCA Delivery Process, see the following `p
 8.     The PDS Engineering Node Operations Team will notify you once delivery has been completed.
 
 8.  🎉 DONE
+
+
+.. _`pagination bug`: https://github.com/NASA-PDS/pds-api/issues/73
+.. _`internal server error`: https://github.com/NASA-PDS/registry-api-service/issues/17
+

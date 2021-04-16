@@ -23,10 +23,11 @@ build it out::
     (gets a zero byte zip file). All the more reason we should dump
     ``zc.buildout`` some day.
 
-At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen``
-programs ready to run as ``bin/pds-deep-archive``, ``bin/aipgen``, and
-``bin/sipgen`` that's set up to use source Python code under ``src``.
-Changes you make to the code are reflected in ``bin/sipgen`` immediately.
+At this point, you'll have the ``pds-deep-archive``,
+``pds-deep-registry-archive``, and other programs ready to run as
+``bin/pds-deep-archive``, ``bin/deep-registry-archive``, etc., that's set up
+to use source Python code under ``src``. Changes you make to the code are
+reflected in immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run

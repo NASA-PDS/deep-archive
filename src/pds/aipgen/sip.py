@@ -34,7 +34,7 @@
 from .constants import (
     AIP_PRODUCT_URI_PREFIX, HASH_ALGORITHMS, INFORMATION_MODEL_VERSION, PDS_LABEL_FILENAME_EXTENSION, PDS_NS_URI,
     PDS_TABLE_FILENAME_EXTENSION, SIP_MANIFEST_URL, XML_MODEL_PI, PDS_SCHEMA_URL, XML_SCHEMA_INSTANCE_NS_URI,
-    AIP_SIP_DEFAULT_VERSION
+    AIP_SIP_DEFAULT_VERSION, PROVIDER_SITE_IDS
 )
 from .interfaces import IURLValidator
 from .utils import (
@@ -70,9 +70,6 @@ generated files are printed upon successful completion.
 
 # Other constants and defaults:
 _registryServiceURL = 'https://pds.nasa.gov/services/registry/pds'  # Default registry service; for future use?
-
-# TODO: Auto-generate from PDS4 IM
-_providerSiteIDs = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]
 
 # URI prefix for logical identifiers of Submission Information Package bundles
 _sipDeepURIPrefix = 'urn:nasa:pds:system_bundle:product_sip_deep_archive:'
@@ -122,33 +119,29 @@ def _getDigests(lidvidsToFiles, hashName):
     return withDigests
 
 
-def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, bp):
+def _writeTable(hashedFiles, hashName, manifest, baseURL, bp):
     '''For each file in ``hashedFiles`` (a triple of file URL, digest, and lidvid), write a tab
     separated sequence of lines onto ``manifest`` with the columns containing the digest,
     the name of the hasing algorithm that produced the digest, the URL to the file, and the
     lidvid. Return a hex conversion of the MD5 digest of the manifest plus the total bytes
     written.  ``bp`` is the base path that'll get stripped from URLs before writing.
-
-    If ``offline`` mode, we transform all URLs written to the table by stripping off
-    everything except the last componeent (the file) and prepending the given ``baseURL``.
     '''
     _logger.debug('⎍ Writing SIP table with hash %s', hashName)
     hashish, size, hashName, count, bp = hashlib.new('md5'), 0, hashName.upper(), 0, bp.replace('\\', '/')
     for url, digest, lidvid in sorted(hashedFiles):
-        if offline:
-            if baseURL.endswith('/'):
-                baseURL = baseURL[:-1]
-            url = baseURL + urlparse(url).path.replace(bp, '')
+        if baseURL.endswith('/'):
+            baseURL = baseURL[:-1]
+        url = baseURL + urlparse(url).path.replace(bp, '')
 
-            # https://github.com/NASA-PDS/pds-deep-archive/issues/102:
-            #
-            # Normally I wouldn't have the guard for ``None`` in here, but many, many tests in the
-            # functional test suite use bad URLs. Rather than try to modify every last test to use
-            # always-available URLs, we simply don't install a URL validator.
-            #
-            # Oh and I added a command-line flag to disable validation, ``--disable-url-validation`` 😉
-            validator = queryUtility(IURLValidator)
-            if validator is not None: validator.validate(url)
+        # https://github.com/NASA-PDS/pds-deep-archive/issues/102:
+        #
+        # Normally I wouldn't have the guard for ``None`` in here, but many, many tests in the
+        # functional test suite use bad URLs. Rather than try to modify every last test to use
+        # always-available URLs, we simply don't install a URL validator.
+        #
+        # Oh and I added a command-line flag to disable validation, ``--disable-url-validation`` 😉
+        validator = queryUtility(IURLValidator)
+        if validator is not None: validator.validate(url)
 
         entry = f'{digest}\t{hashName}\t{url}\t{lidvid.strip()}\r\n'.encode('utf-8')
         hashish.update(entry)
@@ -160,7 +153,7 @@ def _writeTable(hashedFiles, hashName, manifest, offline, baseURL, bp):
     return hashish.hexdigest(), size
 
 
-def _writeLabel(
+def writeLabel(
     logicalID,
     versionID,
     title,
@@ -179,8 +172,8 @@ def _writeLabel(
     used to produce the *contents* of the manifest, which may be MD5 or something else.
 
     The ``aipFile`` is a read-stream to the Archive Infomration Package (AIP) which we use
-    to write an MD5 hash into this label. If it's not given, we default to writing an
-    MD5 of zeros.
+    to write an MD5 hash into this label. Or it's a hex string of the MD5. But if it's not given
+    at all (i.e., is ``None``, we default to writing an MD5 of zeros.
 
     The ``timestamp`` is a ``datetime`` object that tells what creation date to use in the label.
     '''
@@ -228,7 +221,12 @@ def _writeLabel(
     etree.SubElement(deep, prefix + 'manifest_url').text = SIP_MANIFEST_URL + str(timestamp.year) + '/' + manifestFile
     etree.SubElement(deep, prefix + 'aip_lidvid').text = AIP_PRODUCT_URI_PREFIX + logicalID.split(':')[-1] + '_v' + versionID + '_' + timestamp.date().strftime('%Y%m%d') + '::1.0'
 
-    aipMD5 = getMD5(aipFile) if aipFile else '00000000000000000000000000000000'
+    if isinstance(aipFile, str):
+        aipMD5 = aipFile
+    elif aipFile is not None:
+        aipMD5 = getMD5(aipFile)
+    else:
+        aipMD5 = '00000000000000000000000000000000'
     etree.SubElement(deep, prefix + 'aip_label_checksum').text = aipMD5
 
     deepFileArea = etree.Element(prefix + 'File_Area_SIP_Deep_Archive')
@@ -297,29 +295,9 @@ def addSIParguments(parser):
     #     help='File hash (checksum) algorithm; default %(default)s'
     # )
     parser.add_argument(
-        '-s', '--site', required=True, choices=_providerSiteIDs,
+        '-s', '--site', required=True, choices=PROVIDER_SITE_IDS,
         help="Provider site ID for the manifest's label"
     )
-    group = parser.add_mutually_exclusive_group(required=False)
-
-    # TODO: Temporarily setting offline to True by default until online mode is available
-    # group.add_argument(
-    #     '-u', '--url', default=_registryServiceURL,
-    #     help='URL to the registry service; default %(default)s'
-    # )
-
-    # TODO: Temporarily setting offline to True by default until online mode is available
-    group.add_argument(
-        '-n', '--offline', default=True, action='store_true',
-        help='Run offline, scanning bundle directory for matching files instead of querying registry service.'
-             ' NOTE: By default, set to True until online mode is available.'
-    )
-
-    # TODO: Temporarily commenting out until online mode is available
-    # parser.add_argument(
-    #     '-k', '--insecure', default=False, action='store_true',
-    #     help='Ignore SSL/TLS security issues; default %(default)s'
-    # )
 
     # TODO: Temporarily setting to be required by default until online mode is available
     parser.add_argument(
@@ -396,7 +374,6 @@ def produce(
     registryServiceURL,
     insecureConnectionFlag,
     site,
-    offline,
     baseURL,
     aipFile,
     allCollections,
@@ -404,21 +381,14 @@ def produce(
     timestamp
 ):
     '''Produce the submission information package for the given ``bundle``, using the message digest
-    algorithm identified by ``hashName``, and (some day maybe) contacting the ``registryServiceURL``
-    with the given ``insecureConnectionFlag`` but not today.  Label this for the given ``site`` and
-    assume that we're in ``offline`` mode (True) for now.  Prefix items in the submission information
-    package with the given ``baseURL`` and referencing the optional ``aipFile``.  For XML labels that
-    have just a lid reference to other labels, include just the latest version of such referenced
-    labels unless ``allCollections`` is True.  Return the names of the manifest file and the label
-    file generated. ``con`` is a sqlite3 database connection we can use as lookup and storage.
-    The ``timestamp`` is used for the creation date in the label for the SIP and also in filenames
-    for the label and SIP.
+    algorithm identified by ``hashName``. Label this for the given ``site`` and prefix items in the
+    submission information package with the given ``baseURL`` and referencing the optional
+     ``aipFile``.  For XML labels that have just a lid reference to other labels, include just the
+     atest version of such referenced labels unless ``allCollections`` is True.  Return the names
+     of the manifest file and the label file generated. ``con`` is a sqlite3 database connection
+     we can use as lookup and storage. The ``timestamp`` is used for the creation date in the
+     label for the SIP and also in filenames or the label and SIP.
     '''
-    if not offline:
-        msg = '💢 Remote functionality with Registry Service is not yet implemented'
-        _logger.critical(msg)
-        raise NotImplementedError(msg)
-
     _logger.info('🏃‍♀️ Starting SIP generation for %s', bundle.name)
 
     tree              = parseXML(bundle)
@@ -434,9 +404,9 @@ def produce(
     _populate(lid, vid, lidvidsToFiles, allCollections, con)
     hashedFiles = _getDigests(lidvidsToFiles, hashName)
     with open(manifestFileName, 'wb') as manifest:
-        md5, size = _writeTable(hashedFiles, hashName, manifest, offline, baseURL, os.path.dirname(os.path.dirname(bundle)))
+        md5, size = _writeTable(hashedFiles, hashName, manifest, baseURL, os.path.dirname(os.path.dirname(bundle)))
         with open(labelFileName, 'wb') as label:
-            _writeLabel(
+            writeLabel(
                 lid,
                 vid,
                 title,
@@ -473,8 +443,6 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
     _logger.debug('⚙️ command line args = %r', args)
-    if args.offline and not args.bundle_base_url:
-        parser.error('--bundle-base-url is required when in offline mode (--offline).')
 
     # https://github.com/NASA-PDS/pds-deep-archive/issues/102
     if not args.disable_url_validation:
@@ -505,10 +473,9 @@ def main():
             registryServiceURL=None,
             insecureConnectionFlag=False,
             site=args.site,
-            offline=args.offline,
             baseURL=args.bundle_base_url,
             aipFile=args.aip,
-            allCollections=args.include_latest_collection_only,
+            allCollections=not args.include_latest_collection_only,
             con=con,
             timestamp=ts
         )

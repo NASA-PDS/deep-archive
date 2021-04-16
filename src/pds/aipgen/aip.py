@@ -75,7 +75,7 @@ _logger = logging.getLogger(__name__)
 # Functions
 # ---------
 
-def _writeLabel(
+def writeLabel(
     labelOutputFile,
     logicalIDfragment,
     bundleLID,
@@ -340,7 +340,7 @@ def process(bundle, allCollections, con, timestamp):
 
     # Finally, the XML label
     labelFN = strippedLogicalID + '_' + slate + '_aip_v' + AIP_SIP_DEFAULT_VERSION + PDS_LABEL_FILENAME_EXTENSION
-    _writeLabel(
+    writeLabel(
         labelFN,
         strippedLogicalID,
         lid,
@@ -389,7 +389,7 @@ def main():
         ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
         # Here we go, daddy
-        process(args.bundle, args.include_latest_collection_only, con, ts)
+        process(args.bundle, not args.include_latest_collection_only, con, ts)
     finally:
         shutil.rmtree(tempdir, ignore_errors=True)
 
