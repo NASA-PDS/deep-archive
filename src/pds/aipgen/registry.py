@@ -153,12 +153,12 @@ def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str, workaroundBad
             results = cpAPI.products_of_a_collection(lidvid, start=start, limit=_apiQueryLimit, fields=_fields)
         except pds.api_client.exceptions.ApiException as ex:
             if ex.status == http.client.NOT_FOUND:
-                return None
+                return
             elif ex.status == http.client.INTERNAL_SERVER_ERROR and workaroundBadDocuments:
                 # I get 500 for urn:nasa:pds:insight_documents:document_mission::1.1, no idea why, so for
                 # now treat it as not found
                 _logger.warn('😲 Got error 500 finding products of collection %s but treating it as 404', lidvid)
-                return None
+                return
             else: raise
         if results.data is None: return
         start += len(results.data)
