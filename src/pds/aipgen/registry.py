@@ -61,8 +61,8 @@ _apiQueryLimit = 50                                       # Pagination in the PD
 _defaultServer = 'https://pds-gamma.jpl.nasa.gov/api/'    # Not just the default, the only one I know of 😮
 
 
-# PDS API properity keys we're interested in
-# ------------------------------------------
+# PDS API property keys we're interested in
+# -----------------------------------------
 
 _propDataURL  = 'ops:Data_File_Info.ops:file_ref'
 _propDataMD5  = 'ops:Data_File_Info.ops:md5_checksum'
@@ -100,7 +100,7 @@ def _deURNLIDVID(lidvid: str) -> str:
     return lid.split(':')[-1], vid
 
 
-def _makeFilename(lidvid: str, ts: datetime, kind: str, ext: str):
+def _makeFilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
     '''Make a PDS filename for the given ``lidvid`` by dropping its URN prefix, splitting it into
     LID and VID, adding the date part of the ``ts`` timestamp, slapping on the ``kind`` of file it
     is, and the given ``ext``ension, which should already include the ``.``.
@@ -364,7 +364,7 @@ def main():
     parser.add_argument(
         '--disable-pagination-workaround', action='store_true',
         help='By default, this program will sidestep an issue in the PDS Registry that treats pagination '
-        'of results from the "collections of a bundle query" as being off by one item; specifiny this option '
+        'of results from the "collections of a bundle query" as being off by one item; specifiy this option '
         'disables this workaround—see https://github.com/NASA-PDS/pds-api/issues/73 for more information'
     )
     parser.add_argument('bundle', help='LIDVID of the PDS bundle for which to create a PDS Deep Archive')
