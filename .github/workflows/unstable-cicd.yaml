@@ -43,6 +43,7 @@ jobs:
     unstable-assembly:
         name: 🧩 Unstable Assembly
         runs-on: ubuntu-latest
+        if: github.actor != 'pdsen-ci'
         steps:
             -
                 name: 💳 Checkout
