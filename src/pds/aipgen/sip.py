@@ -383,11 +383,11 @@ def produce(
     '''Produce the submission information package for the given ``bundle``, using the message digest
     algorithm identified by ``hashName``. Label this for the given ``site`` and prefix items in the
     submission information package with the given ``baseURL`` and referencing the optional
-     ``aipFile``.  For XML labels that have just a lid reference to other labels, include just the
-     atest version of such referenced labels unless ``allCollections`` is True.  Return the names
-     of the manifest file and the label file generated. ``con`` is a sqlite3 database connection
-     we can use as lookup and storage. The ``timestamp`` is used for the creation date in the
-     label for the SIP and also in filenames or the label and SIP.
+    ``aipFile``.  For XML labels that have just a lid reference to other labels, include just the
+    latest version of such referenced labels unless ``allCollections`` is True.  Return the names
+    of the manifest file and the label file generated. ``con`` is a sqlite3 database connection
+    we can use as lookup and storage. The ``timestamp`` is used for the creation date in the
+    label for the SIP and also in filenames or the label and SIP.
     '''
     _logger.info('🏃‍♀️ Starting SIP generation for %s', bundle.name)
 

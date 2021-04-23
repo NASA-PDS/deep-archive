@@ -211,7 +211,7 @@ def _comprehendRegistry(
     bundleURL = bundle.metadata.label_url
     prefixLen = bundleURL.rfind('/') + 1
 
-    # It turns out the PDS registry make this *trivial* compared to the PDS filesystem version;
+    # It turns out the PDS registry makes this *trivial* compared to the PDS filesystem version;
     # Just understanding it all was there was the hard part! 😊 THANK YOU! 🙏
     for collection in _getCollections(apiClient, bundleLIDVID, workaroundPaginationBug):
         _addFiles(collection, bac)
@@ -238,7 +238,7 @@ def _writeChecksumManifest(fn: str, prefixLen: int, bac: dict) -> (str, int, int
                 count += 1
                 if count % _progressLogging == 0:
                     _logger.debug('⏲ Wrote %d entries into the checksum manifest %s', count, fn)
-    _logger.info('📄 Wrote AIP checksum manifest: %s', fn)
+    _logger.info('📄 Wrote AIP checksum manifest %s with %d entries', fn, count)
     return hashish.hexdigest(), size, count
 
 
@@ -259,7 +259,7 @@ def _writeTransferManifest(fn: str, prefixLen: int, bac: dict) -> (str, int, int
                 count += 1
                 if count % _progressLogging == 0:
                     _logger.debug('⏲ Wrote %d entries into the transfer manifest %s', count, fn)
-    _logger.info('📄 Wrote AIP transfer manifest: %s', fn)
+    _logger.info('📄 Wrote AIP transfer manifest %s with %d entries', fn, count)
     return hashish.hexdigest(), size, count
 
 
@@ -301,7 +301,7 @@ def _writeSIP(bundleLIDVID: str, bac: dict, title: str, site: str, ts: datetime,
                 count += 1
                 if count % _progressLogging == 0:
                     _logger.debug('⏲ Wrote %d entries into the submission info file %s', count, sipFN)
-    _logger.info('📄 Wrote SIP: %s', sipFN)
+    _logger.info('📄 Wrote SIP %s with %d entries', sipFN, count)
     labelFN = _makeFilename(bundleLIDVID, ts, 'sip', PDS_LABEL_FILENAME_EXTENSION)
     _logger.info('📄 Wrote label for SIP: %s', labelFN)
     with open(labelFN, 'wb') as o:

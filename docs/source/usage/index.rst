@@ -8,7 +8,7 @@ Overview
 --------
 
 This package provides two primary executables, ``pds-deep-archive`` and
-``pds-deep-registry-archive``, that generate both and Archive Information
+``pds-deep-registry-archive``, that generate both an Archive Information
 Package (AIP) and a Submission Information Package (SIP). The SIP is what is
 delivered by the PDS to the NASA Space Science Data Coordinated Archive
 (NSSDCA). For more information about the products produced, see the following
