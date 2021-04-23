@@ -233,7 +233,7 @@ def addBundleArguments(parser):
     '''Add command-line parsing to the given argument ``parser`` to support handling of bundles
     with ambiguous ``lid_reference`` without specific versions (#24)
     '''
-    parser.add_argument('--include-latest-collection-only', action='store_false', default=True, help=_allCollectionsHelp)
+    parser.add_argument('--include-latest-collection-only', action='store_true', help=_allCollectionsHelp)
 
 
 # Classes

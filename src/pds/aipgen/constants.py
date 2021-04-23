@@ -74,3 +74,6 @@ HASH_ALGORITHMS = {
 
 # The "well-defined" location for SIP manifests
 SIP_MANIFEST_URL = 'https://pds.nasa.gov/data/pds4/manifests/'
+
+# TODO: Auto-generate from PDS4 IM
+PROVIDER_SITE_IDS = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]
