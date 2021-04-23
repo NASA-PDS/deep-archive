@@ -2,7 +2,7 @@
 # =================================================
 #
 # Note: for this workflow to succeed, the following secrets must be installed
-# in the repository:
+# in the repository or inherited from the organization:
 #
 # ``ADMIN_GITHUB_TOKEN``
 #     A personal access token of a user with collaborator or better access to
@@ -10,11 +10,12 @@
 #     Settings → Developer settings → Personal access tokens → Generate new
 #     token. Give the token scopes on ``repo``, ``write:packages``,
 #     ``delete:packages``, ``workflow``, and ``read:gpg_key``.
-# ``TEST_PYPI_USERNAME``
-#     Username for test.pypi.org.
-# ``TEST_PYPI_PASSWORD``
-#     Password for ``TEST_PYPI_USERNAME``.
-#
+# ``CODE_SIGNING_KEY``
+#     A *private* key with which we can sign artifacts.
+# ``OSSRH_USERNAME``
+#     Username for the Central Repository.
+# ``OSSRH_USERNAME``
+#     Password for the Central Repository.
 
 
 ---
@@ -43,20 +44,24 @@ jobs:
     unstable-assembly:
         name: 🧩 Unstable Assembly
         runs-on: ubuntu-latest
+        if: github.actor != 'pdsen-ci'
         steps:
             -
                 name: 💳 Checkout
                 uses: actions/checkout@v2
                 with:
                     lfs: true
+                    token: ${{secrets.ADMIN_GITHUB_TOKEN}}
+
             -
                 name: 🤠 Roundup
                 uses: NASA-PDS/roundup-action@master
                 with:
                     assembly: unstable
                 env:
-                    pypi_username: ${{secrets.TEST_PYPI_USERNAME}}
-                    pypi_password: ${{secrets.TEST_PYPI_PASSWORD}}
+                    ossrh_username: ${{secrets.OSSRH_USERNAME}}
+                    ossrh_password: ${{secrets.OSSRH_PASSWORD}}
+                    CODE_SIGNING_KEY: ${{secrets.CODE_SIGNING_KEY}}
                     ADMIN_GITHUB_TOKEN: ${{secrets.ADMIN_GITHUB_TOKEN}}
 
 
