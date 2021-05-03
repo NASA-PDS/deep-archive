@@ -44,7 +44,7 @@ requirements:</p>
 <ul class="simple">
 <li><a class="reference external" href="https://www.python.org/">Python</a> 3. This software requires Python 3; it will work with 3.6, 3.7, or
 3.8.  Python 2 will absolutely <em>not</em> work, and indeed Python 2 came to its
-end of life on the first of January, 2020.  Run <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">--version</span></code>, or <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">--version</span></code>, to
+end of life on the first of January, 2020.  Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code>, or <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">--version</span></code>, to
 check it is installed.</li>
 <li><code class="docutils literal notranslate"><span class="pre">libxml2</span></code> version 2.9.2; later 2.9 versions are fine.  Run <code class="docutils literal notranslate"><span class="pre">xml2-config</span>
 <span class="pre">--version</span></code> to find out.</li>
@@ -95,12 +95,13 @@ pip3 install pds.deeparchive
 </div>
 <p>It’s also possible to use <code class="docutils literal notranslate"><span class="pre">easy_install</span></code> if you prefer, or to install it
 via a <a class="reference external" href="http://www.buildout.org/">Buildout</a>, or (if you must) into the system Python.</p>
-<p>You can then run <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span> <span class="pre">--help</span></code> to get a usage message and ensure
+<p>You can then run <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span> <span class="pre">--help</span></code> or
+<code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span> <span class="pre">--help</span></code> to get a usage message and ensure
 it’s properly installed.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The above commands will install last approved release from the Python
-Package Index (“<a class="reference external" href="https://pypi.org/">Cheeseshop</a>”). The latest, cutting edge release is posted
+Package Index (”<a class="reference external" href="https://pypi.org/">Cheeseshop</a>”). The latest, cutting edge release is posted
 at the Test Package Index, but these releases may not be fully confirmed
 to be operational. If you like taking risks, run the following to create a
 new virtual environment and install the latest development version of the

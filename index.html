@@ -42,17 +42,24 @@ Archival Information System (<a class="reference external" href="https://www2.ar
 <p>This software is used to generate the necessary packages for delivery of PDS4
 archives to the NASA Space Science Data Coordinated Archive (NSSDCA).</p>
 <p>For delivering PDS3 data, see <a class="reference external" href="https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process#pds3">documentation at the Engineering Node</a>.</p>
-<p>Currently, this package provides three executable programs:</p>
+<p>Currently, this package provides four executable programs:</p>
 <ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code>, primary executable for creating both Archive
+Information Packages (AIPs) and Submission Information Packages (SIPs) that
+uses the PDS Registry remote API over HTTP; and</li>
 <li><code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>, primary executable for creating both Archive
-Information Packages (AIPs) and Submission Information Packages (SIPs); and</li>
+Information Packages (AIPs) and Submission Information Packages (SIPs) that
+uses a bundle laid out in the local filesystem; and</li>
 <li><code class="docutils literal notranslate"><span class="pre">aipgen</span></code>, a subcomponent of <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code> to create Archive
 Information Packages (AIPs); and</li>
 <li><code class="docutils literal notranslate"><span class="pre">sipgen</span></code>, a subcomponent of <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code> to create Submission
 Information Packages (SIPs)</li>
 </ul>
-<p>from PDS bundles. You’ll mostly just use <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code> but the other
-two are there if you ever <em>just</em> want an AIP or a SIP.</p>
+<p>If you want to make Deep Archives of PDS data in a remote PDS Registry, use
+<code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code>. For Deep Archives of PDS data on your hard
+drive or other nearby filesystem, use <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>. (The other
+two programs are there if you ever <em>just</em> want an AIP or a SIP out of
+local files; you’ll almost never need to use these.)</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -65,8 +72,9 @@ two are there if you ever <em>just</em> want an AIP or a SIP.</p>
 <li class="toctree-l1"><a class="reference internal" href="usage/index.html">🏃‍♀️ Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="usage/index.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage/index.html#usage-information">Usage Information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage/index.html#example-1-basic-usage">Example 1: Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/index.html#example-1-basic-usage-on-local-files">Example 1: Basic Usage on Local Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage/index.html#example-2-bundle-referencing-collections-by-lid">Example 2: Bundle Referencing Collections by LID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/index.html#example-3-generating-deep-archives-of-remote-data-in-a-pds-registry">Example 3: Generating Deep Archives of Remote Data in a PDS Registry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage/index.html#pds-delivery-checklist">PDS Delivery Checklist</a></li>
 </ul>
 </li>

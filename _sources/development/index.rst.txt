@@ -6,7 +6,9 @@ build it out::
 
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
-    python3 bootstrap.py
+    python3 -m venv venv
+    venv/bin/pip install setuptools==51.3.3
+    venv/bin/python3 bootstrap.py --allow-site-packages
     bin/buildout
 
 .. note:: The above series of commands assume you have the corresponding
@@ -14,10 +16,18 @@ build it out::
     command line or "terminal". Shells, operating systems, and command
     invocation varies.
 
-At this point, you'll have the ``pds-deep-archive``, ``aipgen``, ``sipgen``
-programs ready to run as ``bin/pds-deep-archive``, ``bin/aipgen``, and
-``bin/sipgen`` that's set up to use source Python code under ``src``.
-Changes you make to the code are reflected in ``bin/sipgen`` immediately.
+.. note:: Using both ``buildout`` and ``venv``? Short answer: don't worry
+    about it. Long nerdy answer 🤓: ``setuptools`` has advanced such that
+    ``zc.buildout`` is no longer compatible with it, and even specifiying
+    ``--setuptools-version`` to the ``bootstrap.py`` can't retreive it
+    (gets a zero byte zip file). All the more reason we should dump
+    ``zc.buildout`` some day.
+
+At this point, you'll have the ``pds-deep-archive``,
+``pds-deep-registry-archive``, and other programs ready to run as
+``bin/pds-deep-archive``, ``bin/deep-registry-archive``, etc., that's set up
+to use source Python code under ``src``. Changes you make to the code are
+reflected in immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run

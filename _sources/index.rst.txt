@@ -1,5 +1,5 @@
 PDS Deep Archive
-===================
+================
 
 The PDS Deep Archive is a Python_ based package providing utilities for
 handling *deep* archives. It includes software for Archive Information Package
@@ -11,17 +11,24 @@ archives to the NASA Space Science Data Coordinated Archive (NSSDCA).
 
 For delivering PDS3 data, see `documentation at the Engineering Node <https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process#pds3>`_.
 
-Currently, this package provides three executable programs:
+Currently, this package provides four executable programs:
 
+•  ``pds-deep-registry-archive``, primary executable for creating both Archive
+   Information Packages (AIPs) and Submission Information Packages (SIPs) that
+   uses the PDS Registry remote API over HTTP; and
 •  ``pds-deep-archive``, primary executable for creating both Archive
-   Information Packages (AIPs) and Submission Information Packages (SIPs); and
+   Information Packages (AIPs) and Submission Information Packages (SIPs) that
+   uses a bundle laid out in the local filesystem; and
 •  ``aipgen``, a subcomponent of ``pds-deep-archive`` to create Archive
    Information Packages (AIPs); and
 •  ``sipgen``, a subcomponent of ``pds-deep-archive`` to create Submission
    Information Packages (SIPs)
 
-from PDS bundles. You'll mostly just use ``pds-deep-archive`` but the other
-two are there if you ever *just* want an AIP or a SIP.
+If you want to make Deep Archives of PDS data in a remote PDS Registry, use
+``pds-deep-registry-archive``. For Deep Archives of PDS data on your hard
+drive or other nearby filesystem, use ``pds-deep-archive``. (The other
+two programs are there if you ever *just* want an AIP or a SIP out of
+local files; you'll almost never need to use these.)
 
 
 .. toctree::
