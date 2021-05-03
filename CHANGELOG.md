@@ -1,8 +1,8 @@
 # Changelog
 
-## [v0.6.0-dev](https://github.com/NASA-PDS/pds-deep-archive/tree/v0.6.0-dev) (2021-05-03)
+## [v1.0.0](https://github.com/NASA-PDS/pds-deep-archive/tree/v1.0.0) (2021-05-03)
 
-[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v0.5.0...v0.6.0-dev)
+[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v0.5.0...v1.0.0)
 
 ## [v0.5.0](https://github.com/NASA-PDS/pds-deep-archive/tree/v0.5.0) (2021-05-03)
 
