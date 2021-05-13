@@ -41,7 +41,7 @@ todo_include_todos = True
 
 # -- Read the docs config -------
 
-html_logo = 'images/PDS_Planets.png'
+html_logo = '_static/images/PDS_Planets.png'
 
 html_context = {
     'css_files': [
