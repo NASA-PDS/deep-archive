@@ -30,6 +30,9 @@ drive or other nearby filesystem, use ``pds-deep-archive``. (The other
 two programs are there if you ever *just* want an AIP or a SIP out of
 local files; you'll almost never need to use these.)
 
+..  image:: _static/images/fs-vs-registry.png
+    :target: _static/images/fs-vs-registry.png
+
 
 .. toctree::
    :maxdepth: 2
