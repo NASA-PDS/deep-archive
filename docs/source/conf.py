@@ -32,31 +32,26 @@ language           = 'en'
 
 exclude_patterns   = []
 html_static_path   = ['_static']
-html_theme         = 'alabaster'
+html_theme         = 'sphinx_rtd_theme'
 master_doc         = 'index'
 pygments_style     = 'sphinx'
 source_suffix      = '.rst'
 templates_path     = ['_templates']
 todo_include_todos = True
 
-# Alabaster Theme
-# ~~~~~~~~~~~~~~~
-#
-# The "alabaster" theme requires these settings
+# -- Read the docs config -------
+
+html_logo = 'images/PDS_Planets.png'
+
+html_context = {
+    'css_files': [
+        '_static/theme_overrides.css',  # override wide tables in RTD theme
+        ],
+      }
 
 html_theme_options = {
-    'logo': 'PDS_Planets.png',
-    'github_user': 'NASA-PDS',
-    'github_repo': 'pds-deep-archive'
-}
-
-html_sidebars = {
-    '**': [
-        'about.html',
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-        'navigation.html'
-    ]
+    'display_version': True,
+    'style_external_links': True,
 }
 
 # Extensions
@@ -71,6 +66,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
+    'sphinx_rtd_theme',
+    'sphinxemoji.sphinxemoji'
 ]
 
 # Other Options
