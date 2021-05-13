@@ -49,6 +49,30 @@ Documentation
 Installation and Usage information can be found in the documentation online at https://nasa-pds.github.io/pds-deep-archive/ or the latest version is maintained under the ``docs`` directory.
 
 
+Build Sphinx Docs
++++++++++++++++++
+To build the Sphinx HTML documentation
+
+    $ python3 bootstrap.py --allow-site-packages
+    $ bin/buildout
+    $ bin/docbuilder
+    pickling environment... done
+    checking consistency... done
+    preparing documents... done
+    writing output... [100%] usage/index                                                                                    
+    generating indices... genindex
+    writing additional pages... search
+    copying images... [100%] _static/images/fs-vs-registry.png                                                              
+    copying static files... WARNING: logo file 'images/PDS_Planets.png' does not exist
+    done
+    copying extra files... done
+    dumping search index in English (code: en) ... done
+    dumping object inventory... done
+    build succeeded, 1 warning.
+
+    The HTML pages are in html.
+
+
 
 Translations
 ============
