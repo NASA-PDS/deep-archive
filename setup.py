@@ -30,24 +30,44 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-'''PDS Deep Archive Utilities'''
+import setuptools, versioneer
 
 
-from codecs import open
-from os import path
-from setuptools import setup, find_packages
+# Package Metadata
+# ----------------
+#
+# Everything pertinent to the package is here (although we should really
+# transition to the declarative all-in-setup.cfg style some day).
 
+name               = 'pds.deeparchive'
+description        = 'PDS Deep Archive software for generating OAIS AIPs and SIPs for PDS4 Archives.'
+keywords           = ['PDS', 'CCSDS', 'OAIS', 'AIP', 'SIP', 'metadata', 'submission', 'archive', 'package']
+zip_safe           = True
+namespace_packages = ['pds']
+test_suite         = 'pds.aipgen.tests.test_suite'
+extras_require     = {'test': []}
 
-here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README.rst'), encoding='utf-8') as readme_file:
-    readme = readme_file.read()
-with open(path.join(here, 'CHANGES.rst'), encoding='utf-8') as changes_file:
-    changes = changes_file.read()
-with open(path.join(here, 'src', 'pds', 'aipgen', 'version.txt'), encoding='utf-8') as version_file:
-    version = version_file.read().strip()
+entry_points = {
+    'console_scripts': [
+        'sipgen=pds.aipgen.sip:main',
+        'aipgen=pds.aipgen.aip:main',
+        'pds-deep-archive=pds.aipgen.main:main',
+        'pds-deep-registry-archive=pds.aipgen.registry:main'
+    ]
+}
 
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Intended Audience :: Science/Research',
+    'License :: Other/Proprietary License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3 :: Only',
+    'Topic :: Scientific/Engineering',
+]
 
-_requirements = [
+requirements = [
     'setuptools',             # All modern setup.py's should require setuptools
     'lxml',                   # Needed for making XML labels (since ElementTree can't add XML PIs above the root elem!)
     # The next two packages are to support https://github.com/NASA-PDS/pds-deep-archive/issues/102
@@ -59,45 +79,33 @@ _requirements = [
     'sphinxemoji',
 ]
 
+# Below here, you shouldn't have to change anything:
 
-setup(
-    name='pds.deeparchive',
-    version=version,
-    description='PDS Deep Archive software for generating OAIS AIPs and SIPs for PDS4 Archives.',
-    long_description=readme + '\n\n' + changes,
-    keywords='PDS CCSDS OAIS AIP SIP metadata submission archive package',
-    author='Sean Kelly',
-    author_email='sean.kelly@jpl.nasa.gov',
-    url='https://github.com/NASA-PDS/pds-deep-archive/',
-    entry_points={
-        'console_scripts': [
-            'sipgen=pds.aipgen.sip:main',
-            'aipgen=pds.aipgen.aip:main',
-            'pds-deep-archive=pds.aipgen.main:main',
-            'pds-deep-registry-archive=pds.aipgen.registry:main'
-        ]
-    },
-    test_suite='pds.aipgen.tests.test_suite',
-    namespace_packages=['pds'],
-    packages=find_packages('src', exclude=['docs', 'tests', 'bootstrap', 'ez_setup']),
-    package_dir={'': 'src'},
-    package_data={
-        # If any package contains *.txt or *.rst files, include them:
-        '': ['*.txt', '*.rst']
-    },
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    author='PDS',
+    author_email='pds_operator@jpl.nasa.gov',
+    classifiers=classifiers,
+    cmdclass=versioneer.get_cmdclass(),
+    description=description,
+    download_url='https://github.com/NASA-PDS/' + name + '/releases/download/…',
+    entry_points=entry_points,
+    extras_require=extras_require,
     include_package_data=True,
-    zip_safe=True,
-    install_requires=_requirements,
-    extras_require={'test': []},
-    license='ALv2',
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Console',
-        'Intended Audience :: Science/Research',
-        'License :: Other/Proprietary License',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3 :: Only',
-        'Topic :: Scientific/Engineering',
-    ]
+    install_requires=requirements,
+    keywords=keywords,
+    license='apache-2.0',  # There's almost no standardization about what goes here, even amongst ALv2 projects
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    name=name,
+    namespace_packages=namespace_packages,
+    package_dir={'': 'src'},
+    packages=setuptools.find_packages('src', exclude=['docs', 'tests']),
+    python_requires='>=3.6',
+    test_suite=test_suite,
+    url='https://github.com/NASA-PDS/' + name,
+    version=versioneer.get_version(),
+    zip_safe=zip_safe,
 )

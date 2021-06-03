@@ -1,31 +1,71 @@
-# Copyright © 2019–2021 California Institute of Technology ("Caltech").
-# ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
-
-*.egg-info
-*.log
-*.py[co]
-*.spec
-*.sublime-*
-.*.cfg
-.*.swp
-.DS_Store
-.eggs
-__pycache__
-.eggs
-typescript
-/*.tab
-/*.xml
-bin/
-build/
-develop-eggs/
+# Python build, virtual environments, and buildouts
+venv
+__pycache__/
 dist/
-testdist/
-eggs/
-parts/
-venv/
+build/
+*.egg-info
+.*.cfg
+develop-eggs/
+.python-eggs/
+.eggs/
+pip-selfcheck.json
+
+# Python testing artifacts
+.coverage
+htmlcov
+
+# Object files
+*.o
+*.pkl
+*.py[ocd]
+
+# Libraries
+*.lib
+*.a
+
+# Eclipse files
+.settings/
+*.project
+*.classpath
+
+# Editor support
+.idea/
+*.iml
+.vscode
+*.sublime-*
+
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+lib/
+lib64/
+
+# Executables
+*.exe
+*.out
+*.app
 
 # Temporary files
 *~
+.*.swp
+var/
 
 # other stuff
-*.sublime-*
+*.log
+*.xpr
+bin/
+.*.swp
+
+# OS-specific artifacts
+.DS_Store
+._*
+
+# Exclusions
+!.coveragerc
+!.editorconfig
+!.gitattributes
+!.gitignore
+!.gitkeep
