@@ -40,7 +40,7 @@ Doing the Installation
 
     Some things to be aware of regarding examples below:
 
-    * The octothorp characters `#` below indicate comments and need not be typed in.
+    * The octothorp characters ``#`` below indicate comments and need not be typed in.
 
     * The location of where you choose to create a Python virtual environment is entirely your preference.
 
@@ -104,6 +104,7 @@ virtual environment::
 .. note:: The same admonitions mentioned earlier about command line
     invocations also apply to the above example.
 
+.. note:: Activating a virtual environment is deprecated (as per the Python philosophy of "explicit is better than implicit"); the ``bin/activate`` commands are left above for now for specific reasons.
 
 
 .. References:

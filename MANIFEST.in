@@ -1,7 +1,9 @@
-# Copyright © 2019–2019 California Institute of Technology ("Caltech").
+# Copyright © 2019–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 
 graft src/pds
 graft docs
 include *.rst *.tab *.TAB *.xml *.xsd *.pdf *.txt
 global-exclude *.pyc *.pyo
+include versioneer.py
+include src/pds/aipgen/_version.py
