@@ -181,7 +181,7 @@ include:
    tab-separated values file.
 •  ``insight_documents_v2.0_sip_v1.0_DATE.xml``, an PDS label for the SIP file.
 
-As of this writing, there may be a couple of issues with PDS Registry APIs
+As of this writing, there may be an issue with PDS Registry APIs
 that may affect ``pds-deep-registry-archive``:
 
 •  A `pagination bug`_ may cause some performance issues when making deep
@@ -189,11 +189,6 @@ that may affect ``pds-deep-registry-archive``:
    works around the bug—but if you know the PDS Registry you're using is
    free of the bug, you can add ``--disable-pagination-workaround`` to the
    command. It doesn't hurt if you use it regardless.
-•  An `internal server error`_ may appear when certain data is loaded into a
-   PDS Registry. By default, though, ``pds-deep-registry-archive`` will treat
-   such errors as "not found" instead of as serious errors. However, if you
-   prefer to treat the problem as the serious error it really is, add the
-   ``--disable-bad-documents-workaround`` option to the command.
 
 
 PDS Delivery Checklist

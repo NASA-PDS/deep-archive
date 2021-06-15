@@ -74,7 +74,7 @@ requirements = [
     'zope.component',         # To support singleton utilities
     'zope.interface',         # Interfaces and their implementations
     # This is for https://github.com/NASA-PDS/pds-deep-archive/issues/7
-    'pds.api-client==0.4.0',  # So we don't have to ReST
+    'pds.api-client==0.5.0',  # So we don't have to ReST
     'sphinx-rtd-theme',
     'sphinxemoji',
 ]
