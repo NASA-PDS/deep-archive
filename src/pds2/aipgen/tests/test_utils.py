@@ -31,10 +31,10 @@
 
 '''PDS AIP-GEN: Unit tests of the Utilities package'''
 
-from pds.aipgen.utils import (
+from pds2.aipgen.utils import (
     addLoggingArguments, getDigest, getLogicalVersionIdentifier, getMD5, parseXML, URLValidator
 )
-from pds.aipgen.interfaces import IURLValidator
+from pds2.aipgen.interfaces import IURLValidator
 import unittest, tempfile, os, pkg_resources, argparse, logging, zope.component
 
 

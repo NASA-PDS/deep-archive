@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 #
 # Copyright © 2019–2020 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
@@ -29,16 +29,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-'''PDS AIP-GEN Tests'''
+# 😖 Normally we'd use ``pds``, but the ``pds.api_client`` gets installed as a
+# top-level, *not namespace*, package also called ``pds``. Because we're a
+# dependency of it, if Python resolves the ``site-packages`` with ``pds`` in
+# it first, then we can't find out own code. Even if we abandon namespace
+# packages, the ``site-packages/pds/__init__.py`` sets the __path__ for
+# future ``pds`` resolutions. So, ``pds2``. Lovely, huh? 😬
 
+'''PDS2 Namespace'''
 
-import unittest
-import pds.aipgen.tests.test_utils
-import pds.aipgen.tests.test_functional
-
-
-def test_suite():
-    return unittest.TestSuite([
-        pds.aipgen.tests.test_utils.test_suite(),
-        pds.aipgen.tests.test_functional.test_suite()
-    ])
+__import__('pkg_resources').declare_namespace(__name__)

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 #
 # Copyright © 2019–2020 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
@@ -28,6 +28,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-'''PDS Namespace'''
 
-__import__('pkg_resources').declare_namespace(__name__)
+'''PDS AIP-GEN Tests'''
+
+
+import unittest
+import pds2.aipgen.tests.test_utils
+import pds2.aipgen.tests.test_functional
+
+
+def test_suite():
+    return unittest.TestSuite([
+        pds2.aipgen.tests.test_utils.test_suite(),
+        pds2.aipgen.tests.test_functional.test_suite()
+    ])

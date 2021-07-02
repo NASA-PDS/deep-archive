@@ -157,16 +157,15 @@ def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str):
 
 def _addFiles(product: pds.api_client.models.Product, bac: dict):
     '''Add the PDS files described in the PDS ``product`` to the ``bac``.'''
-    lidvid, props = product.id, product.properties                    # Shorthand
-    files = bac.get(lidvid, set())                                    # Get the current set (or a new empty set)
-    if _propDataURL in props:                                         # Are there data files in the product?
-        urls, md5s = props[_propDataURL], props[_propDataMD5]         # Get the URLs and MD5s of them
-        if isinstance(urls, str): urls, md5s = [urls], [md5s]         # Just one? Treat it as a sequence of 1
-        for url, md5 in zip(urls, md5s):                              # For each URL and matching MD5
-            files.add(_File(url, md5))                                # Add it to the set
-    if _propLabelURL in props:                                        # How about the label itself?
-        files.add(_File(props[_propLabelURL], props[_propLabelMD5]))  # Add it too
-    bac[lidvid] = files                                               # Stash for future use
+    lidvid, props = product.id, product.properties                          # Shorthand
+    files = bac.get(lidvid, set())                                          # Get the current set (or a new empty set)
+    if _propDataURL in props:                                               # Are there data files in the product?
+        urls, md5s = props[_propDataURL], props[_propDataMD5]               # Get the URLs and MD5s of them
+        for url, md5 in zip(urls, md5s):                                    # For each URL and matching MD5
+            files.add(_File(url, md5))                                      # Add it to the set
+    if _propLabelURL in props:                                              # How about the label itself?
+        files.add(_File(props[_propLabelURL][0], props[_propLabelMD5][0]))  # Add it too
+    bac[lidvid] = files                                                     # Stash for future use
 
 
 def _comprehendRegistry(
