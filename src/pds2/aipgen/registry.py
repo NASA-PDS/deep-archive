@@ -139,12 +139,8 @@ def _getCollections(apiClient: pds.api_client.ApiClient, lidvid: str, workaround
         for i in results.data: yield i
 
 
-def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str, workaroundBadDocuments=True):
+def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str):
     '''Using the PDS ``apiClient`` generate PDS products that belong to the collection ``lidvid``.
-    If ``workaroundBadDocuments`` is True, sidestep the bug that sometimes produces an HTTP 500
-    "Internal Server Error" because of certain bad documents in the PDS Registry, treating them
-    instead as 404 "Not Found". Otherwise we let such errors propagate—which we really should
-    do anyway! 😦
     '''
     cpAPI, start = pds.api_client.CollectionsProductsApi(apiClient), 0
     while True:
@@ -152,13 +148,7 @@ def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str, workaroundBad
             _logger.debug('⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d', lidvid, start, _apiQueryLimit)
             results = cpAPI.products_of_a_collection(lidvid, start=start, limit=_apiQueryLimit, fields=_fields)
         except pds.api_client.exceptions.ApiException as ex:
-            if ex.status == http.client.NOT_FOUND:
-                return
-            elif ex.status == http.client.INTERNAL_SERVER_ERROR and workaroundBadDocuments:
-                # I get 500 for urn:nasa:pds:insight_documents:document_mission::1.1, no idea why, so for
-                # now treat it as not found
-                _logger.warn('😲 Got error 500 finding products of collection %s but treating it as 404', lidvid)
-                return
+            if ex.status == http.client.NOT_FOUND: return
             else: raise
         if results.data is None: return
         start += len(results.data)
@@ -167,21 +157,19 @@ def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str, workaroundBad
 
 def _addFiles(product: pds.api_client.models.Product, bac: dict):
     '''Add the PDS files described in the PDS ``product`` to the ``bac``.'''
-    lidvid, props = product.id, product.properties                    # Shorthand
-    files = bac.get(lidvid, set())                                    # Get the current set (or a new empty set)
-    if _propDataURL in props:                                         # Are there data files in the product?
-        urls, md5s = props[_propDataURL], props[_propDataMD5]         # Get the URLs and MD5s of them
-        if isinstance(urls, str): urls, md5s = [urls], [md5s]         # Just one? Treat it as a sequence of 1
-        for url, md5 in zip(urls, md5s):                              # For each URL and matching MD5
-            files.add(_File(url, md5))                                # Add it to the set
-    if _propLabelURL in props:                                        # How about the label itself?
-        files.add(_File(props[_propLabelURL], props[_propLabelMD5]))  # Add it too
-    bac[lidvid] = files                                               # Stash for future use
+    lidvid, props = product.id, product.properties                          # Shorthand
+    files = bac.get(lidvid, set())                                          # Get the current set (or a new empty set)
+    if _propDataURL in props:                                               # Are there data files in the product?
+        urls, md5s = props[_propDataURL], props[_propDataMD5]               # Get the URLs and MD5s of them
+        for url, md5 in zip(urls, md5s):                                    # For each URL and matching MD5
+            files.add(_File(url, md5))                                      # Add it to the set
+    if _propLabelURL in props:                                              # How about the label itself?
+        files.add(_File(props[_propLabelURL][0], props[_propLabelMD5][0]))  # Add it too
+    bac[lidvid] = files                                                     # Stash for future use
 
 
 def _comprehendRegistry(
-    url: str, bundleLIDVID: str, allCollections=True,
-    workaroundBadDocuments=True, workaroundPaginationBug=True
+    url: str, bundleLIDVID: str, allCollections=True, workaroundPaginationBug=True
 ) -> (int, dict, str):
     '''Query the PDS API at ``url`` for all information about the PDS ``bundleLIDVID`` and return a
     comprehension of it. If ``allCollections`` is True, we include every reference from a collection
@@ -215,7 +203,7 @@ def _comprehendRegistry(
     # Just understanding it all was there was the hard part! 😊 THANK YOU! 🙏
     for collection in _getCollections(apiClient, bundleLIDVID, workaroundPaginationBug):
         _addFiles(collection, bac)
-        for product in _getProducts(apiClient, collection.id, workaroundBadDocuments):
+        for product in _getProducts(apiClient, collection.id):
             _addFiles(product, bac)
 
     # C'est tout 🌊
@@ -314,7 +302,6 @@ def generateDeepArchive(
     bundleLIDVID: str,
     site: str,
     allCollections=True,
-    workaroundBadDocuments=True,
     workaroundPaginationBug=True
 ):
     '''Make a PDS "deep archive" 🧘 in the current directory (consisting of the Archive Information
@@ -322,9 +309,8 @@ def generateDeepArchive(
     table file—plus their corresponding labels) for the named PDS bundle identified by
     ``bundleLIDVID``, for the PDS ``site``, using knowledge in the PDS Registry at ``url``,
     including ``allCollections`` if True else just the latest collection for PDS bundles that reference
-    collections by logical identifier only, and neatly avoiding a couple of PDS bugs, namely
-    the ``workaroundBadDocuments`` if True if there are bad documents in the registry, and the
-    ``workaroundPaginationBug`` if True if a certain PDS registry endpoint doens't handle
+    collections by logical identifier only, and neatly avoiding a PDS bug, namely
+    the ``workaroundPaginationBug`` if True if a certain PDS registry endpoint doens't handle
     PDS pagination right.
     '''
 
@@ -334,7 +320,7 @@ def generateDeepArchive(
 
     # Figure out what we're dealing with
     prefixLen, bac, title  = _comprehendRegistry(
-        url, bundleLIDVID, allCollections, workaroundBadDocuments, workaroundPaginationBug
+        url, bundleLIDVID, allCollections, workaroundPaginationBug
     )
 
     # Make it rain ☔️
@@ -354,12 +340,6 @@ def main():
     parser.add_argument(
         '-s', '--site', required=True, choices=PROVIDER_SITE_IDS,
         help="Provider site ID for the manifest's label"
-    )
-    parser.add_argument(
-        '--disable-bad-documents-workaround', action='store_true',
-        help='By default, this program will work around a problem in the PDS Registry that sometimes treats '
-        '"bad documents" as simply being not found; specifying this option disables this workaround—see '
-        'issue https://github.com/NASA-PDS/registry-api-service/issues/17 for more information'
     )
     parser.add_argument(
         '--disable-pagination-workaround', action='store_true',
@@ -383,26 +363,17 @@ def main():
     try:
         generateDeepArchive(
             args.url, args.bundle, args.site, not args.include_latest_collection_only,
-            not args.disable_bad_documents_workaround, not args.disable_pagination_workaround
+            not args.disable_pagination_workaround
         )
     except pds.api_client.exceptions.ApiException as ex:
         if ex.status == http.client.INTERNAL_SERVER_ERROR:
-            if args.disable_bad_documents_workaround:
-                _logger.critical(
-                    '🚨 The server at %s gave an INTERNAL SERVER ERROR; this could be a problem with the data '
-                    'loaded into it; you might want to re-run without the --disable-bad-documents-workaround option '
-                    'and see if that gives any better results',
-                    args.url
-                )
-                sys.exit(-1)
-            else:
-                _logger.critical(
-                    '🚨 The server at %s gave an INTERNAL SERVER ERROR; you should contact its administrator if you '
-                    'can figure out who that is. The following information may be helpful to them in figuring out '
-                    'the issue: «%r»',
-                    args.url, ex.body
-                )
-                sys.exit(-2)
+            _logger.critical(
+                '🚨 The server at %s gave an INTERNAL SERVER ERROR; you should contact its administrator if you '
+                'can figure out who that is. The following information may be helpful to them in figuring out '
+                'the issue: «%r»',
+                args.url, ex.body
+            )
+            sys.exit(-2)
         _logger.exception("💥 We got an unexpected error; sorry it didn't work out")
         sys.exit(-3)
     finally:

@@ -57,7 +57,7 @@ class LADEESIPWithBadBaseURLTest(LADEESIPTest):
     def setUp(self):
         super(LADEESIPWithBadBaseURLTest, self).setUp()
         from zope.component import provideUtility
-        from pds.aipgen.utils import URLValidator
+        from pds2.aipgen.utils import URLValidator
         self.validator = URLValidator()
         provideUtility(self.validator)
     def tearDown(self):

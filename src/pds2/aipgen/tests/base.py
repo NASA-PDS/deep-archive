@@ -34,10 +34,10 @@
 
 from datetime import datetime, date
 from lxml import etree
-from pds.aipgen.aip import process as produce_aip
-from pds.aipgen.constants import PDS_NS_URI
-from pds.aipgen.sip import produce as produce_sip
-from pds.aipgen.utils import createSchema, comprehendDirectory
+from pds2.aipgen.aip import process as produce_aip
+from pds2.aipgen.constants import PDS_NS_URI
+from pds2.aipgen.sip import produce as produce_sip
+from pds2.aipgen.utils import createSchema, comprehendDirectory
 import unittest, tempfile, shutil, os, pkg_resources, filecmp, codecs, sqlite3
 
 

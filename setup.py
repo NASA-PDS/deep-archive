@@ -43,16 +43,24 @@ name               = 'pds.deeparchive'
 description        = 'PDS Deep Archive software for generating OAIS AIPs and SIPs for PDS4 Archives.'
 keywords           = ['PDS', 'CCSDS', 'OAIS', 'AIP', 'SIP', 'metadata', 'submission', 'archive', 'package']
 zip_safe           = True
-namespace_packages = ['pds']
-test_suite         = 'pds.aipgen.tests.test_suite'
+
+# 😖 Normally we'd use ``pds``, but the ``pds.api_client`` gets installed as a
+# top-level, *not namespace*, package also called ``pds``. Because we're a
+# dependency of it, if Python resolves the ``site-packages`` with ``pds`` in
+# it first, then we can't find out own code. Even if we abandon namespace
+# packages, the ``site-packages/pds/__init__.py`` sets the __path__ for
+# future ``pds`` resolutions. So, ``pds2``. Lovely, huh? 😬
+
+namespace_packages = ['pds2']
+test_suite         = 'pds2.aipgen.tests.test_suite'
 extras_require     = {'test': []}
 
 entry_points = {
     'console_scripts': [
-        'sipgen=pds.aipgen.sip:main',
-        'aipgen=pds.aipgen.aip:main',
-        'pds-deep-archive=pds.aipgen.main:main',
-        'pds-deep-registry-archive=pds.aipgen.registry:main'
+        'sipgen=pds2.aipgen.sip:main',
+        'aipgen=pds2.aipgen.aip:main',
+        'pds-deep-archive=pds2.aipgen.main:main',
+        'pds-deep-registry-archive=pds2.aipgen.registry:main'
     ]
 }
 
@@ -74,7 +82,7 @@ requirements = [
     'zope.component',         # To support singleton utilities
     'zope.interface',         # Interfaces and their implementations
     # This is for https://github.com/NASA-PDS/pds-deep-archive/issues/7
-    'pds.api-client==0.4.0',  # So we don't have to ReST
+    'pds.api-client==0.5.0',  # So we don't have to ReST
     'sphinx-rtd-theme',
     'sphinxemoji',
 ]
