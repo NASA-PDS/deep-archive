@@ -66,8 +66,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
-    'sphinx_rtd_theme',
-    'sphinxemoji.sphinxemoji'
+    'sphinx_rtd_theme'
 ]
 
 # Other Options
