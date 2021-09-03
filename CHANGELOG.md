@@ -1,5 +1,22 @@
 # Changelog
 
+## [«unknown»](https://github.com/NASA-PDS/pds-deep-archive/tree/«unknown») (2021-09-03)
+
+[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v1.1.0-dev...«unknown»)
+
+**Improvements:**
+
+- Improvements per API updates to remove workarounds from code [\#106](https://github.com/NASA-PDS/pds-deep-archive/issues/106)
+- NSSDCA Delivery Onboarding [\#80](https://github.com/NASA-PDS/pds-deep-archive/issues/80)
+
+**Defects:**
+
+- deep archive misses products that specify primary products using lower case 'p' [\#116](https://github.com/NASA-PDS/pds-deep-archive/issues/116) [[s.low](https://github.com/NASA-PDS/pds-deep-archive/labels/s.low)]
+
+**Other closed issues:**
+
+- Retrofit pds-deep-archive to use pds python template [\#111](https://github.com/NASA-PDS/pds-deep-archive/issues/111)
+
 ## [v1.1.0-dev](https://github.com/NASA-PDS/pds-deep-archive/tree/v1.1.0-dev) (2021-05-03)
 
 [Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v1.0.0...v1.1.0-dev)
@@ -29,7 +46,6 @@
 
 - Bash required for default installation description [\#95](https://github.com/NASA-PDS/pds-deep-archive/issues/95)
 - add year to directory path in URL [\#93](https://github.com/NASA-PDS/pds-deep-archive/issues/93)
-- NSSDCA Delivery Onboarding [\#80](https://github.com/NASA-PDS/pds-deep-archive/issues/80)
 
 ## [v0.3.2](https://github.com/NASA-PDS/pds-deep-archive/tree/v0.3.2) (2021-01-12)
 
