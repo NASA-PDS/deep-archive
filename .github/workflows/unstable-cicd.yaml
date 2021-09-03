@@ -2,7 +2,7 @@
 # =================================================
 #
 # Note: for this workflow to succeed, the following secrets must be installed
-# in the repository:
+# in the repository (or inherited from the repository's organization):
 #
 # ``ADMIN_GITHUB_TOKEN``
 #     A personal access token of a user with collaborator or better access to
@@ -26,12 +26,15 @@ name: 🤪 Unstable integration & delivery
 # -------------
 #
 # What event starts this workflow: a push to ``main`` (or ``master`` in old
-# parlance).
+# parlance). For the "glob++" pattern syntax, see https://git.io/JJZQt
 
 on:
     push:
         branches:
              - main
+        paths-ignore:
+            - 'CHANGELOG.md'
+            - 'docs/requirements/**'
 
 
 # What to Do
@@ -42,8 +45,8 @@ on:
 jobs:
     unstable-assembly:
         name: 🧩 Unstable Assembly
-        runs-on: ubuntu-latest
         if: github.actor != 'pdsen-ci'
+        runs-on: ubuntu-latest
         steps:
             -
                 name: 💳 Checkout
@@ -51,6 +54,18 @@ jobs:
                 with:
                     lfs: true
                     token: ${{secrets.ADMIN_GITHUB_TOKEN}}
+                    fetch-depth: 0
+            -
+                name: 💵 Python Cache
+                uses: actions/cache@v2
+                with:
+                    path: ~/.cache/pip
+                    # The "key" used to indicate a set of cached files is the operating system runner
+                    # plus "py" for Python-specific builds, plus a hash of the wheels, plus "pds" because
+                    # we pds-prefix everything with "pds" in PDS! 😅
+                    key: pds-${{runner.os}}-py-${{hashFiles('**/*.whl')}}
+                    # To restore a set of files, we only need to match a prefix of the saved key.
+                    restore-keys: pds-${{runner.os}}-py-
             -
                 name: 🤠 Roundup
                 uses: NASA-PDS/roundup-action@main
@@ -61,5 +76,6 @@ jobs:
                     pypi_password: ${{secrets.TEST_PYPI_PASSWORD}}
                     ADMIN_GITHUB_TOKEN: ${{secrets.ADMIN_GITHUB_TOKEN}}
 
+...
 
 # -*- mode: yaml; indent: 4; fill-column: 120; coding: utf-8 -*-
