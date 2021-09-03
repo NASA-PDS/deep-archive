@@ -45,10 +45,10 @@ _logger = logging.getLogger(__name__)
 # Private Constants
 # -----------------
 
-_bufsiz = 512                                            # Byte buffer
-_xmlCacheSize = 2**16                                    # XML files to cache in memory
-_digestCacheSize = 2**16                                 # Message digests to cache in memory
-_pLineMatcher = re.compile(r'^P,\s*([^\s]+)::([^\s]+)')  # Match separate lids and vids in "P" lines in ``.tab`` files
+_bufsiz = 512                                               # Byte buffer
+_xmlCacheSize = 2**16                                       # XML files to cache in memory
+_digestCacheSize = 2**16                                    # Message digests to cache in memory
+_pLineMatcher = re.compile(r'^[Pp],\s*([^\s]+)::([^\s]+)')  # Match separate lids and vids in "P/p" lines in .tab files
 
 # Help message for ``--include-latest-collection-only``:
 _allCollectionsHelp = '''For bundles that reference collections by LID, this flag will only include the latest version of

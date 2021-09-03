@@ -75,7 +75,7 @@ class LADEESIPWithBadBaseURLTest(LADEESIPTest):
             super(LADEESIPWithBadBaseURLTest, self).test_sip()
 
 
-class LADEAIPTest(AIPFunctionalTestCase):
+class LADEEAIPTest(AIPFunctionalTestCase):
     '''Test case for AIP generation for all collections from the LADEE test bundle'''
     def getBundleFile(self):
         return 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml'
@@ -84,6 +84,31 @@ class LADEAIPTest(AIPFunctionalTestCase):
     def getManifests(self):
         base = 'data/ladee_test/valid/ladee_mission_bundle_v1.0_'
         return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
+
+
+class SensitivityAIPTest(AIPFunctionalTestCase):
+    '''Test case for AIP generation with mixed-case "P-lines".'''
+    def getBundleFile(self):
+        return 'data/sensitivity/mission_bundle/LADEE_Bundle_1101.xml'
+    def getAllCollectionsFlag(self):
+        return True
+    def getManifests(self):
+        base = 'data/sensitivity/valid/ladee_mission_bundle_v1.0_'
+        return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
+
+
+class SensitivitySIPTest(SIPFunctionalTestCase):
+    '''Test case for SIP generation with mixed-case "P-lines".'''
+    def getBundleFile(self):
+        return 'data/sensitivity/mission_bundle/LADEE_Bundle_1101.xml'
+    def getAllCollectionsFlag(self):
+        return True
+    def getValidSIPFileName(self):
+        return 'data/sensitivity/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+    def getBaseURL(self):
+        return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
+    def getSiteID(self):
+        return 'PDS_ATM'
 
 
 class _InsightSIPTest(SIPFunctionalTestCase):
@@ -169,7 +194,9 @@ class SecondaryCollectionAIPTest(AIPFunctionalTestCase):
 def test_suite():
     return unittest.TestSuite([
         unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(LADEAIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(LADEEAIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(SensitivitySIPTest),
+        unittest.defaultTestLoader.loadTestsFromTestCase(SensitivityAIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllSIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
         unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
