@@ -27,11 +27,8 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""PDS AIP-GEN"""
+import pkg_resources
 
 
-'''PDS AIP-GEN'''
-
-from ._version import get_versions
-__version__ = VERSION = get_versions()['version']
-__date__ = get_versions()['date']
-del get_versions
+__version__ = VERSION = pkg_resources.resource_string(__name__, "VERSION.txt").decode("utf-8")

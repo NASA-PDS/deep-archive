@@ -26,19 +26,18 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-'''Interfaces'''
-
+"""Interfaces"""
 from zope.interface import Interface
 
 
 class IURLValidator(Interface):
-    '''👮‍♀️ Objects (really, a singleton) that implements this interface can perform one-time
+    """👮‍♀️ Objects (really, a singleton) that implements this interface can perform one-time
     validation on URLs.
 
     See https://github.com/NASA-PDS/pds-deep-archive/issues/102
-    '''
+    """
+
     def validate(url):
-        '''Validate the given ``url`` by first checking its form and then attempting to
+        """Validate the given ``url`` by first checking its form and then attempting to
         retrieve a byte of it 🤤. Return nothing on success and throw an error on failure.
-        '''
+        """

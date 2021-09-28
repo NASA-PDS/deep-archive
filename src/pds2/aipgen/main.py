@@ -27,19 +27,28 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""AIP and SIP generation"""
+import argparse
+import logging
+import os
+import shutil
+import sqlite3
+import sys
+import tempfile
+from datetime import datetime
 
-
-'''AIP and SIP generation'''
+from zope.component import provideUtility  # type: ignore
 
 from . import VERSION
 from .aip import process as aipProcess
 from .constants import HASH_ALGORITHMS
 from .sip import addSIParguments
 from .sip import produce as sipProcess
-from .utils import addLoggingArguments, addBundleArguments, createSchema, comprehendDirectory, URLValidator
-from datetime import datetime
-from zope.component import provideUtility
-import argparse, sys, logging, tempfile, sqlite3, os, shutil
+from .utils import addBundleArguments
+from .utils import addLoggingArguments
+from .utils import comprehendDirectory
+from .utils import createSchema
+from .utils import URLValidator
 
 
 # Constants
@@ -49,7 +58,7 @@ import argparse, sys, logging, tempfile, sqlite3, os, shutil
 __version__ = VERSION
 
 # For ``--help``; note this is hand-formatted to wrap at 80 columns:
-_description = '''
+_description = """
 Generate an Archive Information Package (AIP) and a Submission Information
 Package (SIP). This creates three files for the AIP in the current directory
 (overwriting them if they already exist):
@@ -60,8 +69,8 @@ Package (SIP). This creates three files for the AIP in the current directory
 
 It also creates two files for the SIP (also overwriting them if they exist):
 ① A "SIP manifest" file; and an XML label of that file too. The names of
-  the generated files are based on the logical identifier found in the 
-  bundle file, and any existing files are overwritten. The names of the 
+  the generated files are based on the logical identifier found in the
+  bundle file, and any existing files are overwritten. The names of the
   generated files are printed upon successful completion.
 ② A PDS XML label of that file.
 
@@ -69,7 +78,7 @@ The files are created in the current working directory when this program is
 run. The names of the files are based on the logical identifier found in the
 bundle file, and any existing files are overwritten. The names of the
 generated files are printed upon successful completion.
-'''
+"""
 
 # Logging:
 _logger = logging.getLogger(__name__)
@@ -78,31 +87,30 @@ _logger = logging.getLogger(__name__)
 # Functions
 # ---------
 
+
 def main():
-    '''Make an AIP and a SIP'''
+    """Make an AIP and a SIP"""
     parser = argparse.ArgumentParser(description=_description, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     addBundleArguments(parser)
     addSIParguments(parser)
     addLoggingArguments(parser)
-    parser.add_argument(
-        'bundle', type=argparse.FileType('rb'), metavar='IN-BUNDLE.XML', help='Bundle XML file to read'
-    )
+    parser.add_argument("bundle", type=argparse.FileType("rb"), metavar="IN-BUNDLE.XML", help="Bundle XML file to read")
     args = parser.parse_args()
-    logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
-    _logger.info('👟 PDS Deep Archive, version %s', __version__)
-    _logger.debug('⚙️ command line args = %r', args)
+    logging.basicConfig(level=args.loglevel, format="%(levelname)s %(message)s")
+    _logger.info("👟 PDS Deep Archive, version %s", __version__)
+    _logger.debug("⚙️ command line args = %r", args)
 
     # https://github.com/NASA-PDS/pds-deep-archive/issues/102
     if not args.disable_url_validation:
         provideUtility(URLValidator())
 
-    tempdir = tempfile.mkdtemp(suffix='.dir', prefix='deep')
+    tempdir = tempfile.mkdtemp(suffix=".dir", prefix="deep")
     try:
         # Make a site survey
-        dbfile = os.path.join(tempdir, 'pds-deep-archive.sqlite3')
+        dbfile = os.path.join(tempdir, "pds-deep-archive.sqlite3")
         con = sqlite3.connect(dbfile)
-        _logger.debug('⚙️ Creating potentially future-mulitprocessing–capable DB in %s', dbfile)
+        _logger.debug("⚙️ Creating potentially future-mulitprocessing–capable DB in %s", dbfile)
         with con:
             createSchema(con)
             comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
@@ -112,31 +120,31 @@ def main():
         ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
         dummy, dummy, labelFN = aipProcess(args.bundle, not args.include_latest_collection_only, con, ts)
-        with open(labelFN, 'rb') as chksumStream:
+        with open(labelFN, "rb") as chksumStream:
             sipProcess(
                 args.bundle,
                 # TODO: Temporarily hardcoding these values until other modes are available
                 # HASH_ALGORITHMS[args.algorithm],
                 # args.url,
                 # args.insecure,
-                HASH_ALGORITHMS['MD5'],
-                '',
-                '',
+                HASH_ALGORITHMS["MD5"],
+                "",
+                "",
                 args.site,
                 args.bundle_base_url,
                 chksumStream,
                 args.include_latest_collection_only,
                 con,
-                ts
+                ts,
             )
     except Exception as ex:
-        _logger.critical('🛑 Cannot proceed as a critical problem has occurred; re-run with --debug for more info.')
-        _logger.debug('🖥 Here is the exception: %r', ex, exc_info=ex)
+        _logger.critical("🛑 Cannot proceed as a critical problem has occurred; re-run with --debug for more info.")
+        _logger.debug("🖥 Here is the exception: %r", ex, exc_info=ex)
     finally:
         shutil.rmtree(tempdir, ignore_errors=True)
     _logger.info("👋 That's it for now. Bye.")
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

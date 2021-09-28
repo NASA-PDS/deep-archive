@@ -27,53 +27,50 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-'''Constants'''
-
-
+"""Constants"""
 # URI prefix for logical identifiers of volume identifiers for products for Archive Information Packages
-AIP_PRODUCT_URI_PREFIX = 'urn:nasa:pds:system_bundle:product_aip:'
+AIP_PRODUCT_URI_PREFIX = "urn:nasa:pds:system_bundle:product_aip:"
 
 # Version ID for the current PDS information model
-INFORMATION_MODEL_VERSION = '1.13.0.0'
+INFORMATION_MODEL_VERSION = "1.13.0.0"
 
 # Namespace URI for PDS XML
-PDS_NS_URI = 'http://pds.nasa.gov/pds4/pds/v1'
+PDS_NS_URI = "http://pds.nasa.gov/pds4/pds/v1"
 
 # XML tag for a PDS product collection
-PRODUCT_COLLECTION_TAG = f'{{{PDS_NS_URI}}}Product_Collection'
+PRODUCT_COLLECTION_TAG = f"{{{PDS_NS_URI}}}Product_Collection"
 
 # Where to find the PDS schema
-PDS_SCHEMA_URL = 'http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd'
+PDS_SCHEMA_URL = "http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd"
 
 # XML model processing instruction
 XML_MODEL_PI = '''href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch"
 schematypens="http://purl.oclc.org/dsdl/schematron"'''
 
 # Namespace URI for XML Schema
-XML_SCHEMA_INSTANCE_NS_URI = 'http://www.w3.org/2001/XMLSchema-instance'
+XML_SCHEMA_INSTANCE_NS_URI = "http://www.w3.org/2001/XMLSchema-instance"
 
 # Filename extension to use with PDS labels
-PDS_LABEL_FILENAME_EXTENSION = '.xml'
+PDS_LABEL_FILENAME_EXTENSION = ".xml"
 
 # Filename extension for PDS tables
-PDS_TABLE_FILENAME_EXTENSION = '.tab'
+PDS_TABLE_FILENAME_EXTENSION = ".tab"
 
 # Defaut AIP / SIP Version
-AIP_SIP_DEFAULT_VERSION = '1.0'
+AIP_SIP_DEFAULT_VERSION = "1.0"
 
 # Command-line names for hash algorithms mapped to Python *implementation*
 # name which are standardized (as lower case, no less) in the ``hashlib``.
 # There are a lot more possible message digest algorithms, but we choose
 # to support just three.
 HASH_ALGORITHMS = {
-    'MD5':     'md5',
-    'SHA-1':   'sha1',
-    'SHA-256': 'sha256',
+    "MD5": "md5",
+    "SHA-1": "sha1",
+    "SHA-256": "sha256",
 }
 
 # The "well-defined" location for SIP manifests
-SIP_MANIFEST_URL = 'https://pds.nasa.gov/data/pds4/manifests/'
+SIP_MANIFEST_URL = "https://pds.nasa.gov/data/pds4/manifests/"
 
 # TODO: Auto-generate from PDS4 IM
-PROVIDER_SITE_IDS = ['PDS_' + i for i in ('ATM', 'ENG', 'GEO', 'IMG', 'JPL', 'NAI', 'PPI', 'PSI', 'RNG', 'SBN')]
+PROVIDER_SITE_IDS = ["PDS_" + i for i in ("ATM", "ENG", "GEO", "IMG", "JPL", "NAI", "PPI", "PSI", "RNG", "SBN")]

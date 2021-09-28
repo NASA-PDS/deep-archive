@@ -71,7 +71,7 @@ to help explain what follows and need not be typed in::
 
     # Now let's run pds-deep-archive
     # NOTE: This software must be run against data on your local filesystem
-    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
+    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \
         -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
         test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 
@@ -145,7 +145,7 @@ This is the default functionality of ``pds-deep-archive``. See `Example 1: Basic
 
 Execute the software with the ``--include-latest-collection-only`` flag enabled, for example::
 
-    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \ 
+    (pds-deep-archive) $ pds-deep-archive -s PDS_ATM  \
         -b https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/  \
         test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
         --include-latest-collection-only
@@ -207,7 +207,7 @@ For more formalized details on the NSSDCA Delivery Process, see the following `p
 3.     Execute PDS Deep Archive software per usage instructions and example above.
 
 4.     Check the SIP Manifest (e.g. ``ladee_mission_bundle_v1.0_sip_v1.0_20200618.tab``) file to verify URLs indicated are valid. For example::
-    
+
         # Example of a bad URL
         https://this.url.does.not.exist.com/LADEE_Bundle_1101.xml
 
@@ -231,4 +231,3 @@ For more formalized details on the NSSDCA Delivery Process, see the following `p
 
 .. _`pagination bug`: https://github.com/NASA-PDS/pds-api/issues/73
 .. _`internal server error`: https://github.com/NASA-PDS/registry-api-service/issues/17
-

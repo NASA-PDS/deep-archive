@@ -27,32 +27,41 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""PDS AIP-GEN test base classes"""
+import codecs
+import filecmp
+import os
+import shutil
+import sqlite3
+import tempfile
+import unittest
+from datetime import date
+from datetime import datetime
 
-
-'''PDS AIP-GEN test base classes'''
-
-
-from datetime import datetime, date
+import pkg_resources
 from lxml import etree
 from pds2.aipgen.aip import process as produce_aip
 from pds2.aipgen.constants import PDS_NS_URI
 from pds2.aipgen.sip import produce as produce_sip
-from pds2.aipgen.utils import createSchema, comprehendDirectory
-import unittest, tempfile, shutil, os, pkg_resources, filecmp, codecs, sqlite3
+from pds2.aipgen.utils import comprehendDirectory
+from pds2.aipgen.utils import createSchema
 
 
 class _FunctionalTestCase(unittest.TestCase):
-    '''Abstract test harness for functional tests.
+    """Abstract test harness for functional tests.
 
     This just sets up an input stream and temporary testing area for generated
     files. Subclasses actually do the tests.
-    '''
+    """
+
     def getBundleFile(self):
-        '''Return the name of the bundle file to test with'''
-        raise NotImplementedError('Subclasses must implement ``getBundleFile``')
+        """Return the name of the bundle file to test with"""
+        raise NotImplementedError("Subclasses must implement ``getBundleFile``")
+
     def getAllCollectionsFlag(self):
-        '''Return if we're doing all collections or just the latest when faced with lid-only references'''
-        raise NotImplementedError('Subclasses must implement ``getAllCollectionsFlag``')
+        """Return if we're doing all collections or just the latest when faced with lid-only references"""
+        raise NotImplementedError("Subclasses must implement ``getAllCollectionsFlag``")
+
     def setUp(self):
         super(_FunctionalTestCase, self).setUp()
         bundleDir = pkg_resources.resource_filename(__name__, os.path.dirname(self.getBundleFile()))
@@ -66,6 +75,7 @@ class _FunctionalTestCase(unittest.TestCase):
         os.chdir(self.testdir)
         ts = datetime.utcnow()
         self.timestamp = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
+
     def tearDown(self):
         self.input.close()
         self.con.close()
@@ -75,26 +85,38 @@ class _FunctionalTestCase(unittest.TestCase):
 
 
 class SIPFunctionalTestCase(_FunctionalTestCase):
-    '''Functional test case for SIP generation.
-    '''
-    _urlXPath = f'./{{{PDS_NS_URI}}}Information_Package_Component_Deep_Archive/{{{PDS_NS_URI}}}manifest_url'
+    """Functional test case for SIP generation."""
+
+    _urlXPath = f"./{{{PDS_NS_URI}}}Information_Package_Component_Deep_Archive/{{{PDS_NS_URI}}}manifest_url"
+
+    @classmethod
+    def setUpClass(klass):
+        """Child classes must override this method and define ``getValidSIPFileName`` as well as
+        ``getSiteID`` and ``getBaseURL``
+        """
+        raise unittest.SkipTest
+
     def getValidSIPFileName(self):
-        '''Return the name of the valid SIP file to compare against'''
-        raise NotImplementedError('Subclasses must implement ``getValidSIPFileName``')
+        """Return the name of the valid SIP file to compare against"""
+        raise NotImplementedError("Subclasses must implement ``getValidSIPFileName``")
+
     def getBaseURL(self):
-        '''Return the URL prefix to use for node data archives'''
-        raise NotImplementedError('Subclasses must implement ``getBaseURL``')
+        """Return the URL prefix to use for node data archives"""
+        raise NotImplementedError("Subclasses must implement ``getBaseURL``")
+
     def getSiteID(self):
-        '''Return the site ID for the manifest's label'''
-        raise NotImplementedError('Subclasses must implement ``getSiteID``')
+        """Return the site ID for the manifest's label"""
+        raise NotImplementedError("Subclasses must implement ``getSiteID``")
+
     def setUp(self):
         super(SIPFunctionalTestCase, self).setUp()
         self.valid = pkg_resources.resource_filename(__name__, self.getValidSIPFileName())
+
     def test_sip(self):
-        '''Test if a SIP manifest works as expected'''
+        """Test if a SIP manifest works as expected"""
         manifest, ignoredLabel = produce_sip(
             bundle=self.input,
-            hashName='md5',
+            hashName="md5",
             registryServiceURL=None,
             insecureConnectionFlag=True,
             site=self.getSiteID(),
@@ -102,52 +124,57 @@ class SIPFunctionalTestCase(_FunctionalTestCase):
             allCollections=self.getAllCollectionsFlag(),
             aipFile=None,
             con=self.con,
-            timestamp=self.timestamp
+            timestamp=self.timestamp,
         )
         self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
+
     def test_label_url(self):
-        '''Test if the label of a SIP manifest has the right ``manifest_url``'''
+        """Test if the label of a SIP manifest has the right ``manifest_url``"""
         ignoredManifest, label = produce_sip(
             bundle=self.input,
-            hashName='md5',
+            hashName="md5",
             registryServiceURL=None,
             insecureConnectionFlag=True,
-            site='PDS_ATM',
-            baseURL='https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/',
+            site="PDS_ATM",
+            baseURL="https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/",
             allCollections=self.getAllCollectionsFlag(),
             aipFile=None,
             con=self.con,
-            timestamp=self.timestamp
+            timestamp=self.timestamp,
         )
         matches = etree.parse(label).getroot().findall(self._urlXPath)
         self.assertEqual(1, len(matches))
         url = matches[0].text
-        self.assertTrue(url.startswith('https://pds.nasa.gov/data/pds4/manifests/'))
+        self.assertTrue(url.startswith("https://pds.nasa.gov/data/pds4/manifests/"))
         # https://github.com/NASA-PDS/pds-deep-archive/issues/93
         currentYear = date.today().year
         # Account for the possibility that it's "Happy New Year 🍾" between label generation and testing
         legalYears = str(currentYear), str(currentYear + 1)
-        urlEnd = url.split('/')[-2]
+        urlEnd = url.split("/")[-2]
         self.assertTrue(urlEnd in legalYears, f"Expected {url} to contain either {legalYears} but didn't")
 
 
 class AIPFunctionalTestCase(_FunctionalTestCase):
-    '''Functional test case for AIP generation.
-    '''
+    """Functional test case for AIP generation."""
+
+    @classmethod
+    def setUpClass(klass):
+        """Child classes must override this method and define ``getManifests``"""
+        raise unittest.SkipTest
+
     def getManifests(self):
-        '''Return a tuple of valid manifest file names, with checksum first and transfer second'''
-        raise NotImplementedError('Subclasses must implement ``getManifests``')
+        """Return a tuple of valid manifest file names, with checksum first and transfer second"""
+        raise NotImplementedError("Subclasses must implement ``getManifests``")
+
     def setUp(self):
         super(AIPFunctionalTestCase, self).setUp()
         self.csum = pkg_resources.resource_filename(__name__, self.getManifests()[0])
         self.xfer = pkg_resources.resource_filename(__name__, self.getManifests()[1])
+
     def test_manifests(self):
-        '''See if the AIP generator makes the two manifest files'''
+        """See if the AIP generator makes the two manifest files"""
         csum, xfer, ignoredLabel = produce_aip(
-            self.input,
-            allCollections=self.getAllCollectionsFlag(),
-            con=self.con,
-            timestamp=self.timestamp
+            self.input, allCollections=self.getAllCollectionsFlag(), con=self.con, timestamp=self.timestamp
         )
 
         # Normally we'd just do:
@@ -158,7 +185,7 @@ class AIPFunctionalTestCase(_FunctionalTestCase):
 
         def _readTransferManifest(fn):
             d, lc = {}, 0
-            with codecs.open(fn, encoding='utf-8') as f:
+            with codecs.open(fn, encoding="utf-8") as f:
                 for line in f:
                     uri, fn = line.split()
                     fns = d.get(uri, set())
@@ -166,6 +193,7 @@ class AIPFunctionalTestCase(_FunctionalTestCase):
                     d[uri] = fns
                     lc += 1
             return d, lc
-        (xfers, xl), (valids, vl)  = _readTransferManifest(xfer), _readTransferManifest(self.xfer)
+
+        (xfers, xl), (valids, vl) = _readTransferManifest(xfer), _readTransferManifest(self.xfer)
         self.assertEqual(xl, vl, "AIP transfer manifest line counts don't match")
         self.assertEqual(xfers, valids, "AIP transfer manifest doesn't match the valid version")

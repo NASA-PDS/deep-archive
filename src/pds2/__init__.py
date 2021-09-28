@@ -27,15 +27,12 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-
 # 😖 Normally we'd use ``pds``, but the ``pds.api_client`` gets installed as a
 # top-level, *not namespace*, package also called ``pds``. Because we're a
 # dependency of it, if Python resolves the ``site-packages`` with ``pds`` in
 # it first, then we can't find out own code. Even if we abandon namespace
 # packages, the ``site-packages/pds/__init__.py`` sets the __path__ for
 # future ``pds`` resolutions. So, ``pds2``. Lovely, huh? 😬
+"""PDS2 Namespace"""
 
-'''PDS2 Namespace'''
-
-__import__('pkg_resources').declare_namespace(__name__)
+__import__("pkg_resources").declare_namespace(__name__)

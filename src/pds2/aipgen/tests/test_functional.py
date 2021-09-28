@@ -27,181 +27,245 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-
-'''PDS AIP-GEN functional tests'''
-
-
-from .base import SIPFunctionalTestCase, AIPFunctionalTestCase
-from urllib.error import URLError
+"""PDS AIP-GEN functional tests"""
 import unittest
+from urllib.error import URLError
+
+from .base import AIPFunctionalTestCase
+from .base import SIPFunctionalTestCase
 
 
 class LADEESIPTest(SIPFunctionalTestCase):
-    '''Test case for SIP generation for all collections from the LADEE test bundle, produced on behalf of
+    """Test case for SIP generation for all collections from the LADEE test bundle, produced on behalf of
     the PDS Atmospheres node and using an ``atmost.nmsu.edu``-style base URL.
-    '''
+    """
+
+    @classmethod
+    def setUpClass(klass):
+        pass
+
     def getBundleFile(self):
-        return 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml'
+        return "data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml"
+
     def getAllCollectionsFlag(self):
         return True
+
     def getValidSIPFileName(self):
-        return 'data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+        return "data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab"
+
     def getBaseURL(self):
-        return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
+        return "https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/"
+
     def getSiteID(self):
-        return 'PDS_ATM'
+        return "PDS_ATM"
 
 
 class LADEESIPWithBadBaseURLTest(LADEESIPTest):
     def setUp(self):
         super(LADEESIPWithBadBaseURLTest, self).setUp()
-        from zope.component import provideUtility
+        from zope.component import provideUtility  # type: ignore
         from pds2.aipgen.utils import URLValidator
+
         self.validator = URLValidator()
         provideUtility(self.validator)
+
     def tearDown(self):
         del self.validator
         super(LADEESIPWithBadBaseURLTest, self).tearDown()
+
     def getBaseURL(self):
         # This should always be a non-existent path no matter where this test is being run.
         # If you go out of your way to actually create this path on your system, please take
         # a moment to question your other life choices 🧐
-        return 'file:/definitely/a/non/exist/int/path/prefix/'
+        return "file:/definitely/a/non/exist/int/path/prefix/"
+
     # https://github.com/NASA-PDS/pds-deep-archive/issues/102
     def test_sip(self):
-        '''Make sure that the SIP generation fails with a URLError due to a non-existent base URL'''
+        """Make sure that the SIP generation fails with a URLError due to a non-existent base URL"""
         with self.assertRaises(URLError):
             super(LADEESIPWithBadBaseURLTest, self).test_sip()
 
 
 class LADEEAIPTest(AIPFunctionalTestCase):
-    '''Test case for AIP generation for all collections from the LADEE test bundle'''
+    """Test case for AIP generation for all collections from the LADEE test bundle"""
+
+    @classmethod
+    def setUpClass(klass):
+        pass
+
     def getBundleFile(self):
-        return 'data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml'
+        return "data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml"
+
     def getAllCollectionsFlag(self):
         return True
+
     def getManifests(self):
-        base = 'data/ladee_test/valid/ladee_mission_bundle_v1.0_'
-        return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
+        base = "data/ladee_test/valid/ladee_mission_bundle_v1.0_"
+        return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
 
 
 class SensitivityAIPTest(AIPFunctionalTestCase):
-    '''Test case for AIP generation with mixed-case "P-lines".'''
+    """Test case for AIP generation with mixed-case "P-lines"."""
+
+    @classmethod
+    def setUpClass(klass):
+        pass
+
     def getBundleFile(self):
-        return 'data/sensitivity/mission_bundle/LADEE_Bundle_1101.xml'
+        return "data/sensitivity/mission_bundle/LADEE_Bundle_1101.xml"
+
     def getAllCollectionsFlag(self):
         return True
+
     def getManifests(self):
-        base = 'data/sensitivity/valid/ladee_mission_bundle_v1.0_'
-        return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
+        base = "data/sensitivity/valid/ladee_mission_bundle_v1.0_"
+        return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
 
 
 class SensitivitySIPTest(SIPFunctionalTestCase):
-    '''Test case for SIP generation with mixed-case "P-lines".'''
+    """Test case for SIP generation with mixed-case "P-lines"."""
+
+    @classmethod
+    def setUpClass(klass):
+        pass
+
     def getBundleFile(self):
-        return 'data/sensitivity/mission_bundle/LADEE_Bundle_1101.xml'
+        return "data/sensitivity/mission_bundle/LADEE_Bundle_1101.xml"
+
     def getAllCollectionsFlag(self):
         return True
+
     def getValidSIPFileName(self):
-        return 'data/sensitivity/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+        return "data/sensitivity/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab"
+
     def getBaseURL(self):
-        return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
+        return "https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/"
+
     def getSiteID(self):
-        return 'PDS_ATM'
+        return "PDS_ATM"
 
 
 class _InsightSIPTest(SIPFunctionalTestCase):
-    '''Abstract test case for SIP generation for the Insight Documents test bundle, produced on behalf of
+    """Abstract test case for SIP generation for the Insight Documents test bundle, produced on behalf of
     the Geo node and using a ``pds.nasa.gov``-style base URL. Subclasses further make concrete test cases
     that use either all collections or just the latest.
-    '''
+    """
+
     def getBundleFile(self):
-        return 'data/insight_documents/urn-nasa-pds-insight_documents/bundle_insight_documents.xml'
+        return "data/insight_documents/urn-nasa-pds-insight_documents/bundle_insight_documents.xml"
+
     def getBaseURL(self):
-        return 'https://pds.nasa.gov/data/pds4/test-bundles/'
+        return "https://pds.nasa.gov/data/pds4/test-bundles/"
+
     def getSiteID(self):
-        return 'PDS_GEO'
+        return "PDS_GEO"
 
 
 class _InsightAIPTest(AIPFunctionalTestCase):
-    '''Abstract test case for AIP generation for the Insight Documents test bundle. Subclasses make
+    """Abstract test case for AIP generation for the Insight Documents test bundle. Subclasses make
     concrete test cases for either all collections or just the latest when lid-only references appear.
-    '''
+    """
+
     def getBundleFile(self):
-        return 'data/insight_documents/urn-nasa-pds-insight_documents/bundle_insight_documents.xml'
+        return "data/insight_documents/urn-nasa-pds-insight_documents/bundle_insight_documents.xml"
 
 
 class InsightAllSIPTest(_InsightSIPTest):
-    '''Test case for SIP generation for all collections for the Insight Documents test bundle.'''
+    """Test case for SIP generation for all collections for the Insight Documents test bundle."""
+
     def getValidSIPFileName(self):
-        return 'data/insight_documents/valid/all/insight_documents_v2.0_sip_v1.0_20200702.tab'
+        return "data/insight_documents/valid/all/insight_documents_v2.0_sip_v1.0_20200702.tab"
+
     def getAllCollectionsFlag(self):
         return True
 
 
 class InsightAllAIPTest(_InsightAIPTest):
-    '''Test case for AIP generation for all collections for the Insight Documents test bundle.'''
+    """Test case for AIP generation for all collections for the Insight Documents test bundle."""
+
     def getAllCollectionsFlag(self):
         return True
+
     def getManifests(self):
-        base, suffix = 'data/insight_documents/valid/all/insight_documents_v2.0_', '_manifest_v2.0_20200702.tab'
-        return (base + 'checksum' + suffix, base + 'transfer' + suffix)
+        base, suffix = "data/insight_documents/valid/all/insight_documents_v2.0_", "_manifest_v2.0_20200702.tab"
+        return (base + "checksum" + suffix, base + "transfer" + suffix)
 
 
 class InsightLatestSIPTest(_InsightSIPTest):
-    '''Test case for SIP generation for the latest versions for the Insight Documents test bundle.'''
+    """Test case for SIP generation for the latest versions for the Insight Documents test bundle."""
+
     def getValidSIPFileName(self):
-        return 'data/insight_documents/valid/latest/insight_documents_v2.0_sip_v1.0_20200702.tab'
+        return "data/insight_documents/valid/latest/insight_documents_v2.0_sip_v1.0_20200702.tab"
+
     def getAllCollectionsFlag(self):
         return False
 
 
 class InsightLatestAIPTest(_InsightAIPTest):
-    '''Test case for AIP generation for the latest versions for the Insight Documents test bundle.'''
+    """Test case for AIP generation for the latest versions for the Insight Documents test bundle."""
+
+    @classmethod
+    def setUpClass(klass):
+        pass
+
     def getAllCollectionsFlag(self):
         return False
+
     def getManifests(self):
-        base, suffix = 'data/insight_documents/valid/latest/insight_documents_v2.0_', '_manifest_v2.0_20200702.tab'
-        return (base + 'checksum' + suffix, base + 'transfer' + suffix)
+        base, suffix = "data/insight_documents/valid/latest/insight_documents_v2.0_", "_manifest_v2.0_20200702.tab"
+        return (base + "checksum" + suffix, base + "transfer" + suffix)
 
 
 class SecondaryCollectionSIPTest(SIPFunctionalTestCase):
-    '''Test case for SIP generation when there are secondary collections in the bundle.'''
+    """Test case for SIP generation when there are secondary collections in the bundle."""
+
+    @classmethod
+    def setUpClass(klass):
+        pass
+
     def getBundleFile(self):
-        return 'data/secondary_test/mission_bundle/LADEE_Bundle_1101.xml'
+        return "data/secondary_test/mission_bundle/LADEE_Bundle_1101.xml"
+
     def getAllCollectionsFlag(self):
         return True
+
     def getValidSIPFileName(self):
-        return 'data/secondary_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab'
+        return "data/secondary_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab"
+
     def getBaseURL(self):
-        return 'https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/'
+        return "https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/"
+
     def getSiteID(self):
-        return 'PDS_ATM'
+        return "PDS_ATM"
 
 
 class SecondaryCollectionAIPTest(AIPFunctionalTestCase):
-    '''Test case for AIP generation when there are secondary collections in the bundle.'''
+    """Test case for AIP generation when there are secondary collections in the bundle."""
+
     def getBundleFile(self):
-        return 'data/secondary_test/mission_bundle/LADEE_Bundle_1101.xml'
+        return "data/secondary_test/mission_bundle/LADEE_Bundle_1101.xml"
+
     def getAllCollectionsFlag(self):
         return True
+
     def getManifests(self):
-        base = 'data/secondary_test/valid/ladee_mission_bundle_v1.0_'
-        return (base + 'checksum_manifest_v1.0.tab', base + 'transfer_manifest_v1.0.tab')
+        base = "data/secondary_test/valid/ladee_mission_bundle_v1.0_"
+        return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
 
 
 def test_suite():
-    return unittest.TestSuite([
-        unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(LADEEAIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(SensitivitySIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(SensitivityAIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllSIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
-        unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPWithBadBaseURLTest),
-    ])
+    return unittest.TestSuite(
+        [
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEEAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SensitivitySIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SensitivityAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllSIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPWithBadBaseURLTest),
+        ]
+    )

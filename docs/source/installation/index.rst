@@ -27,8 +27,8 @@ requirements:
 
 
 Consult your operating system instructions or system administrator to install
-the required packages. For those without system administrator access and are 
-feeling anxious, you could try a local (home directory) Python_ 3 installation 
+the required packages. For those without system administrator access and are
+feeling anxious, you could try a local (home directory) Python_ 3 installation
 using a Miniconda_ installation.
 
 
@@ -85,17 +85,17 @@ it's properly installed.
     to be operational. If you like taking risks, run the following to create a
     new virtual environment and install the latest development version of the
     software::
-    
+
       mkdir -p $HOME/.virtualenvs
       python3 -m venv $HOME/.virtualenvs/pds-deep-archive
       source $HOME/.virtualenvs/pds-deep-archive/bin/activate
       pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple`` pds.deeparchive
-    
+
 
 Upgrade Software
 ----------------
 
-To check and install an upgrade to the software, run the following command in your 
+To check and install an upgrade to the software, run the following command in your
 virtual environment::
 
     source $HOME/.virtualenvs/pds-deep-archive/bin/activate
