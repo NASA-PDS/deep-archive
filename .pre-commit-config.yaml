@@ -31,7 +31,7 @@ repos:
         entry: black
         files: ^src/
         types: [python]
-        exclude_types: [xml, tab]
+        exclude_types: [xml, wtf]
         language: system
 
 -   repo: local
