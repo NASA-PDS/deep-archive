@@ -24,25 +24,23 @@ repos:
         language: system
         pass_filenames: false
 
--   repo: local
-    hooks:
-    -   id: black
-        name: black
-        entry: black
-        files: ^src/
-        types: [python]
-        # There is no `wtf` type, but we need *something* in here to keep `black` from mucking up all our
-        # test data. Black: thanks, I hate it.
-        exclude_types: [xml, wtf]
-        language: system
+# Black: thanks, I hate it.
+# -   repo: local
+#     hooks:
+#     -   id: black
+#         name: black
+#         entry: black
+#         files: ^src/|tests/
+#         language: system
 
--   repo: local
-    hooks:
-    -   id: flake8
-        name: flake8
-        entry: flake8 src
-        language: system
-        pass_filenames: false
+# Flake8: sorry, this repo has a long-established style which is not yours…get bent
+# -   repo: local
+#     hooks:
+#     -   id: flake8
+#         name: flake8
+#         entry: flake8 src
+#         language: system
+#         pass_filenames: false
 
 -   repo: local
     hooks:
