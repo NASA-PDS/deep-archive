@@ -31,6 +31,8 @@ repos:
         entry: black
         files: ^src/
         types: [python]
+        # There is no `wtf` type, but we need *something* in here to keep `black` from mucking up all our
+        # test data. Black: thanks, I hate it.
         exclude_types: [xml, wtf]
         language: system
 
