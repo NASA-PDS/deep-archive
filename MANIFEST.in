@@ -1,5 +1,5 @@
 # Copyright © 2019–2021 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 
-graft src/pds
-include *.txt
+recursive-include src *.txt
+global-exclude *.py[cod] __pycache__
