@@ -27,7 +27,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""AIP and SIP generation"""
+"""AIP and SIP generation."""
 import argparse
 import logging
 import os
@@ -40,14 +40,14 @@ from datetime import datetime
 from zope.component import provideUtility  # type: ignore
 
 from . import VERSION
-from .aip import process as aipProcess
+from .aip import process as aipprocess
 from .constants import HASH_ALGORITHMS
-from .sip import addSIParguments
-from .sip import produce as sipProcess
-from .utils import addBundleArguments
-from .utils import addLoggingArguments
-from .utils import comprehendDirectory
-from .utils import createSchema
+from .sip import addsiparguments
+from .sip import produce as sipprocess
+from .utils import addbundlearguments
+from .utils import addloggingarguments
+from .utils import comprehenddirectory
+from .utils import createschema
 from .utils import URLValidator
 
 
@@ -89,12 +89,12 @@ _logger = logging.getLogger(__name__)
 
 
 def main():
-    """Make an AIP and a SIP"""
+    """Make an AIP and a SIP."""
     parser = argparse.ArgumentParser(description=_description, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    addBundleArguments(parser)
-    addSIParguments(parser)
-    addLoggingArguments(parser)
+    addbundlearguments(parser)
+    addsiparguments(parser)
+    addloggingarguments(parser)
     parser.add_argument("bundle", type=argparse.FileType("rb"), metavar="IN-BUNDLE.XML", help="Bundle XML file to read")
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format="%(levelname)s %(message)s")
@@ -112,16 +112,16 @@ def main():
         con = sqlite3.connect(dbfile)
         _logger.debug("⚙️ Creating potentially future-mulitprocessing–capable DB in %s", dbfile)
         with con:
-            createSchema(con)
-            comprehendDirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
+            createschema(con)
+            comprehenddirectory(os.path.dirname(os.path.abspath(args.bundle.name)), con)
 
         # Make a timestamp but without microseconds
         ts = datetime.utcnow()
         ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
-        dummy, dummy, labelFN = aipProcess(args.bundle, not args.include_latest_collection_only, con, ts)
-        with open(labelFN, "rb") as chksumStream:
-            sipProcess(
+        dummy, dummy, labelfn = aipprocess(args.bundle, not args.include_latest_collection_only, con, ts)
+        with open(labelfn, "rb") as chksumstream:
+            sipprocess(
                 args.bundle,
                 # TODO: Temporarily hardcoding these values until other modes are available
                 # HASH_ALGORITHMS[args.algorithm],
@@ -132,7 +132,7 @@ def main():
                 "",
                 args.site,
                 args.bundle_base_url,
-                chksumStream,
+                chksumstream,
                 args.include_latest_collection_only,
                 con,
                 ts,

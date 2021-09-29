@@ -9,9 +9,10 @@ Software for the [Planetary Data System](https://pds.nasa.gov/) to generate Arch
 
 ## ✨ Features
 
-- Provides an exectuble Python script `pds-deep-archive`. Run `pds-deep-archive --help` for more details.
-- Provides an exectuble Python script `aipgen`. Run `aipgen --help` for more details.
-- Provides an exectuble Python script `sipgen`. Run `sipgen --help` for more details.
+Installing this package will give you two different executable Python programs:
+
+-   `pds-deep-archive` for making Deep Archives of local, on-disk PDS products.
+-   `pds-deep-registry-archive` for making Deep Archives of proucts in a PDS Registry server.
 
 
 ## ⎆ Installation
@@ -21,8 +22,7 @@ See the online documentation for [Installation](https://nasa-pds.github.io/pds-d
 You should then be able to run the deep archive utilities:
 
     (pds-deep-archive) bash> pds-deep-archive --help
-    (pds-deep-archive) bash> aipgen --help
-    (pds-deep-archive) bash> sipgen --help
+    (pds-deep-archive) bash> pds-deep-registry-archive --help
 
 👉 _Note:_ The above commands demonstrate typical usage with a command-line prompt, such as that provided by the popular `bash` shell; your own prompt may appear differently and may vary depending on operating system, shell choice, and so forth.
 

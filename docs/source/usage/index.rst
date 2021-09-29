@@ -108,7 +108,7 @@ Once you complete this execution, the program will print::
     INFO 🏃‍♀️ Starting SIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
     INFO 🎉 Success! From /SOME/DIR/test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
     INFO 📄 SIP Manifest: ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab
-            allCollections=args.include_latest_collection_only,
+            allcollections=args.include_latest_collection_only,
     INFO 📄 XML label for the SIP: ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml
     INFO 👋 That's it! Thanks for making an AIP and SIP with us today. Bye!
 

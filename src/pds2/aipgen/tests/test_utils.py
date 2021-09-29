@@ -37,11 +37,11 @@ import unittest
 import pkg_resources
 import zope.component  # type: ignore
 from pds2.aipgen.interfaces import IURLValidator
-from pds2.aipgen.utils import addLoggingArguments
-from pds2.aipgen.utils import getDigest
-from pds2.aipgen.utils import getLogicalVersionIdentifier
-from pds2.aipgen.utils import getMD5
-from pds2.aipgen.utils import parseXML
+from pds2.aipgen.utils import addloggingarguments
+from pds2.aipgen.utils import getdigest
+from pds2.aipgen.utils import getlogicalversionidentifier
+from pds2.aipgen.utils import getmd5
+from pds2.aipgen.utils import parsexml
 from pds2.aipgen.utils import URLValidator
 
 
@@ -57,15 +57,15 @@ class HashingTestCase(unittest.TestCase):
         fd, self.emptyFileName = tempfile.mkstemp()
         os.close(fd)
 
-    def test_getDigest(self):
-        """Ensure getDigest works on URLs and various hashing algorithms"""
-        self.assertEqual(EMPTY_SHA1, getDigest("file:" + self.emptyFileName, "sha1"))
-        self.assertEqual(EMPTY_MD5, getDigest("file:" + self.emptyFileName, "md5"))
+    def test_getdigest(self):
+        """Ensure getdigest works on URLs and various hashing algorithms"""
+        self.assertEqual(EMPTY_SHA1, getdigest("file:" + self.emptyFileName, "sha1"))
+        self.assertEqual(EMPTY_MD5, getdigest("file:" + self.emptyFileName, "md5"))
 
-    def test_getMD5(self):
-        """Ensure getMD5 works on file streams"""
+    def test_getmd5(self):
+        """Ensure getmd5 works on file streams"""
         with open(self.emptyFileName, "rb") as i:
-            self.assertEqual(EMPTY_MD5, getMD5(i))
+            self.assertEqual(EMPTY_MD5, getmd5(i))
 
     def tearDown(self):
         os.unlink(self.emptyFileName)
@@ -82,7 +82,7 @@ class BundleParsingTestCase(unittest.TestCase):
         )
 
     def test_lid_vid_retrieval(self):
-        liv, vid = getLogicalVersionIdentifier(parseXML(self.emptyBun))
+        liv, vid = getlogicalversionidentifier(parsexml(self.emptyBun))
 
     def tearDown(self):
         self.emptyBun.close()
@@ -93,12 +93,13 @@ class ArgumentTestCase(unittest.TestCase):
     """Test command-line argument parsing"""
 
     def test_logging_arguments(self):
+        """Test if the logging command line arguments get in there."""
         class NonExitingArgumentParser(argparse.ArgumentParser):
             def exit(self, status=0, message=None):
                 raise ValueError("Bad args")
 
         parser = NonExitingArgumentParser(usage="")
-        addLoggingArguments(parser)
+        addloggingarguments(parser)
         self.assertEqual(logging.INFO, parser.parse_args([]).loglevel)
         self.assertEqual(logging.DEBUG, parser.parse_args(["--debug"]).loglevel)
         self.assertEqual(logging.WARNING, parser.parse_args(["--quiet"]).loglevel)
@@ -142,4 +143,13 @@ class URLValidatorTest(unittest.TestCase):
 
 
 def test_suite():
+    """Return the test suite, duh flake8.
+
+    Come on! If a function is obviously named it shouldn't require a docstring. This is pretty much like
+    commenting obvious code::
+
+        x += 1  # Increment x by 1
+
+    It's just noise and doesn't add anything. Inane flake8 adherence "D103 Missing docstring in public function".
+    """
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

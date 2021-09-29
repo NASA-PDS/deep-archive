@@ -27,7 +27,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Constants"""
+"""Constants."""
 # URI prefix for logical identifiers of volume identifiers for products for Archive Information Packages
 AIP_PRODUCT_URI_PREFIX = "urn:nasa:pds:system_bundle:product_aip:"
 

@@ -27,7 +27,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""PDS AIP-GEN Tests"""
+"""PDS AIP-GEN Tests."""
 import unittest
 
 import pds2.aipgen.tests.test_functional
@@ -35,6 +35,7 @@ import pds2.aipgen.tests.test_utils
 
 
 def test_suite():
+    """Return a suite of tests, duh flake8."""
     return unittest.TestSuite(
         [pds2.aipgen.tests.test_utils.test_suite(), pds2.aipgen.tests.test_functional.test_suite()]
     )

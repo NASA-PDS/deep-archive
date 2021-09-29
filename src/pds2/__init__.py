@@ -33,6 +33,6 @@
 # it first, then we can't find out own code. Even if we abandon namespace
 # packages, the ``site-packages/pds/__init__.py`` sets the __path__ for
 # future ``pds`` resolutions. So, ``pds2``. Lovely, huh? 😬
-"""PDS2 Namespace"""
+"""PDS2 Namespace."""
 
 __import__("pkg_resources").declare_namespace(__name__)

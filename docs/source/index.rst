@@ -9,9 +9,9 @@ Archival Information System (OAIS_) standards.
 This software is used to generate the necessary packages for delivery of PDS4
 archives to the NASA Space Science Data Coordinated Archive (NSSDCA).
 
-For delivering PDS3 data, see `documentation at the Engineering Node <https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process#pds3>`_.
+For delivering PDS3 data, see `documentation at the Engineering Node`_.
 
-Currently, this package provides four executable programs:
+Currently, this package provides two executable programs:
 
 •  ``pds-deep-registry-archive``, primary executable for creating both Archive
    Information Packages (AIPs) and Submission Information Packages (SIPs) that
@@ -19,6 +19,9 @@ Currently, this package provides four executable programs:
 •  ``pds-deep-archive``, primary executable for creating both Archive
    Information Packages (AIPs) and Submission Information Packages (SIPs) that
    uses a bundle laid out in the local filesystem; and
+
+There are two additional programs:
+
 •  ``aipgen``, a subcomponent of ``pds-deep-archive`` to create Archive
    Information Packages (AIPs); and
 •  ``sipgen``, a subcomponent of ``pds-deep-archive`` to create Submission
@@ -54,3 +57,4 @@ local files; you'll almost never need to use these.)
 
 .. _OAIS: https://www2.archivists.org/groups/standards-committee/open-archival-information-system-oais
 .. _Python: https://www.python.org/
+.. _`documentation at the Engineering Node`: https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process#pds3

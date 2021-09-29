@@ -10,10 +10,10 @@ Requirements
 Prior to installing this software, ensure your system meets the following
 requirements:
 
-•  Python_ 3. This software requires Python 3; it will work with 3.6, 3.7, or
-   3.8.  Python 2 will absolutely *not* work, and indeed Python 2 came to its
-   end of life on the first of January, 2020.  Run ``python --version``, or ``python3 --version``, to
-   check it is installed.
+•  Python_ 3. This software requires Python 3.9.  Python 2 will
+   absolutely *not* work, and indeed Python 2 came to its end of life on the
+   first of January, 2020.  Run ``python --version``, or
+   ``python3 --version``, to check it is installed.
 •  ``libxml2`` version 2.9.2; later 2.9 versions are fine.  Run ``xml2-config
    --version`` to find out.
 •  ``libxslt`` version 1.1.28; later 1.1 versions are OK too.  Run

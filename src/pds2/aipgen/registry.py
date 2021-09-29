@@ -27,7 +27,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Registry based AIP and SIP"""
+"""Registry based AIP and SIP."""
 # Imports
 # =======
 import argparse
@@ -41,14 +41,14 @@ from datetime import datetime
 import pds.api_client  # type: ignore
 
 from . import VERSION
-from .aip import writeLabel as writeAIPLabel
+from .aip import writelabel as writeaiplabel
 from .constants import AIP_SIP_DEFAULT_VERSION
 from .constants import PDS_LABEL_FILENAME_EXTENSION
 from .constants import PDS_TABLE_FILENAME_EXTENSION
 from .constants import PROVIDER_SITE_IDS
-from .sip import writeLabel as writeSIPLabel
-from .utils import addBundleArguments
-from .utils import addLoggingArguments
+from .sip import writelabel as writesiplabel
+from .utils import addbundlearguments
+from .utils import addloggingarguments
 
 
 # Constants
@@ -58,24 +58,24 @@ from .utils import addLoggingArguments
 # -------
 
 _logger = logging.getLogger(__name__)  # The one true logger for PDS
-_progressLogging = 100  # How frequently to report PDS progress; every N items
+_progresslogging = 100  # How frequently to report PDS progress; every N items
 
 
 # PDS API Access
 # --------------
 
-_apiQueryLimit = 50  # Pagination in the PDS API
-_defaultServer = "https://pds-gamma.jpl.nasa.gov/api/"  # Not just the default, the only one I know of 😮
+_apiquerylimit = 50  # Pagination in the PDS API
+_defaultserver = "https://pds-gamma.jpl.nasa.gov/api/"  # Not just the default, the only one I know of 😮
 
 
 # PDS API property keys we're interested in
 # -----------------------------------------
 
-_propDataURL = "ops:Data_File_Info.ops:file_ref"
-_propDataMD5 = "ops:Data_File_Info.ops:md5_checksum"
-_propLabelURL = "ops:Label_File_Info.ops:file_ref"
-_propLabelMD5 = "ops:Label_File_Info.ops:md5_checksum"
-_fields = [_propDataURL, _propDataMD5, _propLabelURL, _propLabelMD5]
+_propdataurl = "ops:Data_File_Info.ops:file_ref"
+_propdatamd5 = "ops:Data_File_Info.ops:md5_checksum"
+_proplabelurl = "ops:Label_File_Info.ops:file_ref"
+_proplabelmd5 = "ops:Label_File_Info.ops:md5_checksum"
+_fields = [_propdataurl, _propdatamd5, _proplabelurl, _proplabelmd5]
 
 
 # Program/Module Metadata
@@ -94,38 +94,44 @@ __version__ = VERSION
 
 @dataclasses.dataclass(order=True, frozen=True)
 class _File:
-    """A "PDS file" of some kind in the PDS Registry Service whose details we get via the PDS API"""
+    """A "PDS file" of some kind in the PDS Registry Service whose details we get via the PDS API."""
 
     url: str
     md5: str
 
 
-def _deURNLIDVID(lidvid: str) -> tuple[str, str]:
-    """Given a PDS ``lidvid`` as a Uniform Resource Name such as ``urn:nasa:pds:whatever::1.0``,
+def _deurnlidvid(lidvid: str) -> tuple[str, str]:
+    """De-URN a LID VID.
+
+    Given a PDS ``lidvid`` as a Uniform Resource Name such as ``urn:nasa:pds:whatever::1.0``,
     transform it to a double of ``whatever`` and ``1.0``.
     """
     lid, vid = lidvid.split("::")
     return lid.split(":")[-1], vid
 
 
-def _makeFilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
-    """Make a PDS filename for the given ``lidvid`` by dropping its URN prefix, splitting it into
+def _makefilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
+    """Make a filename.
+
+    Make a PDS filename for the given ``lidvid`` by dropping its URN prefix, splitting it into
     LID and VID, adding the date part of the ``ts`` timestamp, slapping on the ``kind`` of file it
     is, and the given ``ext``ension, which should already include the ``.``.
     """
-    lid, vid = _deURNLIDVID(lidvid)
+    lid, vid = _deurnlidvid(lidvid)
     slate = ts.date().strftime("%Y%m%d")
     return f"{lid}_v{vid}_{slate}_{kind}_v{AIP_SIP_DEFAULT_VERSION}{ext}"
 
 
-def _getBundle(apiClient: pds.api_client.ApiClient, lidvid: str) -> pds.api_client.models.product.Product:
-    """Using the PDS ``apiClient`` find the PDS bundle with the named ``lidvid`` and return it not as
+def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> pds.api_client.models.product.Product:
+    """Get a bundle.
+
+    Using the PDS ``apiclient`` find the PDS bundle with the named ``lidvid`` and return it not as
     an ``pds.api_client.models.product.Bundle`` (which doesn't exist) but as a ``Product``.  If it
     can't be found, return ``None``.
     """
     try:
         _logger.debug("⚙️ Asking ``bundle_by_lidvid`` for %s", lidvid)
-        bundles = pds.api_client.BundlesApi(apiClient)
+        bundles = pds.api_client.BundlesApi(apiclient)
         return bundles.bundle_by_lidvid(lidvid)  # type = ``Product_Bundle``
     except pds.api_client.exceptions.ApiException as ex:
         if ex.status == http.client.NOT_FOUND:
@@ -134,16 +140,18 @@ def _getBundle(apiClient: pds.api_client.ApiClient, lidvid: str) -> pds.api_clie
             raise
 
 
-def _getCollections(apiClient: pds.api_client.ApiClient, lidvid: str, workaroundPaginationBug=True):
-    """Using the PDS ``apiClient`` generate collections that belong to the PDS bundle ``lidvid``.
-    If ``workaroundPaginationBug`` is True, avoid the bug in the count of items returned from the
+def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, workaroundpaginationbug=True):
+    """Get the collections.
+
+    Using the PDS ``apiclient`` generate collections that belong to the PDS bundle ``lidvid``.
+    If ``workaroundpaginationbug`` is True, avoid the bug in the count of items returned from the
     ``/bundles/{lidvid}/collections`` endpoint; see NASA-PDS/pds-api#73.
     """
-    bcAPI, start = pds.api_client.BundlesCollectionsApi(apiClient), 0
+    bcapi, start = pds.api_client.BundlesCollectionsApi(apiclient), 0
     while True:
-        limit = _apiQueryLimit - 1 if workaroundPaginationBug else _apiQueryLimit
+        limit = _apiquerylimit - 1 if workaroundpaginationbug else _apiquerylimit
         _logger.debug("⚙️ Asking ``collections_of_a_bundle`` for %s at %d limit %d", lidvid, start, limit)
-        results = bcAPI.collections_of_a_bundle(lidvid, start=start, limit=limit, fields=_fields)
+        results = bcapi.collections_of_a_bundle(lidvid, start=start, limit=limit, fields=_fields)
         if results.data is None:
             return
         start += len(results.data)
@@ -151,13 +159,13 @@ def _getCollections(apiClient: pds.api_client.ApiClient, lidvid: str, workaround
             yield i
 
 
-def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str):
-    """Using the PDS ``apiClient`` generate PDS products that belong to the collection ``lidvid``."""
-    cpAPI, start = pds.api_client.CollectionsProductsApi(apiClient), 0
+def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
+    """Using the PDS ``apiclient`` generate PDS products that belong to the collection ``lidvid``."""
+    cpapi, start = pds.api_client.CollectionsProductsApi(apiclient), 0
     while True:
         try:
-            _logger.debug("⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d", lidvid, start, _apiQueryLimit)
-            results = cpAPI.products_of_a_collection(lidvid, start=start, limit=_apiQueryLimit, fields=_fields)
+            _logger.debug("⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d", lidvid, start, _apiquerylimit)
+            results = cpapi.products_of_a_collection(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
         except pds.api_client.exceptions.ApiException as ex:
             if ex.status == http.client.NOT_FOUND:
                 return
@@ -170,64 +178,68 @@ def _getProducts(apiClient: pds.api_client.ApiClient, lidvid: str):
             yield i
 
 
-def _addFiles(product: pds.api_client.models.Product, bac: dict):
+def _addfiles(product: pds.api_client.models.Product, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
     lidvid, props = product.id, product.properties  # Shorthand
     files = bac.get(lidvid, set())  # Get the current set (or a new empty set)
-    if _propDataURL in props:  # Are there data files in the product?
-        urls, md5s = props[_propDataURL], props[_propDataMD5]  # Get the URLs and MD5s of them
+    if _propdataurl in props:  # Are there data files in the product?
+        urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
         for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
             files.add(_File(url, md5))  # Add it to the set
-    if _propLabelURL in props:  # How about the label itself?
-        files.add(_File(props[_propLabelURL][0], props[_propLabelMD5][0]))  # Add it too
+    if _proplabelurl in props:  # How about the label itself?
+        files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
     bac[lidvid] = files  # Stash for future use
 
 
-def _comprehendRegistry(
-    url: str, bundleLIDVID: str, allCollections=True, workaroundPaginationBug=True
+def _comprehendregistry(
+    url: str, bundlelidvid: str, allcollections=True, workaroundpaginationbug=True
 ) -> tuple[int, dict, str]:
-    """Query the PDS API at ``url`` for all information about the PDS ``bundleLIDVID`` and return a
-    comprehension of it. If ``allCollections`` is True, we include every reference from a collection
+    """Fathom the registry.
+
+    Query the PDS API at ``url`` for all information about the PDS ``bundlelidvid`` and return a
+    comprehension of it. If ``allcollections`` is True, we include every reference from a collection
     that's LID-only; if it's False, then we only include the latest reference form a LID-only reference.
     A "comprehension of it" means a triple of the common prefix length of all PDS paths referenced
     within it, the "B.A.C." (a dict mapping PDS lidvids to sets of ``_File``s), and the title of
     the PDS bundle.
 
-    Note: currently ``allCollections`` is ignored; see NASA-PDS/pds-api#74.
+    Note: currently ``allcollections`` is ignored; see NASA-PDS/pds-api#74.
     """
-    _logger.debug("🤔 Comprehending the registry at %s for %s", url, bundleLIDVID)
+    _logger.debug("🤔 Comprehending the registry at %s for %s", url, bundlelidvid)
 
     # Set up our client connection
     config = pds.api_client.Configuration()
     config.host = url
-    apiClient = pds.api_client.ApiClient(config)
+    apiclient = pds.api_client.ApiClient(config)
 
     # This is the "B.A.C." 😏
     bac: dict[str, set[_File]]
     bac = {}
 
-    bundle = _getBundle(apiClient, bundleLIDVID)  # There's no class "Bundle" but class Product 🤷‍♀️
+    bundle = _getbundle(apiclient, bundlelidvid)  # There's no class "Bundle" but class Product 🤷‍♀️
     if bundle is None:
-        raise ValueError(f"🤷‍♀️ The bundle {bundleLIDVID} cannot be found in the registry at {url}")
+        raise ValueError(f"🤷‍♀️ The bundle {bundlelidvid} cannot be found in the registry at {url}")
     title = bundle.title if bundle.title else "«unknown»"
-    _addFiles(bundle, bac)
+    _addfiles(bundle, bac)
 
-    bundleURL = bundle.metadata.label_url
-    prefixLen = bundleURL.rfind("/") + 1
+    bundleurl = bundle.metadata.label_url
+    prefixlen = bundleurl.rfind("/") + 1
 
     # It turns out the PDS registry makes this *trivial* compared to the PDS filesystem version;
     # Just understanding it all was there was the hard part! 😊 THANK YOU! 🙏
-    for collection in _getCollections(apiClient, bundleLIDVID, workaroundPaginationBug):
-        _addFiles(collection, bac)
-        for product in _getProducts(apiClient, collection.id):
-            _addFiles(product, bac)
+    for collection in _getcollections(apiclient, bundlelidvid, workaroundpaginationbug):
+        _addfiles(collection, bac)
+        for product in _getproducts(apiclient, collection.id):
+            _addfiles(product, bac)
 
     # C'est tout 🌊
-    return prefixLen, bac, title
+    return prefixlen, bac, title
 
 
-def _writeChecksumManifest(fn: str, prefixLen: int, bac: dict) -> tuple[str, int, int]:
-    """Write an AIP "checksum manifest" to the given ``fn`` PDS filename, stripping ``prefixLen``
+def _writechecksummanifest(fn: str, prefixlen: int, bac: dict) -> tuple[str, int, int]:
+    """Write an AIP "checksum manifest".
+
+    This writes an AIP "checksum manifest" to the given ``fn`` PDS filename, stripping ``prefixlen``
     characters off paths, and using information from the ``bac``.  Return a triple of the MD5
     of the manifest, its size in bytes, and a count of the number of entries in it.
     """
@@ -235,19 +247,21 @@ def _writeChecksumManifest(fn: str, prefixLen: int, bac: dict) -> tuple[str, int
     with open(fn, "wb") as o:
         for files in bac.values():
             for f in files:
-                entry = f"{f.md5}\t{f.url[prefixLen:]}\r\n".encode("utf-8")
+                entry = f"{f.md5}\t{f.url[prefixlen:]}\r\n".encode("utf-8")
                 o.write(entry)
                 hashish.update(entry)
                 size += len(entry)
                 count += 1
-                if count % _progressLogging == 0:
+                if count % _progresslogging == 0:
                     _logger.debug("⏲ Wrote %d entries into the checksum manifest %s", count, fn)
     _logger.info("📄 Wrote AIP checksum manifest %s with %d entries", fn, count)
     return hashish.hexdigest(), size, count
 
 
-def _writeTransferManifest(fn: str, prefixLen: int, bac: dict) -> tuple[str, int, int]:
-    """Write an AIP "transfer manifest" to the named ``fn`` PDS file, stripping ``prefixLen``
+def _writetransfermanifest(fn: str, prefixlen: int, bac: dict) -> tuple[str, int, int]:
+    """Write an AIP "transfer manifest".
+
+    This writes an AIP "transfer manifest" to the named ``fn`` PDS file, stripping ``prefixlen``
     characters off the beginnings of PDS paths, and using info in the ``bac``. Return a triple of
     the MD5 of the created manifest, its size in bytes, and a count of its entries.
     """
@@ -256,46 +270,50 @@ def _writeTransferManifest(fn: str, prefixLen: int, bac: dict) -> tuple[str, int
     with open(fn, "wb") as o:
         for lidvid, files in bac.items():
             for f in files:
-                entry = f"{lidvid:255}/{f.url[prefixLen:]:255}\r\n".encode("utf-8")
+                entry = f"{lidvid:255}/{f.url[prefixlen:]:255}\r\n".encode("utf-8")
                 o.write(entry)
                 hashish.update(entry)
                 size += len(entry)
                 count += 1
-                if count % _progressLogging == 0:
+                if count % _progresslogging == 0:
                     _logger.debug("⏲ Wrote %d entries into the transfer manifest %s", count, fn)
     _logger.info("📄 Wrote AIP transfer manifest %s with %d entries", fn, count)
     return hashish.hexdigest(), size, count
 
 
-def _writeAIP(bundleLIDVID: str, prefixLen: int, bac: dict, ts: datetime) -> str:
-    """Create the PDS Archive Information Package for the given ``bundleLIDVID``, stripping
-    ``prefixLen`` characters off file paths and using information in the ``bac``.  The ``ts``
+def _writeaip(bundlelidvid: str, prefixlen: int, bac: dict, ts: datetime) -> str:
+    """Create the PDS Archive Information Package.
+
+    This creates the PDS Archive Information Package for the given ``bundlelidvid``, stripping
+    ``prefixlen`` characters off file paths and using information in the ``bac``.  The ``ts``
     timestamp tells what metadata to put in the PDS label and the date for generated PDS
     filenames. Return a stringified version of the MD5 hash of the *checksum manifest* of the AIP.
     """
-    _logger.debug("⚙️ Creating AIP for %s", bundleLIDVID)
-    cmFN = _makeFilename(bundleLIDVID, ts, "checksum_manifest", PDS_TABLE_FILENAME_EXTENSION)
-    tmFN = _makeFilename(bundleLIDVID, ts, "transfer_manifest", PDS_TABLE_FILENAME_EXTENSION)
-    cmMD5, cmSize, cmNum = _writeChecksumManifest(cmFN, prefixLen, bac)
-    tmMD5, tmSize, tmNum = _writeTransferManifest(tmFN, prefixLen, bac)
-    lid, vid = _deURNLIDVID(bundleLIDVID)
-    labelFN = _makeFilename(bundleLIDVID, ts, "aip", PDS_LABEL_FILENAME_EXTENSION)
-    writeAIPLabel(labelFN, f"{lid}_v{vid}", lid, vid, cmFN, cmMD5, cmSize, cmNum, tmFN, tmMD5, tmSize, tmNum, ts)
-    _logger.info("📄 Wrote label for them both: %s", labelFN)
-    return cmMD5
+    _logger.debug("⚙️ Creating AIP for %s", bundlelidvid)
+    cmfn = _makefilename(bundlelidvid, ts, "checksum_manifest", PDS_TABLE_FILENAME_EXTENSION)
+    tmfn = _makefilename(bundlelidvid, ts, "transfer_manifest", PDS_TABLE_FILENAME_EXTENSION)
+    cmmd5, cmsize, cmnum = _writechecksummanifest(cmfn, prefixlen, bac)
+    tmmd5, tmsize, tmnum = _writetransfermanifest(tmfn, prefixlen, bac)
+    lid, vid = _deurnlidvid(bundlelidvid)
+    labelfn = _makefilename(bundlelidvid, ts, "aip", PDS_LABEL_FILENAME_EXTENSION)
+    writeaiplabel(labelfn, f"{lid}_v{vid}", lid, vid, cmfn, cmmd5, cmsize, cmnum, tmfn, tmmd5, tmsize, tmnum, ts)
+    _logger.info("📄 Wrote label for them both: %s", labelfn)
+    return cmmd5
 
 
-def _writeSIP(bundleLIDVID: str, bac: dict, title: str, site: str, ts: datetime, cmMD5: str):
-    """Write a Submission Information Package based on the ``bac`` to the current directory
-    generating PDS filenames and other label metadata from the timestamp ``ts`` and ``bundleLIDVID``.
-    The ``cmMD5`` is the MD5 digest of the PDS Archive Information Package's transfer manifest and
+def _writesip(bundlelidvid: str, bac: dict, title: str, site: str, ts: datetime, cmmd5: str):
+    """Write a Submission Information Package.
+
+    This writes a Submission Information Package based on the ``bac`` to the current directory
+    generating PDS filenames and other label metadata from the timestamp ``ts`` and ``bundlelidvid``.
+    The ``cmmd5`` is the MD5 digest of the PDS Archive Information Package's transfer manifest and
     also goes into the PDS label. The PDS ``site`` is a string like ``PDS_ATM`` indicating the
     PDS site. You'd think we could get that from the PDS API but 🤷‍♀️.
     """
-    _logger.debug("⚙️ Creating SIP for %s (title %s) for site %s", bundleLIDVID, title, site)
-    sipFN = _makeFilename(bundleLIDVID, ts, "sip", PDS_TABLE_FILENAME_EXTENSION)
+    _logger.debug("⚙️ Creating SIP for %s (title %s) for site %s", bundlelidvid, title, site)
+    sipfn = _makefilename(bundlelidvid, ts, "sip", PDS_TABLE_FILENAME_EXTENSION)
     hashish, size, count = hashlib.new("md5"), 0, 0
-    with open(sipFN, "wb") as o:
+    with open(sipfn, "wb") as o:
         for lidvid, files in bac.items():
             for f in files:
                 entry = f"{f.md5}\tMD5\t{f.url}\t{lidvid}\r\n".encode("utf-8")
@@ -303,47 +321,47 @@ def _writeSIP(bundleLIDVID: str, bac: dict, title: str, site: str, ts: datetime,
                 hashish.update(entry)
                 size += len(entry)
                 count += 1
-                if count % _progressLogging == 0:
-                    _logger.debug("⏲ Wrote %d entries into the submission info file %s", count, sipFN)
-    _logger.info("📄 Wrote SIP %s with %d entries", sipFN, count)
-    labelFN = _makeFilename(bundleLIDVID, ts, "sip", PDS_LABEL_FILENAME_EXTENSION)
-    _logger.info("📄 Wrote label for SIP: %s", labelFN)
-    with open(labelFN, "wb") as o:
-        lid, vid = _deURNLIDVID(bundleLIDVID)
-        writeSIPLabel(lid, vid, title, hashish.hexdigest(), size, count, "MD5", sipFN, site, o, cmMD5, ts)
+                if count % _progresslogging == 0:
+                    _logger.debug("⏲ Wrote %d entries into the submission info file %s", count, sipfn)
+    _logger.info("📄 Wrote SIP %s with %d entries", sipfn, count)
+    labelfn = _makefilename(bundlelidvid, ts, "sip", PDS_LABEL_FILENAME_EXTENSION)
+    _logger.info("📄 Wrote label for SIP: %s", labelfn)
+    with open(labelfn, "wb") as o:
+        lid, vid = _deurnlidvid(bundlelidvid)
+        writesiplabel(lid, vid, title, hashish.hexdigest(), size, count, "MD5", sipfn, site, o, cmmd5, ts)
 
 
-def generateDeepArchive(url: str, bundleLIDVID: str, site: str, allCollections=True, workaroundPaginationBug=True):
-    """Make a PDS "deep archive" 🧘 in the current directory (consisting of the Archive Information
-    Package's transfer manifest and checksum manifest, and the Submission Information Package's
-    table file—plus their corresponding labels) for the named PDS bundle identified by
-    ``bundleLIDVID``, for the PDS ``site``, using knowledge in the PDS Registry at ``url``,
-    including ``allCollections`` if True else just the latest collection for PDS bundles that reference
-    collections by logical identifier only, and neatly avoiding a PDS bug, namely
-    the ``workaroundPaginationBug`` if True if a certain PDS registry endpoint doens't handle
+def generatedeeparchive(url: str, bundlelidvid: str, site: str, allcollections=True, workaroundpaginationbug=True):
+    """Make a PDS "deep archive" 🧘 in the current directory.
+
+    A PDS "deep archive" 🧘‍♀️ (consisting of the Archive Information Package's transfer manifest and
+    checksum manifest, and the Submission Information Package's table file—plus their corresponding
+    labels) for the named PDS bundle identified by ``bundlelidvid``, for the PDS ``site``, using knowledge
+    in the PDS Registry at ``url``, including ``allcollections`` if True else just the latest collection
+    for PDS bundles that reference collections by logical identifier only, and neatly avoiding a PDS bug,
+    namely the ``workaroundpaginationbug`` if True if a certain PDS registry endpoint doens't handle
     PDS pagination right.
     """
-
     # When is happening? Make a timestamp and remove the timezone info
     ts = datetime.utcnow()
     ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
     # Figure out what we're dealing with
-    prefixLen, bac, title = _comprehendRegistry(url, bundleLIDVID, allCollections, workaroundPaginationBug)
+    prefixlen, bac, title = _comprehendregistry(url, bundlelidvid, allcollections, workaroundpaginationbug)
 
     # Make it rain ☔️
-    cmMD5 = _writeAIP(bundleLIDVID, prefixLen, bac, ts)
-    _writeSIP(bundleLIDVID, bac, title, site, ts, cmMD5)
+    cmmd5 = _writeaip(bundlelidvid, prefixlen, bac, ts)
+    _writesip(bundlelidvid, bac, title, site, ts, cmmd5)
 
 
 def main():
     """Check the command line and make a PDS Deep Archive for the named PDS bundle LIDVID."""
     parser = argparse.ArgumentParser(description=_description)
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    addLoggingArguments(parser)
-    addBundleArguments(parser)
+    addloggingarguments(parser)
+    addbundlearguments(parser)
     parser.add_argument(
-        "-u", "--url", default=_defaultServer, help="URL to the PDS API of the PDS Registry to use [%(default)s]"
+        "-u", "--url", default=_defaultserver, help="URL to the PDS API of the PDS Registry to use [%(default)s]"
     )
     parser.add_argument(
         "-s", "--site", required=True, choices=PROVIDER_SITE_IDS, help="Provider site ID for the manifest's label"
@@ -369,7 +387,7 @@ def main():
 
     _logger.debug("%r", args)
     try:
-        generateDeepArchive(
+        generatedeeparchive(
             args.url,
             args.bundle,
             args.site,
@@ -429,18 +447,19 @@ if __name__ == "__main__":
 # - ops:Data_File_Info.ops:file_ref - maybe we can make the filepath out of this?
 # pprint(bundle)
 #
-# if aip: _writeAIP(bundleLIDVID, prefixLen, bac, ts)
-# if sip: _writeSIP(bundleLIDVID, bac, ts)
+# if aip: _writeaip(bundlelidvid, prefixlen, bac, ts)
+# if sip: _writesip(bundlelidvid, bac, ts)
 #
-# # xxx = bcAPI.collections_of_a_bundle(bundleLIDVID)  # type of each = ``Product_Collection``
-# # xxx = bcAPI.collections_of_a_bundle(bundleLIDVID, fields=['ops:Label_File_Info.ops:md5_checksum'])  # type of each = ``Product_Collection``
+# # xxx = bcapi.collections_of_a_bundle(bundlelidvid)  # type of each = ``Product_Collection``
+# # xxx = bcapi.collections_of_a_bundle(bundlelidvid,
+#     fields=['ops:Label_File_Info.ops:md5_checksum'])  # type of each = ``Product_Collection``
 #
 # # The lidvid below comes from one of the responses iterating over xxx.data:
 # print('before')
-# for product in cpAPI.products_of_a_collection('urn:nasa:pds:insight_documents:document_hp3rad::8.0').data:
+# for product in cpapi.products_of_a_collection('urn:nasa:pds:insight_documents:document_hp3rad::8.0').data:
 #     print(product.id)
 # print('after')
-# for product in _getProducts(apiClient, 'urn:nasa:pds:insight_documents:document_hp3rad::8.0'):
+# for product in _getproducts(apiclient, 'urn:nasa:pds:insight_documents:document_hp3rad::8.0'):
 #     print(product.id)
 # return
 
@@ -467,7 +486,8 @@ if __name__ == "__main__":
 #
 # We are normally passed a bundle.xml file; we can get its info directly with:
 #
-#     curl -X GET --header 'Accept: application/pds4+xml' 'https://pds-gamma.jpl.nasa.gov/api/bundles/urn%3Anasa%3Apds%3Ainsight_documents%3A%3A2.0'
+#     curl -X GET --header 'Accept: application/pds4+xml' \
+#         'https://pds-gamma.jpl.nasa.gov/api/bundles/urn%3Anasa%3Apds%3Ainsight_documents%3A%3A2.0'
 #
 # This gives:
 #
