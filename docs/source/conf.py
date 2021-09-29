@@ -14,8 +14,6 @@
 project            = 'PDS Deep Archive'
 author             = 'NASA Planetary Data System'
 copyright          = '2020 California Institute of Technology'
-version            = '1.0'
-release            = '1.0.0'
 language           = 'en'
 
 
@@ -46,12 +44,21 @@ html_logo = '_static/images/PDS_Planets.png'
 html_context = {
     'css_files': [
         '_static/theme_overrides.css',  # override wide tables in RTD theme
-        ],
-      }
+    ],
+}
 
 html_theme_options = {
+    'canonical_url': '',
+    'logo_only': False,
     'display_version': True,
-    'style_external_links': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
 }
 
 # Extensions
@@ -66,7 +73,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
+    'sphinxarg.ext',
 ]
 
 # Other Options

@@ -32,7 +32,7 @@ When the ``member_status`` is ``Primary``, then look up each ``lid_reference`` i
     s = pysolr.Solr('https://pds-dev-el7.jpl.nasa.gov/services/registry/pds', verify=False)
     results = s.search('lid:"urn:nasa:pds:ladee_mission:xml_schema_collection"')
 
-Iterate through ``results`` and look for ``file_ref_url``. 
+Iterate through ``results`` and look for ``file_ref_url``.
 
 
 Grabbing Data

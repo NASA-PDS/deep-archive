@@ -7,7 +7,7 @@ build it out::
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
     python3 -m venv venv
-    venv/bin/python setup.py develop
+    venv/bin/pip install --editable '.[dev]'
 
 .. note:: The above series of commands assume you have the corresponding
     development tools and familiarity with invoking them from the
@@ -22,8 +22,8 @@ the code are reflected in immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run
-``venv/bin/python setup.py sphinx_build``. It will write HTML output to
-``build/docs/html``.
+``venv/bin/python setup.py build_sphinx``. It will write HTML output to
+``build/sphinx/html``.
 
 Commits back to GitHub will trigger workflows in GitHub Actions_ that
 re-publish the project website_ as well as send artifacts to the testing_
@@ -36,10 +36,10 @@ Testing
 -------
 
 The code base finally includes unit and functional tests. Once you've run
-``venv/bin/python setup.py develop`` you can run the entire test suite easily
-with::
+``venv/bin/pip install --editable '.[dev]'`` you can run the entire test suite
+easily with::
 
-    venv/bin/python setup.py test
+    venv/bin/pytest
 
 
 Making Releases
@@ -51,7 +51,12 @@ That's what our continuous integration is for; the "stable" workflow
 Contribute
 ----------
 
-Source Code: https://github.com/NASA-PDS/pds-deep-archive
+Before contributing please review our `contributor's guide`_ which delineates
+the kinds of contributions we accept. Our `code of conduct`_ outlines the
+standards of behavior we practice and expect by everyone who participates
+with our software.
+
+The `source code is on GitHub`_.
 
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
@@ -60,3 +65,6 @@ Source Code: https://github.com/NASA-PDS/pds-deep-archive
 .. _Actions: https://github.com/features/actions
 .. _website: https://nasa-pds.github.io/pds-deep-archive/
 .. _Jenkins: https://jenkins-ci.org/
+.. _`contributor's guide`: https://github.com/NASA-PDS/.github/blob/main/CONTRIBUTING.md
+.. _`code of conduct`: https://github.com/NASA-PDS/.github/blob/main/CODE_OF_CONDUCT.md
+.. _`source code is on GitHub`: https://github.com/NASA-PDS/pds-deep-archive
