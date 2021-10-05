@@ -10,10 +10,10 @@ Requirements
 Prior to installing this software, ensure your system meets the following
 requirements:
 
-•  Python_ 3. This software requires Python 3; it will work with 3.6, 3.7, or
-   3.8.  Python 2 will absolutely *not* work, and indeed Python 2 came to its
-   end of life on the first of January, 2020.  Run ``python --version``, or ``python3 --version``, to
-   check it is installed.
+•  Python_ 3. This software requires Python 3.9.  Python 2 will
+   absolutely *not* work, and indeed Python 2 came to its end of life on the
+   first of January, 2020.  Run ``python --version``, or
+   ``python3 --version``, to check it is installed.
 •  ``libxml2`` version 2.9.2; later 2.9 versions are fine.  Run ``xml2-config
    --version`` to find out.
 •  ``libxslt`` version 1.1.28; later 1.1 versions are OK too.  Run
@@ -27,8 +27,8 @@ requirements:
 
 
 Consult your operating system instructions or system administrator to install
-the required packages. For those without system administrator access and are 
-feeling anxious, you could try a local (home directory) Python_ 3 installation 
+the required packages. For those without system administrator access and are
+feeling anxious, you could try a local (home directory) Python_ 3 installation
 using a Miniconda_ installation.
 
 
@@ -40,7 +40,7 @@ Doing the Installation
 
     Some things to be aware of regarding examples below:
 
-    * The octothorp characters `#` below indicate comments and need not be typed in.
+    * The octothorp characters ``#`` below indicate comments and need not be typed in.
 
     * The location of where you choose to create a Python virtual environment is entirely your preference.
 
@@ -85,17 +85,17 @@ it's properly installed.
     to be operational. If you like taking risks, run the following to create a
     new virtual environment and install the latest development version of the
     software::
-    
+
       mkdir -p $HOME/.virtualenvs
       python3 -m venv $HOME/.virtualenvs/pds-deep-archive
       source $HOME/.virtualenvs/pds-deep-archive/bin/activate
       pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple`` pds.deeparchive
-    
+
 
 Upgrade Software
 ----------------
 
-To check and install an upgrade to the software, run the following command in your 
+To check and install an upgrade to the software, run the following command in your
 virtual environment::
 
     source $HOME/.virtualenvs/pds-deep-archive/bin/activate
@@ -104,6 +104,7 @@ virtual environment::
 .. note:: The same admonitions mentioned earlier about command line
     invocations also apply to the above example.
 
+.. note:: Activating a virtual environment is deprecated (as per the Python philosophy of "explicit is better than implicit"); the ``bin/activate`` commands are left above for now for specific reasons.
 
 
 .. References:

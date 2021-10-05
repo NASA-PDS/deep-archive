@@ -7,101 +7,56 @@ build it out::
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
     python3 -m venv venv
-    venv/bin/pip install setuptools==51.3.3
-    venv/bin/python3 bootstrap.py --allow-site-packages
-    bin/buildout
+    venv/bin/pip install --editable '.[dev]'
 
 .. note:: The above series of commands assume you have the corresponding
     development tools and familiarity with invoking them from the
     command line or "terminal". Shells, operating systems, and command
     invocation varies.
 
-.. note:: Using both ``buildout`` and ``venv``? Short answer: don't worry
-    about it. Long nerdy answer 🤓: ``setuptools`` has advanced such that
-    ``zc.buildout`` is no longer compatible with it, and even specifiying
-    ``--setuptools-version`` to the ``bootstrap.py`` can't retreive it
-    (gets a zero byte zip file). All the more reason we should dump
-    ``zc.buildout`` some day.
-
 At this point, you'll have the ``pds-deep-archive``,
 ``pds-deep-registry-archive``, and other programs ready to run as
-``bin/pds-deep-archive``, ``bin/deep-registry-archive``, etc., that's set up
-to use source Python code under ``src``. Changes you make to the code are
-reflected in immediately.
+``venv/bin/pds-deep-archive``, ``venv/bin/deep-registry-archive``, etc.,
+that's set up to use source Python code under ``src``. Changes you make to
+the code are reflected in immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run
-``bin/docbuilder``. It will write HTML output to ``build/docs/html``.
-
-You can also build local distributions or run any ``setuptools`` command via
-the buildout refrain::
-
-    bin/buildout setup . --help-commands
+``venv/bin/python setup.py build_sphinx``. It will write HTML output to
+``build/sphinx/html``.
 
 Commits back to GitHub will trigger workflows in GitHub Actions_ that
 re-publish the project website_ as well as send artifacts to the testing_
-Python Package Index. (The official Python Package Index gets updated only
-with official release tags.)
+Python Package Index via the "unstable" workflow. The official Python Package
+Index gets updated only with official release tags via the "stable"
+workflow.
 
 
 Testing
 -------
 
-The code base finally includes unit and functional tests. Once you've built
-out, you can run the entire test suite easily with::
+The code base finally includes unit and functional tests. Once you've run
+``venv/bin/pip install --editable '.[dev]'`` you can run the entire test suite
+easily with::
 
-    bin/test
-
-If you'd like to integrate test data output with a CI/CD system such as
-Jenkins_, add the ``--xml`` option to make a machine-readable reports in the
-``parts/test`` directory.  Try ``bin/test --help`` for lots of other options.
-
-
-..  note::
-
-    Integration testing is not yet implemented, but could be if the need
-    arises.
+    venv/bin/pytest
 
 
 Making Releases
 ---------------
 
-As mentioned in the parenthetical above, the official Python Package Index is
-updated with an official release of this software is created with a release tag.
-To ensure coherency with the GitHub release, first update the file::
+That's what our continuous integration is for; the "stable" workflow
 
-    src/pds/aipgen/version.txt
-
-and enter the release version number you'd like to appear when running the
-commands with ``--version`` and on the official Python Package Index.  Commit
-and push this, then, on GitHub (and with appropriate permissions), visit:
-
-    https://github.com/NASA-PDS/pds-deep-archive/releases/new
-
-and enter a release tag with the same version number plus any release notes.
-This will trigger a GitHub Actions release to the official PyPI 🤞.
-
-To deploy to the official PyPi manually:
-
-1. Place the appropriate credentials in ``~/.pypirc``
-2. Create the package::
-
-    python setup.py sdist
-    … or …
-    bin/buildout setup . sdist
-
-3. Deploy to PyPi::
-
-    pip install twine
-    twine upload dist/*.tar.gz
-
-.. note:: The same admonitions mentioned earlier about command line
-    invocations also apply to the above example.
 
 Contribute
 ----------
 
-Source Code: https://github.com/NASA-PDS/pds-deep-archive
+Before contributing please review our `contributor's guide`_ which delineates
+the kinds of contributions we accept. Our `code of conduct`_ outlines the
+standards of behavior we practice and expect by everyone who participates
+with our software.
+
+The `source code is on GitHub`_.
 
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
@@ -110,3 +65,6 @@ Source Code: https://github.com/NASA-PDS/pds-deep-archive
 .. _Actions: https://github.com/features/actions
 .. _website: https://nasa-pds.github.io/pds-deep-archive/
 .. _Jenkins: https://jenkins-ci.org/
+.. _`contributor's guide`: https://github.com/NASA-PDS/.github/blob/main/CONTRIBUTING.md
+.. _`code of conduct`: https://github.com/NASA-PDS/.github/blob/main/CODE_OF_CONDUCT.md
+.. _`source code is on GitHub`: https://github.com/NASA-PDS/pds-deep-archive

@@ -1,38 +1,169 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>🏃‍♀️ Usage &#8212; PDS Deep Archive 1.0.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>🏃‍♀️ Usage &mdash; PDS Deep Archive  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="👩‍💻 Development" href="../development/index.html" />
-    <link rel="prev" title="📦 Installation" href="../installation/index.html" />
+    <link rel="prev" title="📦 Installation" href="../installation/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> PDS Deep Archive
+          
+
+          
+            
+            <img src="../_static/PDS_Planets.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">📦 Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">🏃‍♀️ Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-information">Usage Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-1-basic-usage-on-local-files">Example 1: Basic Usage on Local Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-2-bundle-referencing-collections-by-lid">Example 2: Bundle Referencing Collections by LID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-3-generating-deep-archives-of-remote-data-in-a-pds-registry">Example 3: Generating Deep Archives of Remote Data in a PDS Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pds-delivery-checklist">PDS Delivery Checklist</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">👩‍💻 Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support/index.html">🚑 Support</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PDS Deep Archive</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>🏃‍♀️ Usage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/usage/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="usage">
 <h1>🏃‍♀️ Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
@@ -47,9 +178,9 @@ delivered by the PDS to the NASA Space Science Data Coordinated Archive
 (NSSDCA). For more information about the products produced, see the following
 references:</p>
 <ul class="simple">
-<li>OAIS Information - <a class="reference external" href="http://www.oais.info/">http://www.oais.info/</a></li>
-<li>AIP Information - <a class="reference external" href="https://www.iasa-web.org/tc04/archival-information-package-aip">https://www.iasa-web.org/tc04/archival-information-package-aip</a></li>
-<li>SIP Information - <a class="reference external" href="https://www.iasa-web.org/tc04/submission-information-package-sip">https://www.iasa-web.org/tc04/submission-information-package-sip</a></li>
+<li><p>OAIS Information - <a class="reference external" href="http://www.oais.info/">http://www.oais.info/</a></p></li>
+<li><p>AIP Information - <a class="reference external" href="https://www.iasa-web.org/tc04/archival-information-package-aip">https://www.iasa-web.org/tc04/archival-information-package-aip</a></p></li>
+<li><p>SIP Information - <a class="reference external" href="https://www.iasa-web.org/tc04/submission-information-package-sip">https://www.iasa-web.org/tc04/submission-information-package-sip</a></p></li>
 </ul>
 <p>You use <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code> for PDS data on your hard drive, network
 filesystem, etc.; you use <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code> for PDS data in a
@@ -57,8 +188,8 @@ PDS Registry.</p>
 <p>This package also comes with the two sub-components of <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>
 that can be ran individually:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">aipgen</span></code> that generates Archive Information Packages from a PDS4 bundle</li>
-<li><code class="docutils literal notranslate"><span class="pre">sipgen</span></code> that generates Submission Information from a PDS4 bundle</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aipgen</span></code> that generates Archive Information Packages from a PDS4 bundle</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sipgen</span></code> that generates Submission Information from a PDS4 bundle</p></li>
 </ul>
 <p>These work just with local files, not the PDS Registry.</p>
 </div>
@@ -80,8 +211,8 @@ $ source $HOME/.virtualenvs/pds-deep-archive/bin/activate
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The <code class="docutils literal notranslate"><span class="pre">source</span></code> command and the location of your Python virtual
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">source</span></code> command and the location of your Python virtual
 environment may vary depending on the command-line interpreter (terminal)
 you’re using and the installation of Python. You may wish to consult a
 system administrator for clarification. In some cases, it may involve
@@ -94,8 +225,8 @@ environment.</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The changes the the prompt may not necessarily appear depending on
+<p class="admonition-title">Note</p>
+<p>The changes the the prompt may not necessarily appear depending on
 the local machine environment, command interpreter, etc.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Now let&#39;s run pds-deep-archive
@@ -106,8 +237,8 @@ the local machine environment, command interpreter, etc.</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The trailing backslashes above are “continuation characters” to
+<p class="admonition-title">Note</p>
+<p>The trailing backslashes above are “continuation characters” to
 indicate to the command shell that the entire command line spans multiple
 physical lines. You may choose to enter the command on a single long
 physical line without the backslashes. Regardless, please consult your
@@ -116,17 +247,17 @@ your shell; in the most common cases, it is a backslash.</p>
 </div>
 <p>From this command-line execution, we are inputting the following information:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">PDS_ATM</span></code> - uses <code class="docutils literal notranslate"><span class="pre">-s</span></code> flag to specify Atmospheres Node as the
-provider site for the manifest’s label</li>
-<li><code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/</span></code> - uses <code class="docutils literal notranslate"><span class="pre">-b</span></code> flag Base
+<li><p><code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">PDS_ATM</span></code> - uses <code class="docutils literal notranslate"><span class="pre">-s</span></code> flag to specify Atmospheres Node as the
+provider site for the manifest’s label</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/</span></code> - uses <code class="docutils literal notranslate"><span class="pre">-b</span></code> flag Base
 URL for Node data archive. This URL will be prepended to the bundle
 directory to form URLs to the products. For this case, this will allow us
 to form proper URLs in the output manifests based upon the valid online
 products, e.g.
-<a class="reference external" href="https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml">https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml</a></li>
-<li><code class="docutils literal notranslate"><span class="pre">test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml</span></code> - this is the
+<a class="reference external" href="https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml">https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/mission_bundle/LADEE_Bundle_1101.xml</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml</span></code> - this is the
 final positional argument input to the software that specifies the bundle
-product file on the local filesystem.</li>
+product file on the local filesystem.</p></li>
 </ul>
 <p>Once you complete this execution, the program will print:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>INFO 👟 PDS Deep Archive, version VERSION-NUMBER
@@ -138,7 +269,7 @@ INFO 📄 XML label for them both: ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml
 INFO 🏃‍♀️ Starting SIP generation for test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml
 INFO 🎉 Success! From /SOME/DIR/test/data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml, generated these output files:
 INFO 📄 SIP Manifest: ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab
-        allCollections=args.include_latest_collection_only,
+        allcollections=args.include_latest_collection_only,
 INFO 📄 XML label for the SIP: ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml
 INFO 👋 That&#39;s it! Thanks for making an AIP and SIP with us today. Bye!
 </pre></div>
@@ -146,12 +277,12 @@ INFO 👋 That&#39;s it! Thanks for making an AIP and SIP with us today. Bye!
 <p>This creates 5 output files in the current directory as part of the AIP and
 SIP Generation (with DATE replaced by the current date):</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_checksum_manifest_v1.0_DATE.tab</span></code>, the checksum manifest</li>
-<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_transfer_manifest_v1.0_DATE.tab</span></code>, the transfer manifest</li>
-<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml</span></code>, the label for these two files</li>
-<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab</span></code>, the created SIP manifest as a
-tab-separated values file.</li>
-<li><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_checksum_manifest_v1.0_DATE.tab</span></code>, the checksum manifest</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_transfer_manifest_v1.0_DATE.tab</span></code>, the transfer manifest</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_aip_v1.0_DATE.xml</span></code>, the label for these two files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab</span></code>, the created SIP manifest as a
+tab-separated values file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</p></li>
 </ul>
 <p>Be sure to check out the SIP Manifest,
 <code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_DATE.tab</span></code>, to ensure the URLs included are
@@ -174,8 +305,8 @@ package (e.g. <code class="docutils literal notranslate"><span class="pre">ladee
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The same admonitions about the command prompt and continuation
+<p class="admonition-title">Note</p>
+<p>The same admonitions about the command prompt and continuation
 characters mentioned earlier applies to the above example.</p>
 </div>
 </div>
@@ -192,34 +323,29 @@ checksum and transfer manifests and the SIP manifest for the bundle
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The same admonitions about the command prompt and continuation
+<p class="admonition-title">Note</p>
+<p>The same admonitions about the command prompt and continuation
 characters mentioned earlier applies to the above examples.</p>
 </div>
 <p>This writes 5 output files in the current directory as part of the AIP and
 SIP Generation, but without needing to read any local files; these files
 include:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_checksum_manifest_v1.0_DATE.tab</span></code>, the checksum manifest</li>
-<li><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_transfer_manifest_v1.0_DATE.tab</span></code>, the transfer manifest</li>
-<li><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_aip_v1.0_DATE.xml</span></code>, the label for these two files</li>
-<li><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_sip_v1.0_DATE.tab</span></code>, the created SIP manifest as a
-tab-separated values file.</li>
-<li><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_checksum_manifest_v1.0_DATE.tab</span></code>, the checksum manifest</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_transfer_manifest_v1.0_DATE.tab</span></code>, the transfer manifest</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_aip_v1.0_DATE.xml</span></code>, the label for these two files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_sip_v1.0_DATE.tab</span></code>, the created SIP manifest as a
+tab-separated values file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</p></li>
 </ul>
-<p>As of this writing, there may be a couple of issues with PDS Registry APIs
+<p>As of this writing, there may be an issue with PDS Registry APIs
 that may affect <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code>:</p>
 <ul class="simple">
-<li>A <a class="reference external" href="https://github.com/NASA-PDS/pds-api/issues/73">pagination bug</a> may cause some performance issues when making deep
+<li><p>A <a class="reference external" href="https://github.com/NASA-PDS/pds-api/issues/73">pagination bug</a> may cause some performance issues when making deep
 archives of large bundles. By default, <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code>
 works around the bug—but if you know the PDS Registry you’re using is
 free of the bug, you can add <code class="docutils literal notranslate"><span class="pre">--disable-pagination-workaround</span></code> to the
-command. It doesn’t hurt if you use it regardless.</li>
-<li>An <a class="reference external" href="https://github.com/NASA-PDS/registry-api-service/issues/17">internal server error</a> may appear when certain data is loaded into a
-PDS Registry. By default, though, <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code> will treat
-such errors as “not found” instead of as serious errors. However, if you
-prefer to treat the problem as the serious error it really is, add the
-<code class="docutils literal notranslate"><span class="pre">--disable-bad-documents-workaround</span></code> option to the command.</li>
+command. It doesn’t hurt if you use it regardless.</p></li>
 </ul>
 </div>
 <div class="section" id="pds-delivery-checklist">
@@ -227,15 +353,12 @@ prefer to treat the problem as the serious error it really is, add the
 <p>The following is a checklist and procedure Discipline Node personnel should
 follow when delivering a PDS Deep Archive data package to the PDS Engineering
 Node upon a new release of data.</p>
-<p>For more formalized details on the NSSDCA Delivery Process, see the following <a class="reference external" href="https://github.com/NASA-PDS/pds-deep-archive/tree/master/docs/PDS4_Submission_Process_v1.0.docx">process document</a>.</p>
+<p>For more formalized details on the NSSDCA Delivery Process, see the following <a class="reference external" href="https://github.com/NASA-PDS/pds-deep-archive/tree/main/docs/PDS4_Submission_Process_v1.0.docx">process document</a>.</p>
 <ol class="arabic">
-<li><p class="first">▶  START: New Bundle is ready for Delivery.</p>
-</li>
-<li><p class="first">Verify the Bundle has completed successful validation with PDS4 Validate Tool (no ERRORS).</p>
-</li>
-<li><p class="first">Execute PDS Deep Archive software per usage instructions and example above.</p>
-</li>
-<li><p class="first">Check the SIP Manifest (e.g. <code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_20200618.tab</span></code>) file to verify URLs indicated are valid. For example:</p>
+<li><p>▶  START: New Bundle is ready for Delivery.</p></li>
+<li><p>Verify the Bundle has completed successful validation with PDS4 Validate Tool (no ERRORS).</p></li>
+<li><p>Execute PDS Deep Archive software per usage instructions and example above.</p></li>
+<li><p>Check the SIP Manifest (e.g. <code class="docutils literal notranslate"><span class="pre">ladee_mission_bundle_v1.0_sip_v1.0_20200618.tab</span></code>) file to verify URLs indicated are valid. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of a bad URL</span>
 <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">this</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">does</span><span class="o">.</span><span class="ow">not</span><span class="o">.</span><span class="n">exist</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">LADEE_Bundle_1101</span><span class="o">.</span><span class="n">xml</span>
 
@@ -244,110 +367,78 @@ Node upon a new release of data.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Package up the five <code class="docutils literal notranslate"><span class="pre">*.tab`</span> <span class="pre">and</span> <span class="pre">``*.xml</span></code> files into a <code class="docutils literal notranslate"><span class="pre">.ZIP</span></code> or <code class="docutils literal notranslate"><span class="pre">.TAR.GZ</span></code> PDS Deep Archive Delivery package. For example:</p>
+<li><p>Package up the five <code class="docutils literal notranslate"><span class="pre">*.tab`</span> <span class="pre">and</span> <span class="pre">``*.xml</span></code> files into a <code class="docutils literal notranslate"><span class="pre">.ZIP</span></code> or <code class="docutils literal notranslate"><span class="pre">.TAR.GZ</span></code> PDS Deep Archive Delivery package. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tar</span> <span class="o">-</span><span class="n">cvzf</span> <span class="n">ladee_mission_bundle_v1</span><span class="mf">.0</span><span class="n">_NSSDCA_20200702</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span> <span class="n">ladee_mission_bundle_v1</span><span class="mf">.0</span><span class="n">_</span><span class="o">*.</span><span class="n">tab</span> <span class="n">ladee_mission_bundle_v1</span><span class="mf">.0</span><span class="n">_</span><span class="o">*.</span><span class="n">xml</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Create a new <a class="reference external" href="https://github.com/NASA-PDS/pdsen-operations/issues/new/choose">PDS4 NSSDCA Delivery Github Issue</a> for the PDS Engineering Node to submit the package to NSSDCA.</p>
-</li>
-<li><p class="first">EN will then complete <a class="reference external" href="https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process">validation and submission to NSSDCA</a>.</p>
-</li>
+<li><p>Create a new <a class="reference external" href="https://github.com/NASA-PDS/pdsen-operations/issues/new/choose">PDS4 NSSDCA Delivery Github Issue</a> for the PDS Engineering Node to submit the package to NSSDCA.</p></li>
+<li><p>EN will then complete <a class="reference external" href="https://pds-engineering.jpl.nasa.gov/content/nssdca_interface_process">validation and submission to NSSDCA</a>.</p></li>
 </ol>
 <ol class="arabic simple" start="7">
-<li>You can then follow along with status in the Github Issue.</li>
-<li>The PDS Engineering Node Operations Team will notify you once delivery has been completed.</li>
+<li><p>You can then follow along with status in the Github Issue.</p></li>
+<li><p>The PDS Engineering Node Operations Team will notify you once delivery has been completed.</p></li>
 </ol>
 <ol class="arabic simple" start="8">
-<li>🎉 DONE</li>
+<li><p>🎉 DONE</p></li>
 </ol>
 </div>
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../index.html">
-    <img class="logo" src="../_static/PDS_Planets.png" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-<p>
-<iframe src="https://ghbtns.com/github-btn.html?user=NASA-PDS&repo=pds-deep-archive&type=watch&count=true&size=large&v=2"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
-</p>
-
-
-
-
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../installation/index.html" title="previous chapter">📦 Installation</a></li>
-      <li>Next: <a href="../development/index.html" title="next chapter">👩‍💻 Development</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../development/index.html" class="btn btn-neutral float-right" title="👩‍💻 Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../installation/index.html" class="btn btn-neutral float-left" title="📦 Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script><h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">📦 Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">🏃‍♀️ Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#usage-information">Usage Information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-1-basic-usage-on-local-files">Example 1: Basic Usage on Local Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-2-bundle-referencing-collections-by-lid">Example 2: Bundle Referencing Collections by LID</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-3-generating-deep-archives-of-remote-data-in-a-pds-registry">Example 3: Generating Deep Archives of Remote Data in a PDS Registry</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pds-delivery-checklist">PDS Delivery Checklist</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../development/index.html">👩‍💻 Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../support/index.html">🚑 Support</a></li>
-</ul>
+  
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020 California Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020 California Institute of Technology.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../_sources/usage/index.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>
