@@ -52,7 +52,10 @@ from .utils import addloggingarguments
 
 # Import entity classes: in this case we just need class ``Product``.
 #
-# 😛 Apparently this API changes with the phase of the moon:
+# 😛 Apparently this API changes with the phase of the moon. See, in some versions of pds.api-client,
+# the name of the ``model`` package is ``model``, singular. But then seemingly at random, it becomes
+# ``models`` plural. And even some releases support *both*. So here we try to accomodate whatever the
+# flavor du jour is.
 try:
     from pds.api_client.model.product import Product  # type: ignore
 except ImportError:
@@ -63,7 +66,10 @@ from pds.api_client.exceptions import ApiAttributeError  # type: ignore
 
 # Import functional endpoints.
 #
-# 😛 Apparently this API changes more more frequently than a fringe politician's platform:
+# 😛 Apparently this API changes more more frequently than a fringe politician's platform. See, in
+# some versions of pds.api-client, the endpoint classes are importable directly from ``pds.api_client``.
+# And in other releases, they're not. And it seems to swap randomly. So here we try to be resilient
+# to whatever the pds.api-client we get stuck with.
 try:
     from pds.api_client import CollectionsProductsApi, BundlesCollectionsApi, BundlesApi  # type: ignore
 except ImportError:
@@ -165,10 +171,9 @@ def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, allcollect
     """Get the collections.
 
     Using the PDS ``apiclient`` generate collections that belong to the PDS bundle ``lidvid``.
-    If ``workaroundpaginationbug`` is True, avoid the bug in the count of items returned from the
-    ``/bundles/{lidvid}/collections`` endpoint; see NASA-PDS/pds-api#73. If ``allcollections`` is
-    True, then return all collections for LID-only references; otherwise return just the latest
-    collection for LID-only references (has no effect on full LIDVID-references).
+
+    If ``allcollections`` is True, then return all collections for LID-only references; otherwise
+    return just the latest collection for LID-only references (has no effect on full LIDVID-references.
     """
     bcapi, start = BundlesCollectionsApi(apiclient), 0
     while True:
@@ -186,7 +191,10 @@ def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, allcollect
             _logger.warning(msg)
             results = bcapi.collections_of_a_bundle(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
 
-        # 😛 Apparently this API changes more often than a newborn's nappies:
+        # 😛 Apparently this API changes more often than a newborn's nappies. See, in some releases of
+        # pds.api-client, ``data`` is an attribute on ``results``. And in other versions, it's an indexed
+        # element of ``results``. What you get is pretty random! So here we try to be resilient to whatever
+        # the "soup of the day" is with pds.api-client.
         try:
             if results.data is None:
                 return
@@ -211,7 +219,10 @@ def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
             else:
                 raise
 
-        # 😛 Apparently this API changes faster than Superman in a phone booth:
+        # 😛 Apparently this API changes faster than Superman in a phone booth. See, in some releases of
+        # pds.api-client, ``data`` is an indexed element of ``results``, and in others it's a named
+        # attribute of ``results``.  What is it today? No one can tell, so here we try to be flexible
+        # to whatever shape it gives us.
         try:
             if results.data is None:
                 return
@@ -226,7 +237,10 @@ def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
 
 def _addfiles(product: Product, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
-    # 😛 Apparently this API changes as frequently as my knickers:
+    # 😛 Apparently this API changes as frequently as my knickers. See, in some releases of pds.api-client,
+    # ``Product`` entity objects have two named attributes, ``id`` and ``properties``. But then sometimes,
+    # and for apparently random reasons, ``id`` and ``properties`` become indexed elements of a ``Product``.
+    # So, we try to accommodate whatever the flavor du jour is.
     try:
         lidvid, props = product['id'], product['properties']
     except TypeError:
@@ -235,7 +249,11 @@ def _addfiles(product: Product, bac: dict):
     files = bac.get(lidvid, set())  # Get the current set (or a new empty set)
 
     if _propdataurl in props:  # Are there data files in the product?
-        # 😛 Apparently this API changes depending on the day of the week:
+        # 😛 Apparently this API changes depending on the day of the week. See, in some releases of
+        # pds.api-client, the URLs and MD5s are directly two sequences of the properties. And in other
+        # releases, they're sequences of the ``value`` element of the properties. Why? Who knows! We
+        # jump through this extra try…except block here so we can work with whatever the pds.api-client
+        # decides to be that day.
         try:
             urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
             for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
@@ -245,7 +263,9 @@ def _addfiles(product: Product, bac: dict):
             for url, md5 in zip(urls, md5s):
                 files.add(_File(url, md5))
 
-    # 😛 Apparently this API changes faster than Coinstar™:
+    # 😛 Apparently this API changes faster than Coinstar™. For the same reason above, sometimes the
+    # URL and MD5 sequences are directly accessible from the properties, and sometimes they're in a
+    # ``value`` element of properties. Whew!
     try:
         if _proplabelurl in props:  # How about the label itself?
             files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
@@ -287,6 +307,10 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
         raise ValueError(f"🤷‍♀️ The bundle {bundlelidvid} cannot be found in the registry at {url}")
 
     # 😛 Did I mention this API changes **a lot?**
+    #
+    # The pds-api.client is pretty fickle between each release: sometimes ``title`` is an indexed value
+    # of the ``bundle``, and sometimes it's a named attribute of the bundle. The try…except block here
+    # handles both cases.
     try:
         title = bundle.get('title', '«unknown»')
     except AttributeError:
@@ -294,7 +318,9 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
 
     _addfiles(bundle, bac)
 
-    # 😛 I'm sure I mentioned it by now:
+    # 😛 I'm sure I mentioned it by now!
+    #
+    # Ditto the above comment, but for ``metadata``'s ``label_url'.
     try:
         bundleurl = bundle['metadata']['label_url']
     except TypeError:
