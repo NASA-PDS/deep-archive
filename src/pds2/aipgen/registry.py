@@ -50,6 +50,27 @@ from .sip import writelabel as writesiplabel
 from .utils import addbundlearguments
 from .utils import addloggingarguments
 
+# Import entity classes: in this case we just need class ``Product``.
+#
+# 😛 Apparently this API changes with the phase of the moon:
+try:
+    from pds.api_client.model.product import Product  # type: ignore
+except ImportError:
+    from pds.api_client.models.product import Product  # type: ignore
+
+# If this fails to import, then we're using a pds.api-client ≤ 0.5.0, which I'm arbitrarily declaring "too old":
+from pds.api_client.exceptions import ApiAttributeError  # type: ignore
+
+# Import functional endpoints.
+#
+# 😛 Apparently this API changes more more frequently than a fringe politician's platform:
+try:
+    from pds.api_client import CollectionsProductsApi, BundlesCollectionsApi, BundlesApi  # type: ignore
+except ImportError:
+    from pds.api_client.api.bundles_api import BundlesApi  # type: ignore
+    from pds.api_client.api.bundles_collections_api import BundlesCollectionsApi  # type: ignore
+    from pds.api_client.api.collections_products_api import CollectionsProductsApi  # type: ignore
+
 
 # Constants
 # =========
@@ -122,7 +143,7 @@ def _makefilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
     return f"{lid}_v{vid}_{slate}_{kind}_v{AIP_SIP_DEFAULT_VERSION}{ext}"
 
 
-def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> pds.api_client.models.product.Product:
+def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> Product:
     """Get a bundle.
 
     Using the PDS ``apiclient`` find the PDS bundle with the named ``lidvid`` and return it not as
@@ -131,7 +152,7 @@ def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> pds.api_clie
     """
     try:
         _logger.debug("⚙️ Asking ``bundle_by_lidvid`` for %s", lidvid)
-        bundles = pds.api_client.BundlesApi(apiclient)
+        bundles = BundlesApi(apiclient)
         return bundles.bundle_by_lidvid(lidvid)  # type = ``Product_Bundle``
     except pds.api_client.exceptions.ApiException as ex:
         if ex.status == http.client.NOT_FOUND:
@@ -140,20 +161,38 @@ def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> pds.api_clie
             raise
 
 
-def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, workaroundpaginationbug=True):
+def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, allcollections=True):
     """Get the collections.
 
     Using the PDS ``apiclient`` generate collections that belong to the PDS bundle ``lidvid``.
     If ``workaroundpaginationbug`` is True, avoid the bug in the count of items returned from the
-    ``/bundles/{lidvid}/collections`` endpoint; see NASA-PDS/pds-api#73.
+    ``/bundles/{lidvid}/collections`` endpoint; see NASA-PDS/pds-api#73. If ``allcollections`` is
+    True, then return all collections for LID-only references; otherwise return just the latest
+    collection for LID-only references (has no effect on full LIDVID-references).
     """
-    bcapi, start = pds.api_client.BundlesCollectionsApi(apiclient), 0
+    bcapi, start = BundlesCollectionsApi(apiclient), 0
     while True:
-        limit = _apiquerylimit - 1 if workaroundpaginationbug else _apiquerylimit
-        _logger.debug("⚙️ Asking ``collections_of_a_bundle`` for %s at %d limit %d", lidvid, start, limit)
-        results = bcapi.collections_of_a_bundle(lidvid, start=start, limit=limit, fields=_fields)
-        if results.data is None:
-            return
+        _logger.debug('⚙️ Asking ``collections_of_a_bundle`` for %s at %d limit %d', lidvid, start, _apiquerylimit)
+
+        try:
+            if allcollections:
+                results = bcapi.collections_of_a_bundle_all(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
+            else:
+                results = bcapi.collections_of_a_bundle_latest(
+                    lidvid, start=start, limit=_apiquerylimit, fields=_fields
+                )
+        except AttributeError:
+            msg = '☡ Warning: the all+latest collections_of_a_bundle API is missing, reverting to older behavior'
+            _logger.warning(msg)
+            results = bcapi.collections_of_a_bundle(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
+
+        # 😛 Apparently this API changes more often than a newborn's nappies:
+        try:
+            if results.data is None:
+                return
+        except ApiAttributeError:
+            if 'data' not in results:
+                return
         start += len(results.data)
         for i in results.data:
             yield i
@@ -161,7 +200,7 @@ def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, workaround
 
 def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
     """Using the PDS ``apiclient`` generate PDS products that belong to the collection ``lidvid``."""
-    cpapi, start = pds.api_client.CollectionsProductsApi(apiclient), 0
+    cpapi, start = CollectionsProductsApi(apiclient), 0
     while True:
         try:
             _logger.debug("⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d", lidvid, start, _apiquerylimit)
@@ -171,29 +210,53 @@ def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
                 return
             else:
                 raise
-        if results.data is None:
-            return
+
+        # 😛 Apparently this API changes faster than Superman in a phone booth:
+        try:
+            if results.data is None:
+                return
+        except ApiAttributeError:
+            if 'data' not in results:
+                return
+
         start += len(results.data)
         for i in results.data:
             yield i
 
 
-def _addfiles(product: pds.api_client.models.Product, bac: dict):
+def _addfiles(product: Product, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
-    lidvid, props = product.id, product.properties  # Shorthand
+    # 😛 Apparently this API changes as frequently as my knickers:
+    try:
+        lidvid, props = product['id'], product['properties']
+    except TypeError:
+        lidvid, props = product.id, product.properties
+
     files = bac.get(lidvid, set())  # Get the current set (or a new empty set)
+
     if _propdataurl in props:  # Are there data files in the product?
-        urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
-        for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
-            files.add(_File(url, md5))  # Add it to the set
-    if _proplabelurl in props:  # How about the label itself?
-        files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
+        # 😛 Apparently this API changes depending on the day of the week:
+        try:
+            urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
+            for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
+                files.add(_File(url, md5))  # Add it to the set
+        except ApiAttributeError:
+            urls, md5s = props[_propdataurl]['value'], props[_propdatamd5]['value']  # Get the URLs and MD5s of them
+            for url, md5 in zip(urls, md5s):
+                files.add(_File(url, md5))
+
+    # 😛 Apparently this API changes faster than Coinstar™:
+    try:
+        if _proplabelurl in props:  # How about the label itself?
+            files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
+    except ApiAttributeError:
+        if _proplabelurl in props:  # How about the label itself?
+            files.add(_File(props[_proplabelurl]['value'][0], props[_proplabelmd5]['value'][0]))  # Add it too
+
     bac[lidvid] = files  # Stash for future use
 
 
-def _comprehendregistry(
-    url: str, bundlelidvid: str, allcollections=True, workaroundpaginationbug=True
-) -> tuple[int, dict, str]:
+def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tuple[int, dict, str]:
     """Fathom the registry.
 
     Query the PDS API at ``url`` for all information about the PDS ``bundlelidvid`` and return a
@@ -203,7 +266,10 @@ def _comprehendregistry(
     within it, the "B.A.C." (a dict mapping PDS lidvids to sets of ``_File``s), and the title of
     the PDS bundle.
 
-    Note: currently ``allcollections`` is ignored; see NASA-PDS/pds-api#74.
+    If ``allcollections`` is True, we include all collections, meaning that if a bundle references
+    a collection with LID only (no VID), we include all version IDs of that collection. When this
+    flag ``allcollections`` is False, then we include only the *latest* collection for a LID-only
+    reference.
     """
     _logger.debug("🤔 Comprehending the registry at %s for %s", url, bundlelidvid)
 
@@ -219,15 +285,26 @@ def _comprehendregistry(
     bundle = _getbundle(apiclient, bundlelidvid)  # There's no class "Bundle" but class Product 🤷‍♀️
     if bundle is None:
         raise ValueError(f"🤷‍♀️ The bundle {bundlelidvid} cannot be found in the registry at {url}")
-    title = bundle.title if bundle.title else "«unknown»"
+
+    # 😛 Did I mention this API changes **a lot?**
+    try:
+        title = bundle.get('title', '«unknown»')
+    except AttributeError:
+        title = bundle.title if bundle.title else '«unknown»'
+
     _addfiles(bundle, bac)
 
-    bundleurl = bundle.metadata.label_url
+    # 😛 I'm sure I mentioned it by now:
+    try:
+        bundleurl = bundle['metadata']['label_url']
+    except TypeError:
+        bundleurl = bundle.metadata.label_url
+
     prefixlen = bundleurl.rfind("/") + 1
 
     # It turns out the PDS registry makes this *trivial* compared to the PDS filesystem version;
     # Just understanding it all was there was the hard part! 😊 THANK YOU! 🙏
-    for collection in _getcollections(apiclient, bundlelidvid, workaroundpaginationbug):
+    for collection in _getcollections(apiclient, bundlelidvid, allcollections):
         _addfiles(collection, bac)
         for product in _getproducts(apiclient, collection.id):
             _addfiles(product, bac)
@@ -331,23 +408,21 @@ def _writesip(bundlelidvid: str, bac: dict, title: str, site: str, ts: datetime,
         writesiplabel(lid, vid, title, hashish.hexdigest(), size, count, "MD5", sipfn, site, o, cmmd5, ts)
 
 
-def generatedeeparchive(url: str, bundlelidvid: str, site: str, allcollections=True, workaroundpaginationbug=True):
+def generatedeeparchive(url: str, bundlelidvid: str, site: str, allcollections=True):
     """Make a PDS "deep archive" 🧘 in the current directory.
 
     A PDS "deep archive" 🧘‍♀️ (consisting of the Archive Information Package's transfer manifest and
     checksum manifest, and the Submission Information Package's table file—plus their corresponding
     labels) for the named PDS bundle identified by ``bundlelidvid``, for the PDS ``site``, using knowledge
     in the PDS Registry at ``url``, including ``allcollections`` if True else just the latest collection
-    for PDS bundles that reference collections by logical identifier only, and neatly avoiding a PDS bug,
-    namely the ``workaroundpaginationbug`` if True if a certain PDS registry endpoint doens't handle
-    PDS pagination right.
+    for PDS bundles that reference collections by logical identifier only.
     """
     # When is happening? Make a timestamp and remove the timezone info
     ts = datetime.utcnow()
     ts = datetime(ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second, microsecond=0, tzinfo=None)
 
     # Figure out what we're dealing with
-    prefixlen, bac, title = _comprehendregistry(url, bundlelidvid, allcollections, workaroundpaginationbug)
+    prefixlen, bac, title = _comprehendregistry(url, bundlelidvid, allcollections)
 
     # Make it rain ☔️
     cmmd5 = _writeaip(bundlelidvid, prefixlen, bac, ts)
@@ -366,34 +441,13 @@ def main():
     parser.add_argument(
         "-s", "--site", required=True, choices=PROVIDER_SITE_IDS, help="Provider site ID for the manifest's label"
     )
-    parser.add_argument(
-        "--disable-pagination-workaround",
-        action="store_true",
-        help="By default, this program will sidestep an issue in the PDS Registry that treats pagination "
-        'of results from the "collections of a bundle query" as being off by one item; specifiy this option '
-        "disables this workaround—see https://github.com/NASA-PDS/pds-api/issues/73 for more information",
-    )
     parser.add_argument("bundle", help="LIDVID of the PDS bundle for which to create a PDS Deep Archive")
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format="%(levelname)s %(message)s")
     _logger.info("👟 PDS Deep Registry-based Archive, version %s", __version__)
     _logger.debug("💢 command line args = %r", args)
-    if args.include_latest_collection_only:
-        _logger.critical(
-            "🙇 SORRY! Including only the latest collection is not yet supported! Please see "
-            "https://github.com/NASA-PDS/pds-api/issues/74 and for now re-run without --include-latest-collection-only"
-        )
-        sys.exit(1)
-
-    _logger.debug("%r", args)
     try:
-        generatedeeparchive(
-            args.url,
-            args.bundle,
-            args.site,
-            not args.include_latest_collection_only,
-            not args.disable_pagination_workaround,
-        )
+        generatedeeparchive(args.url, args.bundle, args.site, not args.include_latest_collection_only)
     except pds.api_client.exceptions.ApiException as ex:
         if ex.status == http.client.INTERNAL_SERVER_ERROR:
             _logger.critical(
