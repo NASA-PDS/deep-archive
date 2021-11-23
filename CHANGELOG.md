@@ -1,8 +1,16 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/pds-deep-archive/tree/«unknown») (2021-09-03)
+## [«unknown»](https://github.com/NASA-PDS/pds-deep-archive/tree/«unknown») (2021-11-23)
 
-[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v1.1.0-dev...«unknown»)
+[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v1.1.0...«unknown»)
+
+**Improvements:**
+
+- Update PDS Deep "Registry" Archive and remove workaround + implement latest-only-feature per API updates [\#107](https://github.com/NASA-PDS/pds-deep-archive/issues/107)
+
+## [v1.1.0](https://github.com/NASA-PDS/pds-deep-archive/tree/v1.1.0) (2021-09-29)
+
+[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v1.0.0...v1.1.0)
 
 **Improvements:**
 
@@ -16,10 +24,6 @@
 **Other closed issues:**
 
 - Retrofit pds-deep-archive to use pds python template [\#111](https://github.com/NASA-PDS/pds-deep-archive/issues/111)
-
-## [v1.1.0-dev](https://github.com/NASA-PDS/pds-deep-archive/tree/v1.1.0-dev) (2021-05-03)
-
-[Full Changelog](https://github.com/NASA-PDS/pds-deep-archive/compare/v1.0.0...v1.1.0-dev)
 
 ## [v1.0.0](https://github.com/NASA-PDS/pds-deep-archive/tree/v1.0.0) (2021-05-03)
 
