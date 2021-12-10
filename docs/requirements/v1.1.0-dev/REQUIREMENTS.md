@@ -20,6 +20,10 @@ This requirement is not impacted by the current version
 
 
 This requirement is not impacted by the current version
+## As a user I want to generate a delta SIP (Submission Information Package) ([#125](https://github.com/NASA-PDS/pds-deep-archive/issues/125)) 
+
+
+This requirement is not impacted by the current version
 # NSSDCA-delivery-requirements
 
 ## The tool shall be capable of generating a valid Archive Information Package transfer manifest and PDS4 XML label in accordance with the PDS4 Information Model ([#45](https://github.com/NASA-PDS/pds-deep-archive/issues/45)) 
