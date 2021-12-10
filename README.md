@@ -1,7 +1,7 @@
 # 🪐 PDS Deep Archive Utilities
 
 
-[![Stable Build](https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%98%8C%20Stable%20integration%20&%20delivery/badge.svg "Latest stable integration log")](https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%98%8C+Stable+integration+%26+delivery%2) [![Unstable Build](https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%A4%AA%20Unstable%20integration%20&%20delivery/badge.svg "Latest unstable integration log")](https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%A4%AA+Unstable+integration+%26+delivery%22)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5750540.svg)](https://doi.org/10.5281/zenodo.5750540) [![Unstable Build](https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%A4%AA%20Unstable%20integration%20&%20delivery/badge.svg "Latest unstable integration log")](https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%A4%AA+Unstable+integration+%26+delivery%22) [![Stable Build](https://github.com/NASA-PDS/pds-deep-archive/workflows/%F0%9F%98%8C%20Stable%20integration%20&%20delivery/badge.svg "Latest stable integration log")](https://github.com/NASA-PDS/pds-deep-archive/actions?query=workflow%3A%22%F0%9F%98%8C+Stable+integration+%26+delivery%2)
 
 
 Software for the [Planetary Data System](https://pds.nasa.gov/) to generate Archive Information Package (AIP) and Submission Information Package (SIP) products, based upon [Open Archival Information System](https://www2.archivists.org/groups/standards-committee/open-archival-information-system-oais) standards.
