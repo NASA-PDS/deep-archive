@@ -33,6 +33,7 @@ import hashlib
 import logging
 import os.path
 import re
+import sqlite3
 import urllib
 
 from lxml import etree
@@ -125,10 +126,13 @@ def _addinterlabelreferencesfromtabfile(lid, vid, tabfile, con):
             match = _plinematcher.match(line)
             if not match:
                 continue
-            con.execute(
-                "INSERT INTO inter_label_references (lid, vid, to_lid, to_vid) VALUES (?,?,?,?)",
-                (lid, vid, match.group(1), match.group(2)),
-            )
+            try:
+                con.execute(
+                    "INSERT INTO inter_label_references (lid, vid, to_lid, to_vid) VALUES (?,?,?,?)",
+                    (lid, vid, match.group(1), match.group(2)),
+                )
+            except sqlite3.IntegrityError:
+                pass
 
 
 def comprehenddirectory(dn, con):
