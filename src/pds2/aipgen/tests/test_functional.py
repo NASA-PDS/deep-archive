@@ -303,6 +303,28 @@ class SecondaryCollectionAIPTest(AIPFunctionalTestCase):
         return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
 
 
+class DuplicateTabFileTest(AIPFunctionalTestCase):
+    """Test case for to see if we can handle tab files with duplicate P-lines in them."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Override the abstract base class which just skips itself."""
+        pass
+
+    def getbundlefile(self):
+        """Get the bundle file."""
+        return "data/duplicate_test/mission_bundle/Duplicate_Bundle_1101.xml"
+
+    def getallcollectionsflag(self):
+        """Get the all collections flag."""
+        return True
+
+    def getmanifests(self):
+        """Get the manifests."""
+        base = "data/duplicate_test/valid/ladee_mission_bundle_v1.0_"
+        return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
+
+
 def test_suite():
     """Return a suite of tests, duh flake8."""
     return unittest.TestSuite(
@@ -318,5 +340,6 @@ def test_suite():
             unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPWithBadbaseurlTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(DuplicateTabFileTest),
         ]
     )

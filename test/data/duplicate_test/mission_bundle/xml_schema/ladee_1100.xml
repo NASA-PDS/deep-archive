@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Product_XML_Schema xmlns="http://pds.nasa.gov/pds4/pds/v1"
+    xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+    http://pds.jpl.nasa.gov/pds4/schema/released/pds/v1/PDS4_PDS_1101.xsd">
+    <Identification_Area>
+        <logical_identifier>urn:nasa:pds:ladee_mission:xml_schema:ladee_1100</logical_identifier>
+        <version_id>1.1</version_id>
+        <title>LADEE Mission Dictionary</title>
+        <information_model_version>1.1.0.1</information_model_version>
+        <product_class>Product_XML_Schema</product_class>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2015-03-06</modification_date>
+                <version_id>1.1</version_id>
+                <description>Updated information_model_version.</description>
+            </Modification_Detail>
+            <Modification_Detail>
+                <modification_date>2014-09-22</modification_date>
+                <version_id>1.0</version_id>
+                <description>This is the LADEE Mission dictionary, first release.</description>
+            </Modification_Detail>        </Modification_History>
+    </Identification_Area>
+    <File_Area_XML_Schema>
+        <File>
+            <file_name>ladee_1100.xsd</file_name>
+            <creation_date_time>2014-09-22T10:59:22</creation_date_time>
+            <records>1246</records>
+        </File>
+        <XML_Schema>
+            <name>ladee_1100.xsd</name>
+            <offset unit="byte">0</offset>
+            <parsing_standard_id>XML Schema Version 1.1</parsing_standard_id>
+            <description>This is the PDS4 XML Schema file for the phxmd namespace.</description>
+        </XML_Schema>
+    </File_Area_XML_Schema>
+</Product_XML_Schema>
