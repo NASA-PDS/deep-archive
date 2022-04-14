@@ -181,14 +181,7 @@ include:
    tab-separated values file.
 •  ``insight_documents_v2.0_sip_v1.0_DATE.xml``, an PDS label for the SIP file.
 
-As of this writing, there may be an issue with PDS Registry APIs
-that may affect ``pds-deep-registry-archive``:
-
-•  A `pagination bug`_ may cause some performance issues when making deep
-   archives of large bundles. By default, ``pds-deep-registry-archive``
-   works around the bug—but if you know the PDS Registry you're using is
-   free of the bug, you can add ``--disable-pagination-workaround`` to the
-   command. It doesn't hurt if you use it regardless.
+As with ``pds-deep-archive``, you can also specify ``--include-latest-collection-only`` to select if you want just the latest version of LID-only collections in your deep archive versus the default behavior of **all** versions of them.
 
 
 PDS Delivery Checklist

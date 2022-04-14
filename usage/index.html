@@ -338,15 +338,7 @@ include:</p>
 tab-separated values file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</p></li>
 </ul>
-<p>As of this writing, there may be an issue with PDS Registry APIs
-that may affect <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code>:</p>
-<ul class="simple">
-<li><p>A <a class="reference external" href="https://github.com/NASA-PDS/pds-api/issues/73">pagination bug</a> may cause some performance issues when making deep
-archives of large bundles. By default, <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code>
-works around the bug—but if you know the PDS Registry you’re using is
-free of the bug, you can add <code class="docutils literal notranslate"><span class="pre">--disable-pagination-workaround</span></code> to the
-command. It doesn’t hurt if you use it regardless.</p></li>
-</ul>
+<p>As with <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>, you can also specify <code class="docutils literal notranslate"><span class="pre">--include-latest-collection-only</span></code> to select if you want just the latest version of LID-only collections in your deep archive versus the default behavior of <strong>all</strong> versions of them.</p>
 </div>
 <div class="section" id="pds-delivery-checklist">
 <h2>PDS Delivery Checklist<a class="headerlink" href="#pds-delivery-checklist" title="Permalink to this headline">¶</a></h2>
