@@ -1,20 +1,16 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2022-02-02)
-
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0-dev...«unknown»)
-
-**Defects:**
-
-- Unexpected fatal error when running pds-deep-archive against bundle [\#124](https://github.com/NASA-PDS/deep-archive/issues/124) [[s.medium](https://github.com/NASA-PDS/deep-archive/labels/s.medium)]
-
-## [v1.1.0-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.0-dev) (2021-12-10)
+## [v1.1.0-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.0-dev) (2022-02-02)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0...v1.1.0-dev)
 
 **Improvements:**
 
 - Update PDS Deep "Registry" Archive and remove workaround + implement latest-only-feature per API updates [\#107](https://github.com/NASA-PDS/deep-archive/issues/107)
+
+**Defects:**
+
+- Unexpected fatal error when running pds-deep-archive against bundle [\#124](https://github.com/NASA-PDS/deep-archive/issues/124) [[s.medium](https://github.com/NASA-PDS/deep-archive/labels/s.medium)]
 
 ## [v1.1.0](https://github.com/NASA-PDS/deep-archive/tree/v1.1.0) (2021-09-29)
 
