@@ -56,13 +56,12 @@ from .utils import addloggingarguments
 # the name of the ``model`` package is ``model``, singular. But then seemingly at random, it becomes
 # ``models`` plural. And even some releases support *both*. So here we try to accomodate whatever the
 # flavor du jour is.
-try:
-    from pds.api_client.model.product import Product  # type: ignore
-except ImportError:
-    from pds.api_client.models.product import Product  # type: ignore
+
+from pds.api_client.model.pds_product import PdsProduct
 
 # If this fails to import, then we're using a pds.api-client ≤ 0.5.0, which I'm arbitrarily declaring "too old":
 from pds.api_client.exceptions import ApiAttributeError  # type: ignore
+from pds.api_client.exceptions import NotFoundException
 
 # Import functional endpoints.
 #
@@ -149,11 +148,11 @@ def _makefilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
     return f"{lid}_v{vid}_{slate}_{kind}_v{AIP_SIP_DEFAULT_VERSION}{ext}"
 
 
-def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> Product:
+def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> PdsProduct:
     """Get a bundle.
 
-    Using the PDS ``apiclient`` find the PDS bundle with the named ``lidvid`` and return it not as
-    an ``pds.api_client.models.product.Bundle`` (which doesn't exist) but as a ``Product``.  If it
+    Using the PDS ``apiclient`` find the PDS bundle with the named ``lidvid``
+    and return as a ``pds.api_client.models.pds_product.PdsProduct``.  If it
     can't be found, return ``None``.
     """
     try:
@@ -186,24 +185,13 @@ def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, allcollect
                 results = bcapi.collections_of_a_bundle_latest(
                     lidvid, start=start, limit=_apiquerylimit, fields=_fields
                 )
-        except AttributeError:
-            msg = '☡ Warning: the all+latest collections_of_a_bundle API is missing, reverting to older behavior'
-            _logger.warning(msg)
-            results = bcapi.collections_of_a_bundle(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
 
-        # 😛 Apparently this API changes more often than a newborn's nappies. See, in some releases of
-        # pds.api-client, ``data`` is an attribute on ``results``. And in other versions, it's an indexed
-        # element of ``results``. What you get is pretty random! So here we try to be resilient to whatever
-        # the "soup of the day" is with pds.api-client.
-        try:
-            if results.data is None:
-                return
-        except ApiAttributeError:
-            if 'data' not in results:
-                return
-        start += len(results.data)
-        for i in results.data:
-            yield i
+            start += len(results.data)
+            for i in results.data:
+                yield i
+
+        except NotFoundException:  # end of the pages
+            return
 
 
 def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
@@ -213,29 +201,19 @@ def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
         try:
             _logger.debug("⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d", lidvid, start, _apiquerylimit)
             results = cpapi.products_of_a_collection(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
+
+            start += len(results.data)
+            for i in results.data:
+                yield i
+
         except pds.api_client.exceptions.ApiException as ex:
             if ex.status == http.client.NOT_FOUND:
                 return
             else:
                 raise
 
-        # 😛 Apparently this API changes faster than Superman in a phone booth. See, in some releases of
-        # pds.api-client, ``data`` is an indexed element of ``results``, and in others it's a named
-        # attribute of ``results``.  What is it today? No one can tell, so here we try to be flexible
-        # to whatever shape it gives us.
-        try:
-            if results.data is None:
-                return
-        except ApiAttributeError:
-            if 'data' not in results:
-                return
 
-        start += len(results.data)
-        for i in results.data:
-            yield i
-
-
-def _addfiles(product: Product, bac: dict):
+def _addfiles(product: PdsProduct, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
     # 😛 Apparently this API changes as frequently as my knickers. See, in some releases of pds.api-client,
     # ``Product`` entity objects have two named attributes, ``id`` and ``properties``. But then sometimes,
