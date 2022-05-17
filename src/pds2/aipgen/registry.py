@@ -61,7 +61,7 @@ from pds.api_client.model.pds_product import PdsProduct # type: ignore
 
 # If this fails to import, then we're using a pds.api-client ≤ 0.5.0, which I'm arbitrarily declaring "too old":
 from pds.api_client.exceptions import ApiAttributeError  # type: ignore
-from pds.api_client.exceptions import NotFoundException
+from pds.api_client.exceptions import NotFoundException  # type: ignore
 
 # Import functional endpoints.
 #
