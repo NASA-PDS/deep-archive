@@ -1,8 +1,16 @@
 # Changelog
 
-## [v1.1.0-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.0-dev) (2022-02-02)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2022-05-17)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0...v1.1.0-dev)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.1...«unknown»)
+
+**Other closed issues:**
+
+- Upgrade to latest PDS API Client [\#128](https://github.com/NASA-PDS/deep-archive/issues/128)
+
+## [v1.1.1](https://github.com/NASA-PDS/deep-archive/tree/v1.1.1) (2022-04-14)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0...v1.1.1)
 
 **Improvements:**
 
