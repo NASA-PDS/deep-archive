@@ -57,7 +57,7 @@ from .utils import addloggingarguments
 # ``models`` plural. And even some releases support *both*. So here we try to accomodate whatever the
 # flavor du jour is.
 
-from pds.api_client.model.pds_product import PdsProduct
+from pds.api_client.model.pds_product import PdsProduct # type: ignore
 
 # If this fails to import, then we're using a pds.api-client ≤ 0.5.0, which I'm arbitrarily declaring "too old":
 from pds.api_client.exceptions import ApiAttributeError  # type: ignore
