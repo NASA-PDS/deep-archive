@@ -1,8 +1,12 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2022-05-17)
+## [v1.1.2](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2) (2022-05-17)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.1...«unknown»)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2-dev...v1.1.2)
+
+## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2022-05-17)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.1...v1.1.2-dev)
 
 **Other closed issues:**
 
@@ -10,7 +14,11 @@
 
 ## [v1.1.1](https://github.com/NASA-PDS/deep-archive/tree/v1.1.1) (2022-04-14)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0...v1.1.1)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0-dev...v1.1.1)
+
+## [v1.1.0-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.0-dev) (2022-02-02)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.0...v1.1.0-dev)
 
 **Improvements:**
 
