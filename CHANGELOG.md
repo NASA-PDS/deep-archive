@@ -8,7 +8,7 @@
 
 - README.md link errors [\#131](https://github.com/NASA-PDS/deep-archive/issues/131)
 
-## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2022-11-15)
+## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2022-12-06)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2...v1.1.2-dev)
 
