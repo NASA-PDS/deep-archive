@@ -17,7 +17,7 @@ Installing this package will give you two different executable Python programs:
 
 ## ⎆ Installation
 
-See the online documentation for [Installation](https://nasa-pds.github.io/pds-deep-archive/installation/) instructions.
+See the online documentation for [Installation](https://nasa-pds.github.io/pds-deep-archive/installation/index.html) instructions.
 
 You should then be able to run the deep archive utilities:
 
@@ -29,7 +29,7 @@ You should then be able to run the deep archive utilities:
 
 ## 👷‍♂️ Build
 
-See the [Development Guide](https://nasa-pds.github.io/pds-deep-archive/development/) for more information.
+See the [Development Guide](https://nasa-pds.github.io/pds-deep-archive/development/index.html) for more information.
 
 
 ## 📄 Documentation
