@@ -39,6 +39,9 @@ import sys
 from datetime import datetime
 
 import pds.api_client  # type: ignore
+from pds.api_client.exceptions import ApiAttributeError  # type: ignore
+from pds.api_client.exceptions import NotFoundException  # type: ignore
+from pds.api_client.model.pds_product import PdsProduct  # type: ignore
 
 from . import VERSION
 from .aip import writelabel as writeaiplabel
@@ -49,19 +52,13 @@ from .constants import PROVIDER_SITE_IDS
 from .sip import writelabel as writesiplabel
 from .utils import addbundlearguments
 from .utils import addloggingarguments
-
 # Import entity classes: in this case we just need class ``Product``.
 #
 # 😛 Apparently this API changes with the phase of the moon. See, in some versions of pds.api-client,
 # the name of the ``model`` package is ``model``, singular. But then seemingly at random, it becomes
 # ``models`` plural. And even some releases support *both*. So here we try to accomodate whatever the
 # flavor du jour is.
-
-from pds.api_client.model.pds_product import PdsProduct # type: ignore
-
 # If this fails to import, then we're using a pds.api-client ≤ 0.5.0, which I'm arbitrarily declaring "too old":
-from pds.api_client.exceptions import ApiAttributeError  # type: ignore
-from pds.api_client.exceptions import NotFoundException  # type: ignore
 
 # Import functional endpoints.
 #
@@ -91,7 +88,7 @@ _progresslogging = 100  # How frequently to report PDS progress; every N items
 # --------------
 
 _apiquerylimit = 50  # Pagination in the PDS API
-_defaultserver = "https://pds-gamma.jpl.nasa.gov/api/"  # Not just the default, the only one I know of 😮
+_defaultserver = "https://pds.nasa.gov/api/search/1.0/"
 
 
 # PDS API property keys we're interested in
@@ -540,12 +537,12 @@ if __name__ == "__main__":
 # We may have to dump all that because the registry API seems to give a lot of data immediately
 # blobs? blobs???
 #
-# Using the https://pds-gamma.jpl.nasa.gov/api/ directly (without the Python pds.api_client):
+# Using the https://pds.nasa.gov/api/search/1.0/ directly (without the Python pds.api_client):
 #
 # We are normally passed a bundle.xml file; we can get its info directly with:
 #
-#     curl -X GET --header 'Accept: application/pds4+xml' \
-#         'https://pds-gamma.jpl.nasa.gov/api/bundles/urn%3Anasa%3Apds%3Ainsight_documents%3A%3A2.0'
+#     curl -X GET --header 'Accept: application/vnd.nasa.pds.pds4+xml' \
+#         'https://pds.nasa.gov/api/search/1.0/bundles/urn%3Anasa%3Apds%3Ainsight_documents%3A%3A2.0'
 #
 # This gives:
 #
