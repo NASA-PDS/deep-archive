@@ -1,16 +1,20 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2022-12-06)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2022-12-22)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2-dev...«unknown»)
 
 **Other closed issues:**
 
-- README.md link errors [\#131](https://github.com/NASA-PDS/deep-archive/issues/131)
+- Change default API endpoint to the operational API on pds.nasa.gov [\#133](https://github.com/NASA-PDS/deep-archive/issues/133)
 
 ## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2022-12-06)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2...v1.1.2-dev)
+
+**Other closed issues:**
+
+- README.md link errors [\#131](https://github.com/NASA-PDS/deep-archive/issues/131)
 
 ## [v1.1.2](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2) (2022-05-17)
 
