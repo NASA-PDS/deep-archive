@@ -455,7 +455,7 @@ def main():
                 "🚨 The server at %s gave an INTERNAL SERVER ERROR; you should contact its administrator if you "
                 "can figure out who that is. The following information may be helpful to them in figuring out "
                 "the issue: «%r»",
-                args.url.rtrim('/'),
+                args.url.rstrip('/'),
                 ex.body,
             )
             sys.exit(-2)
