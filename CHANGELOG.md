@@ -1,5 +1,13 @@
 # Changelog
 
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2023-01-19)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2-dev...«unknown»)
+
+**Defects:**
+
+- Pagination handling does not appear to work properly for pds-deep-registry-archive [\#137](https://github.com/NASA-PDS/deep-archive/issues/137) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+
 ## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2022-12-22)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2...v1.1.2-dev)
