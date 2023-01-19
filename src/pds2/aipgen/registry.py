@@ -182,7 +182,7 @@ def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, allcollect
                 results = bcapi.collections_of_a_bundle_latest(
                     lidvid, start=start, limit=_apiquerylimit, fields=_fields
                 )
-
+            if len(results.data) == 0: return
             start += len(results.data)
             for i in results.data:
                 yield i
@@ -198,7 +198,7 @@ def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
         try:
             _logger.debug("⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d", lidvid, start, _apiquerylimit)
             results = cpapi.products_of_a_collection(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
-
+            if len(results.data) == 0: return
             start += len(results.data)
             for i in results.data:
                 yield i
