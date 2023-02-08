@@ -41,10 +41,6 @@ pipeline {
     // We want this to run completely on pds-expo.jpl.nasa.gov and nowhere else
     agent { node('pds-expo') }
 
-    environment {
-        // None needed
-    }
-
     options {
         // Self-explanatory
         disableConcurrentBuilds()
