@@ -1,16 +1,24 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2023-01-19)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2023-02-15)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2-dev...«unknown»)
 
 **Defects:**
 
-- Pagination handling does not appear to work properly for pds-deep-registry-archive [\#137](https://github.com/NASA-PDS/deep-archive/issues/137) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+- Cannot connect to any PDS API endpoints for pds-deep-archive-registry [\#134](https://github.com/NASA-PDS/deep-archive/issues/134) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 
-## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2022-12-22)
+**Other closed issues:**
+
+- integrate deep archive to staging tests [\#138](https://github.com/NASA-PDS/deep-archive/issues/138)
+
+## [v1.1.2-dev](https://github.com/NASA-PDS/deep-archive/tree/v1.1.2-dev) (2023-01-19)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2...v1.1.2-dev)
+
+**Defects:**
+
+- Pagination handling does not appear to work properly for pds-deep-registry-archive [\#137](https://github.com/NASA-PDS/deep-archive/issues/137) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 
 **Other closed issues:**
 
