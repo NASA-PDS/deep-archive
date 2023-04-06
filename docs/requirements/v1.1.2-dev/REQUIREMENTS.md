@@ -32,6 +32,10 @@ This requirement is not impacted by the current version
 
 
 This requirement is not impacted by the current version
+## As a developer, I want to know when the CI pipeline fails ([#143](https://github.com/NASA-PDS/deep-archive/issues/143)) 
+
+
+This requirement is not impacted by the current version
 # NSSDCA-delivery-requirements
 
 ## The tool shall be capable of generating a valid Archive Information Package transfer manifest and PDS4 XML label in accordance with the PDS4 Information Model ([#45](https://github.com/NASA-PDS/deep-archive/issues/45)) 
