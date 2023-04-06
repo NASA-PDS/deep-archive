@@ -190,6 +190,13 @@ def comprehenddirectory(dn, con):
                     # And see if it refers to other files
                     matches = tree.getroot().findall(f".//{{{PDS_NS_URI}}}file_name")
                     for match in matches:
+                        # Reject relative paths (#145)
+                        if ".." in match.text:
+                            message = (
+                                f'Bundle {xmlfile} contains a <file_name> ``{match.text}`` which contains a'
+                                ' relative path ``..``, which is invalid'
+                            )
+                            raise ValueError(message)
                         # any sibling directory_path_name?
                         dpnnode = match.getparent().find(f"./{{{PDS_NS_URI}}}directory_path_name")
                         fn = match.text.strip()
