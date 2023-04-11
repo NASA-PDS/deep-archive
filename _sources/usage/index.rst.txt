@@ -161,7 +161,7 @@ Assuming the software is installed properly and the virtual Python environment
 is still set up as above, then the following invocation will generate the AIP
 checksum and transfer manifests and the SIP manifest for the bundle
 ``urn:nasa:pds:insight_documents::2.0`` using the PDS Registry API at
-``https://pds-gamma.jpl.nasa.gov/api/`` for the site ``PDS_ATM``::
+``https://pds.nasa.gov/api/search/1.0/`` for the site ``PDS_ATM``::
 
     (pds-deep-archive) $ bin/pds-deep-registry-archive \
         --site PDS_ATM \
