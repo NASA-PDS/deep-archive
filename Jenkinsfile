@@ -71,7 +71,7 @@ pipeline {
                 // 🔮 In the future, we'll also want to look at the generated output files and ensure
                 // they contain correct data. But right now, pagination is broken in the server so we
                 // can't even get output files, so we'll just go by exit status.
-                sh ".venv/bin/pds-deep-registry-archive --debug --site PDS_ATM urn:nasa:pds:mer1_navcam_sci_calibrated::1.0"
+                sh ".venv/bin/pds-deep-registry-archive --debug --url http://localhost:8080 --site PDS_ATM urn:nasa:pds:insight_rad::2.1"
             }
         }
     }
