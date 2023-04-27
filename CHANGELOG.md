@@ -1,8 +1,16 @@
 # Changelog
 
-## [release/1.1.3](https://github.com/NASA-PDS/deep-archive/tree/release/1.1.3) (2023-04-11)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2023-04-27)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2...release/1.1.3)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.3...«unknown»)
+
+**Defects:**
+
+- Jenkins Deep Regsitry Archive ran for the first time, failed [\#147](https://github.com/NASA-PDS/deep-archive/issues/147)
+
+## [v1.1.3](https://github.com/NASA-PDS/deep-archive/tree/v1.1.3) (2023-04-11)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.2...v1.1.3)
 
 **Defects:**
 
