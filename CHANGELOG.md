@@ -1,11 +1,12 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2023-04-27)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2023-07-07)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.3...«unknown»)
 
 **Defects:**
 
+- Install issue with Python 3.11 [\#149](https://github.com/NASA-PDS/deep-archive/issues/149) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 - Jenkins Deep Regsitry Archive ran for the first time, failed [\#147](https://github.com/NASA-PDS/deep-archive/issues/147)
 
 ## [v1.1.3](https://github.com/NASA-PDS/deep-archive/tree/v1.1.3) (2023-04-11)
