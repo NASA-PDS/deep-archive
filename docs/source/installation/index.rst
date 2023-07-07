@@ -12,8 +12,9 @@ requirements:
 
 •  Python_ 3. This software requires Python 3.9.  Python 2 will
    absolutely *not* work, and indeed Python 2 came to its end of life on the
-   first of January, 2020.  Run ``python --version``, or
-   ``python3 --version``, to check it is installed.
+   first of January, 2020.  In addition, Python 3.11 currently does not work
+   either.  Run ``python --version``, or ``python3 --version``, to check what
+   is installed.
 •  ``libxml2`` version 2.9.2; later 2.9 versions are fine.  Run ``xml2-config
    --version`` to find out.
 •  ``libxslt`` version 1.1.28; later 1.1 versions are OK too.  Run
@@ -59,7 +60,7 @@ won't interfere with—or be interfered by—other packages.  To do so::
     # For Linux / Mac / other Unix systems
     # Example assumes bash command shell. For others, consult shell documentation.
     mkdir -p $HOME/.virtualenvs
-    python3 -m venv $HOME/.virtualenvs/pds-deep-archive
+    python3.9 -m venv $HOME/.virtualenvs/pds-deep-archive
     source $HOME/.virtualenvs/pds-deep-archive/bin/activate
     pip3 install pds.deeparchive
 
@@ -87,7 +88,7 @@ it's properly installed.
     software::
 
       mkdir -p $HOME/.virtualenvs
-      python3 -m venv $HOME/.virtualenvs/pds-deep-archive
+      python3.9 -m venv $HOME/.virtualenvs/pds-deep-archive
       source $HOME/.virtualenvs/pds-deep-archive/bin/activate
       pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple`` pds.deeparchive
 
