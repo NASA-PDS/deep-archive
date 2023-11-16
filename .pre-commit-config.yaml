@@ -49,3 +49,23 @@ repos:
         language: system
         stages: [push]
         pass_filenames: false
+
+-   repo: https://github.com/NASA-AMMOS/slim-detect-secrets
+    # using commit id for now, will change to tag when official version is released
+    rev: 91e097ad4559ae6ab785c883dc5ed989202c7fbe
+    hooks:
+      - id: detect-secrets
+        args:
+          - '--baseline'
+          - '.secrets.baseline'
+          - --exclude-files '\.secrets..*'
+          - --exclude-files '\.pre-commit-config.yaml'
+          - --exclude-files '\.git.*'
+          - --exclude-files '\.mypy_cache'
+          - --exclude-files '\.pytest_cache'
+          - --exclude-files '\.tox'
+          - --exclude-files '\.venv'
+          - --exclude-files 'venv'
+          - --exclude-files 'dist'
+          - --exclude-files 'build'
+          - --exclude-files '.*\.egg-info'
