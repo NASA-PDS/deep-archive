@@ -6,7 +6,7 @@ build it out::
 
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
-    python3 -m venv venv
+    python3.9 -m venv venv
     venv/bin/pip install --editable '.[dev]'
 
 .. note:: The above series of commands assume you have the corresponding
