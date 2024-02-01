@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright © 2021 California Institute of Technology ("Caltech").
+# Copyright © 2021–2024 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -131,6 +131,16 @@ def _deurnlidvid(lidvid: str) -> tuple[str, str]:
     """
     lid, vid = lidvid.split("::")
     return lid.split(":")[-1], vid
+
+
+def _splitlidvid(lidvid: str) -> tuple[str, str]:
+    """Split a LIDVID into a LID and VID.
+
+    Given a PDS ``lidvid`` as a Uniform Resource Name such as ``urn:nasa:pds:whatever::1.0``,
+    transform it to a double of ``urn:nasa:pds:whatever`` and ``1.0``.
+    """
+    lid, vid = lidvid.split("::")
+    return lid, vid
 
 
 def _makefilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
@@ -372,8 +382,8 @@ def _writeaip(bundlelidvid: str, prefixlen: int, bac: dict, ts: datetime) -> str
     tmfn = _makefilename(bundlelidvid, ts, "transfer_manifest", PDS_TABLE_FILENAME_EXTENSION)
     cmmd5, cmsize, cmnum = _writechecksummanifest(cmfn, prefixlen, bac)
     tmmd5, tmsize, tmnum = _writetransfermanifest(tmfn, prefixlen, bac)
-    lid, vid = _deurnlidvid(bundlelidvid)
     labelfn = _makefilename(bundlelidvid, ts, "aip", PDS_LABEL_FILENAME_EXTENSION)
+    lid, vid = _splitlidvid(bundlelidvid)
     writeaiplabel(labelfn, f"{lid}_v{vid}", lid, vid, cmfn, cmmd5, cmsize, cmnum, tmfn, tmmd5, tmsize, tmnum, ts)
     _logger.info("📄 Wrote label for them both: %s", labelfn)
     return cmmd5
@@ -405,7 +415,7 @@ def _writesip(bundlelidvid: str, bac: dict, title: str, site: str, ts: datetime,
     labelfn = _makefilename(bundlelidvid, ts, "sip", PDS_LABEL_FILENAME_EXTENSION)
     _logger.info("📄 Wrote label for SIP: %s", labelfn)
     with open(labelfn, "wb") as o:
-        lid, vid = _deurnlidvid(bundlelidvid)
+        lid, vid = _splitlidvid(bundlelidvid)
         writesiplabel(lid, vid, title, hashish.hexdigest(), size, count, "MD5", sipfn, site, o, cmmd5, ts)
 
 
