@@ -1,5 +1,14 @@
 # Changelog
 
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-02-15)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...«unknown»)
+
+**Defects:**
+
+- Transfer manifest mismatch between `pds-deep-archive` and `pds-deep-registry-archive` [\#158](https://github.com/NASA-PDS/deep-archive/issues/158) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+- pds-deep-registry-archive produces invalid SIPs/AIPs [\#155](https://github.com/NASA-PDS/deep-archive/issues/155) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+
 ## [v1.1.4](https://github.com/NASA-PDS/deep-archive/tree/v1.1.4) (2024-01-08)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.3...v1.1.4)
