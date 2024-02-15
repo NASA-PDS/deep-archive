@@ -358,7 +358,7 @@ def _writetransfermanifest(fn: str, prefixlen: int, bac: dict) -> tuple[str, int
     with open(fn, "wb") as o:
         for lidvid, files in bac.items():
             for f in files:
-                entry = f"{lidvid:255}/{f.url[prefixlen:]:255}\r\n".encode("utf-8")
+                entry = f"{lidvid:255}/{f.url[prefixlen:]:254}\r\n".encode("utf-8")  # 254 because we hard-code the /
                 o.write(entry)
                 hashish.update(entry)
                 size += len(entry)
