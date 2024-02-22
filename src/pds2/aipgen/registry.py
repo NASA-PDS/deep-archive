@@ -33,15 +33,15 @@
 import argparse
 import dataclasses
 import hashlib
-import http.client
 import logging
 import sys
 from datetime import datetime
+from http import HTTPStatus
+from typing import Any
+from typing import Iterator
+from typing import Union
 
-import pds.api_client  # type: ignore
-from pds.api_client.exceptions import ApiAttributeError  # type: ignore
-from pds.api_client.exceptions import NotFoundException  # type: ignore
-from pds.api_client.model.pds_product import PdsProduct  # type: ignore
+import requests
 
 from . import VERSION
 from .aip import writelabel as writeaiplabel
@@ -52,26 +52,6 @@ from .constants import PROVIDER_SITE_IDS
 from .sip import writelabel as writesiplabel
 from .utils import addbundlearguments
 from .utils import addloggingarguments
-# Import entity classes: in this case we just need class ``Product``.
-#
-# 😛 Apparently this API changes with the phase of the moon. See, in some versions of pds.api-client,
-# the name of the ``model`` package is ``model``, singular. But then seemingly at random, it becomes
-# ``models`` plural. And even some releases support *both*. So here we try to accomodate whatever the
-# flavor du jour is.
-# If this fails to import, then we're using a pds.api-client ≤ 0.5.0, which I'm arbitrarily declaring "too old":
-
-# Import functional endpoints.
-#
-# 😛 Apparently this API changes more more frequently than a fringe politician's platform. See, in
-# some versions of pds.api-client, the endpoint classes are importable directly from ``pds.api_client``.
-# And in other releases, they're not. And it seems to swap randomly. So here we try to be resilient
-# to whatever the pds.api-client we get stuck with.
-try:
-    from pds.api_client import CollectionsProductsApi, BundlesCollectionsApi, BundlesApi  # type: ignore
-except ImportError:
-    from pds.api_client.api.bundles_api import BundlesApi  # type: ignore
-    from pds.api_client.api.bundles_collections_api import BundlesCollectionsApi  # type: ignore
-    from pds.api_client.api.collections_products_api import CollectionsProductsApi  # type: ignore
 
 
 # Constants
@@ -88,7 +68,8 @@ _progresslogging = 100  # How frequently to report PDS progress; every N items
 # --------------
 
 _apiquerylimit = 50  # Pagination in the PDS API
-_defaultserver = "https://pds.nasa.gov/api/search/1.0/"
+_defaultserver = "https://pds.nasa.gov/api/search/1.0/"  # Where to find the PDS API
+_searchkey = "ops:Harvest_Info.ops:harvest_date_time"  # How to sort products
 
 
 # PDS API property keys we're interested in
@@ -155,109 +136,52 @@ def _makefilename(lidvid: str, ts: datetime, kind: str, ext: str) -> str:
     return f"{lid}_v{vid}_{slate}_{kind}_v{AIP_SIP_DEFAULT_VERSION}{ext}"
 
 
-def _getbundle(apiclient: pds.api_client.ApiClient, lidvid: str) -> PdsProduct:
+def _getbundle(server_url: str, lidvid: str) -> Union[dict[str, Any], None]:
     """Get a bundle.
 
-    Using the PDS ``apiclient`` find the PDS bundle with the named ``lidvid``
-    and return as a ``pds.api_client.models.pds_product.PdsProduct``.  If it
-    can't be found, return ``None``.
+    Using the PDS API server at ``server_url`` ask for the bundle with the
+    identifier ``lidvid`` and return a ``dict`` with its attributes.
+    If it can't be found, return ``None``.
     """
-    try:
-        _logger.debug("⚙️ Asking ``bundle_by_lidvid`` for %s", lidvid)
-        bundles = BundlesApi(apiclient)
-        return bundles.bundle_by_lidvid(lidvid)  # type = ``Product_Bundle``
-    except pds.api_client.exceptions.ApiException as ex:
-        if ex.status == http.client.NOT_FOUND:
-            return None
-        else:
-            raise
+    r = requests.get(f"{server_url}/products/{lidvid}")
+    if r.status_code == HTTPStatus.NOT_FOUND:
+        return None
+    return r.json()
 
 
-def _getcollections(apiclient: pds.api_client.ApiClient, lidvid: str, allcollections=True):
-    """Get the collections.
+def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[dict[str, Any]]:
+    """Get products (which could be collections of a dataset or products of a collection).
 
-    Using the PDS ``apiclient`` generate collections that belong to the PDS bundle ``lidvid``.
+    Using the PDS API server at ``server_url`` generate products that belong to ``lidvid``.
 
     If ``allcollections`` is True, then return all collections for LID-only references; otherwise
-    return just the latest collection for LID-only references (has no effect on full LIDVID-references.
+    return just the latest collection for LID-only references (has no effect on full LIDVID-references).
     """
-    bcapi, start = BundlesCollectionsApi(apiclient), 0
+    url = f"{server_url}/products/{lidvid}/members/{'all' if allcollections else 'latest'}"
+    params = {"sort": _searchkey, "limit": _apiquerylimit}
     while True:
-        _logger.debug('⚙️ Asking ``collections_of_a_bundle`` for %s at %d limit %d', lidvid, start, _apiquerylimit)
-
-        try:
-            if allcollections:
-                results = bcapi.collections_of_a_bundle_all(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
-            else:
-                results = bcapi.collections_of_a_bundle_latest(
-                    lidvid, start=start, limit=_apiquerylimit, fields=_fields
-                )
-            if len(results.data) == 0: return
-            start += len(results.data)
-            for i in results.data:
-                yield i
-
-        except NotFoundException:  # end of the pages
-            return
+        _logger.debug('Making request to %s with params %r', url, params)
+        r = requests.get(url, params=params)
+        matches = r.json()["data"]
+        num_matches = len(matches)
+        for i in matches:
+            yield i
+        if num_matches < _apiquerylimit:
+            break
+        params["search-after"] = matches[-1]["properties"][_searchkey]
 
 
-def _getproducts(apiclient: pds.api_client.ApiClient, lidvid: str):
-    """Using the PDS ``apiclient`` generate PDS products that belong to the collection ``lidvid``."""
-    cpapi, start = CollectionsProductsApi(apiclient), 0
-    while True:
-        try:
-            _logger.debug("⚙️ Asking ``products_of_a_collection`` for %s at %d limit %d", lidvid, start, _apiquerylimit)
-            results = cpapi.products_of_a_collection(lidvid, start=start, limit=_apiquerylimit, fields=_fields)
-            if len(results.data) == 0: return
-            start += len(results.data)
-            for i in results.data:
-                yield i
-
-        except pds.api_client.exceptions.ApiException as ex:
-            if ex.status == http.client.NOT_FOUND:
-                return
-            else:
-                raise
-
-
-def _addfiles(product: PdsProduct, bac: dict):
+def _addfiles(product: dict, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
-    # 😛 Apparently this API changes as frequently as my knickers. See, in some releases of pds.api-client,
-    # ``Product`` entity objects have two named attributes, ``id`` and ``properties``. But then sometimes,
-    # and for apparently random reasons, ``id`` and ``properties`` become indexed elements of a ``Product``.
-    # So, we try to accommodate whatever the flavor du jour is.
-    try:
-        lidvid, props = product['id'], product['properties']
-    except TypeError:
-        lidvid, props = product.id, product.properties
-
+    lidvid, props = product["id"], product["properties"]
     files = bac.get(lidvid, set())  # Get the current set (or a new empty set)
 
     if _propdataurl in props:  # Are there data files in the product?
-        # 😛 Apparently this API changes depending on the day of the week. See, in some releases of
-        # pds.api-client, the URLs and MD5s are directly two sequences of the properties. And in other
-        # releases, they're sequences of the ``value`` element of the properties. Why? Who knows! We
-        # jump through this extra try…except block here so we can work with whatever the pds.api-client
-        # decides to be that day.
-        try:
-            urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
-            for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
-                files.add(_File(url, md5))  # Add it to the set
-        except ApiAttributeError:
-            urls, md5s = props[_propdataurl]['value'], props[_propdatamd5]['value']  # Get the URLs and MD5s of them
-            for url, md5 in zip(urls, md5s):
-                files.add(_File(url, md5))
-
-    # 😛 Apparently this API changes faster than Coinstar™. For the same reason above, sometimes the
-    # URL and MD5 sequences are directly accessible from the properties, and sometimes they're in a
-    # ``value`` element of properties. Whew!
-    try:
-        if _proplabelurl in props:  # How about the label itself?
-            files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
-    except ApiAttributeError:
-        if _proplabelurl in props:  # How about the label itself?
-            files.add(_File(props[_proplabelurl]['value'][0], props[_proplabelmd5]['value'][0]))  # Add it too
-
+        urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
+        for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
+            files.add(_File(url, md5))  # Add it to the set
+    if _proplabelurl in props:  # How about the label itself?
+        files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
     bac[lidvid] = files  # Stash for future use
 
 
@@ -279,45 +203,24 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
     _logger.debug("🤔 Comprehending the registry at %s for %s", url, bundlelidvid)
 
     # Set up our client connection
-    config = pds.api_client.Configuration()
-    config.host = url
-    apiclient = pds.api_client.ApiClient(config)
 
     # This is the "B.A.C." 😏
     bac: dict[str, set[_File]]
     bac = {}
 
-    bundle = _getbundle(apiclient, bundlelidvid)  # There's no class "Bundle" but class Product 🤷‍♀️
+    bundle = _getbundle(url, bundlelidvid)
     if bundle is None:
         raise ValueError(f"🤷‍♀️ The bundle {bundlelidvid} cannot be found in the registry at {url}")
-
-    # 😛 Did I mention this API changes **a lot?**
-    #
-    # The pds-api.client is pretty fickle between each release: sometimes ``title`` is an indexed value
-    # of the ``bundle``, and sometimes it's a named attribute of the bundle. The try…except block here
-    # handles both cases.
-    try:
-        title = bundle.get('title', '«unknown»')
-    except AttributeError:
-        title = bundle.title if bundle.title else '«unknown»'
-
+    title = bundle.get("title", "«unknown»")
     _addfiles(bundle, bac)
-
-    # 😛 I'm sure I mentioned it by now!
-    #
-    # Ditto the above comment, but for ``metadata``'s ``label_url'.
-    try:
-        bundleurl = bundle['metadata']['label_url']
-    except TypeError:
-        bundleurl = bundle.metadata.label_url
-
+    bundleurl = bundle["metadata"]["label_url"]
     prefixlen = bundleurl.rfind("/") + 1
 
     # It turns out the PDS registry makes this *trivial* compared to the PDS filesystem version;
     # Just understanding it all was there was the hard part! 😊 THANK YOU! 🙏
-    for collection in _getcollections(apiclient, bundlelidvid, allcollections):
+    for collection in _getproducts(url, bundlelidvid, allcollections):
         _addfiles(collection, bac)
-        for product in _getproducts(apiclient, collection.id):
+        for product in _getproducts(url, collection["id"]):
             _addfiles(product, bac)
 
     # C'est tout 🌊
@@ -459,18 +362,9 @@ def main():
     _logger.debug("💢 command line args = %r", args)
     try:
         generatedeeparchive(args.url, args.bundle, args.site, not args.include_latest_collection_only)
-    except pds.api_client.exceptions.ApiException as ex:
-        if ex.status == http.client.INTERNAL_SERVER_ERROR:
-            _logger.critical(
-                "🚨 The server at %s gave an INTERNAL SERVER ERROR; you should contact its administrator if you "
-                "can figure out who that is. The following information may be helpful to them in figuring out "
-                "the issue: «%r»",
-                args.url.rstrip('/'),
-                ex.body,
-            )
-            sys.exit(-2)
+    except Exception:
         _logger.exception("💥 We got an unexpected error; sorry it didn't work out")
-        sys.exit(-3)
+        sys.exit(-1)
     finally:
         _logger.info("👋 Thanks for using this program! Bye!")
     sys.exit(0)
