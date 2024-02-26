@@ -1,8 +1,12 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-02-15)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-02-26)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...«unknown»)
+
+**Improvements:**
+
+- Upgrade deep-archive to comply with latest search API changes \(API v1.4.0 / pds-api-client v1.5.0\) [\#159](https://github.com/NASA-PDS/deep-archive/issues/159)
 
 **Defects:**
 
