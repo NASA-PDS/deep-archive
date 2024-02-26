@@ -36,6 +36,10 @@ This requirement is not impacted by the current version
 
 
 This requirement is not impacted by the current version
+## As a user, I want deep archive to support LBLX label extensions ([#157](https://github.com/NASA-PDS/deep-archive/issues/157)) 
+
+
+This requirement is not impacted by the current version
 # NSSDCA-delivery-requirements
 
 ## The tool shall be capable of generating a valid Archive Information Package transfer manifest and PDS4 XML label in accordance with the PDS4 Information Model ([#45](https://github.com/NASA-PDS/deep-archive/issues/45)) 
