@@ -1,8 +1,8 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-02-26)
+## [release/1.1.5](https://github.com/NASA-PDS/deep-archive/tree/release/1.1.5) (2024-02-26)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...«unknown»)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...release/1.1.5)
 
 **Improvements:**
 
