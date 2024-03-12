@@ -202,11 +202,11 @@ Installing PDS Deep Archive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, you can install the PDS Deep Archive. As of this writing, version
-1.5.0 or later is recommended for Windows. To install it, enter the following
+1.1.5 or later is recommended for Windows. To install it, enter the following
 command in the same Windows PowerShell with the ``(pds)`` prompt (then press
 Enter)::
 
-    pip install pds.deeparchive~=1.5.0
+    pip install pds.deeparchive~=1.1.5
 
 Feel free to change the version number in the command as needed.
 
