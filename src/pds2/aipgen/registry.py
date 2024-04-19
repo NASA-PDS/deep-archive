@@ -52,6 +52,7 @@ from .constants import PROVIDER_SITE_IDS
 from .sip import writelabel as writesiplabel
 from .utils import addbundlearguments
 from .utils import addloggingarguments
+from .utils import fixmultislashes
 
 
 # Constants
@@ -102,6 +103,16 @@ class _File:
 
     url: str
     md5: str
+
+    @classmethod
+    def make(cls, url, md5):
+        """Make a ``_File``, fixing issues with multi-slashes in ``url``.
+
+        Note that this allows us to keep the generated ctor from ``dataclass`` without
+        having to do weird things with ``__setattr__``. See https://dsh.re/f9fd7b for
+        more information.
+        """
+        return cls(fixmultislashes(url), md5)
 
 
 def _deurnlidvid(lidvid: str) -> tuple[str, str]:
@@ -179,9 +190,9 @@ def _addfiles(product: dict, bac: dict):
     if _propdataurl in props:  # Are there data files in the product?
         urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
         for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
-            files.add(_File(url, md5))  # Add it to the set
+            files.add(_File.make(url, md5))  # Add it to the set
     if _proplabelurl in props:  # How about the label itself?
-        files.add(_File(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
+        files.add(_File.make(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
     bac[lidvid] = files  # Stash for future use
 
 

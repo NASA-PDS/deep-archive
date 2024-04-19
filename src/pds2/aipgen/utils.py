@@ -35,6 +35,8 @@ import os.path
 import re
 import sqlite3
 import urllib
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 
 from lxml import etree
 from zope.interface import implementer
@@ -66,6 +68,19 @@ root directory.
 
 # Functions
 # ---------
+
+
+def fixmultislashes(url):
+    """Fix occurrences of multiple slashes in the given ``url``.
+
+    This addresses issue №162: where submission information packages would have double-
+    slashes in their paths, which leads to validation errors. Note that the upstream
+    problem is that the registry is loaded with examples of these bad paths. This is
+    a workaround.
+    """
+    scheme, netloc, path, params, query, fragment = urlparse(url)
+    path = re.sub(r'/{2,}', '/', path)
+    return urlunparse((scheme, netloc, path, params, query, fragment))
 
 
 def createschema(con):
