@@ -1,5 +1,13 @@
 # Changelog
 
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-04-19)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.5...«unknown»)
+
+**Requirements:**
+
+- As a data custodian, I want the Deep Archive to work around invalid URLs in the Registry [\#162](https://github.com/NASA-PDS/deep-archive/issues/162)
+
 ## [v1.1.5](https://github.com/NASA-PDS/deep-archive/tree/v1.1.5) (2024-02-27)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...v1.1.5)
