@@ -38,6 +38,7 @@ import pkg_resources
 import zope.component  # type: ignore
 from pds2.aipgen.interfaces import IURLValidator
 from pds2.aipgen.utils import addloggingarguments
+from pds2.aipgen.utils import fixmultislashes
 from pds2.aipgen.utils import getdigest
 from pds2.aipgen.utils import getlogicalversionidentifier
 from pds2.aipgen.utils import getmd5
@@ -140,6 +141,45 @@ class URLValidatorTest(unittest.TestCase):
         validator = zope.component.getUtility(IURLValidator)
         with self.assertRaises(ValueError):
             validator.validate("?")
+
+
+# https://github.com/NASA-PDS/deep-archive/issues/162
+class URLCorrectingTest(unittest.TestCase):
+    """Check if we can correct ``//`` in URLs as reported in issue №162."""
+
+    def test_normalurls(self):
+        """Ensure we leave "normal" URLs alone, à la Britney."""
+        for url in (
+            "ftp://ftp.cdrom.com/pub/idgames/doom.exe",
+            "gopher://gopher.hprc.utoronto.ca/cuisine/poutine.recipe",
+            "wais://cnidr.org:210/1994/directory-of-servers",
+            "file:///usr/local/rootkits/3klagia.dll",
+            "https://fanfiction.net/startrek/"
+        ):
+            self.assertEqual(url, fixmultislashes(url))
+
+    def test_multislashesinpaths(self):
+        """Ensure we properly remove multiple slashes from paths."""
+        url = "https://fanfiction.net/startrek//sentient//computers//index.html"
+        self.assertEqual("https://fanfiction.net/startrek/sentient/computers/index.html", fixmultislashes(url))
+
+        url = "nntp://news.fanfiction.net//alt.fanfiction.startrek//91172//"
+        self.assertEqual("nntp://news.fanfiction.net/alt.fanfiction.startrek/91172/", fixmultislashes(url))
+
+        url = "rtsp://kirkfan:s3cr3t@stream.fanfiction.net:554/////streaming///Channels//101/"
+        self.assertEqual(
+            "rtsp://kirkfan:s3cr3t@stream.fanfiction.net:554/streaming/Channels/101/",
+            fixmultislashes(url)
+        )
+
+    def test_multislasheselsewhere(self):
+        """Ensure we leave multiple slashes alone in other contexts outside of the path."""
+        for url in (
+            "shttp://fanfiction.net/blog?article_id=kirk%2F%2Fspock",
+            "mailto:admin@fanfiction.net?subject=Sentient%20computer%2F%2Fsentient%20planet%20stories",
+            "prospero://ucla.edu:9155/index.dat#//readme"
+        ):
+            self.assertEqual(url, fixmultislashes(url))
 
 
 def test_suite():
