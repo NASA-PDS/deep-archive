@@ -25,8 +25,8 @@ name: 😌 Stable integration & delivery
 # Driving Event
 # -------------
 #
-# What event starts this workflow: a push of a release tag. Note: according to
-# https://git.io/JJZQt we have been doing our tag matching wrong. It's not
+# What event starts this workflow: a push of a stable tag. Note: according to
+# https://git.io/JTLTf we have been doing our tag matching wrong. It's not
 # regexp, it's not glob…it's more like…glob++ 😮
 
 on:
@@ -48,14 +48,14 @@ jobs:
         steps:
             -
                 name: 💳 Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     lfs: true
                     token: ${{secrets.ADMIN_GITHUB_TOKEN}}
                     fetch-depth: 0
             -
                 name: 💵 Python Cache
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: ~/.cache/pip
                     # The "key" used to indicate a set of cached files is the operating system runner
@@ -75,5 +75,4 @@ jobs:
                     ADMIN_GITHUB_TOKEN: ${{secrets.ADMIN_GITHUB_TOKEN}}
 
 ...
-
 # -*- mode: yaml; indent: 4; fill-column: 120; coding: utf-8 -*-
