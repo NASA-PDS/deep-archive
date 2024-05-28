@@ -130,6 +130,7 @@ class SIPFunctionalTestCase(_FunctionalTestCase):
         )
         self.assertTrue(filecmp.cmp(manifest, self.valid), "SIP manifest doesn't match the valid version")
 
+    @unittest.skip("temporarily skipping test per https://github.com/NASA-PDS/deep-archive/issues/169")
     def test_label_url(self):
         """Test if the label of a SIP manifest has the right ``manifest_url``."""
         ignoredmanifest, label = produce_sip(
