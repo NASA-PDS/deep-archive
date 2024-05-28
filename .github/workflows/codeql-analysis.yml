@@ -25,6 +25,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    if: github.actor != 'pdsen-ci'
     permissions:
       actions: read
       contents: read
