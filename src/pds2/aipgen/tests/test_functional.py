@@ -67,37 +67,6 @@ class LADEESIPTest(SIPFunctionalTestCase):
         return "PDS_ATM"
 
 
-class LADEESIPWithBadbaseurlTest(LADEESIPTest):
-    """This is the test fixture for LADEE SIPs but with bad base URLS."""
-
-    def setUp(self):
-        """Set up this text fixture."""
-        super(LADEESIPWithBadbaseurlTest, self).setUp()
-        from zope.component import provideUtility  # type: ignore
-        from pds2.aipgen.utils import URLValidator
-
-        self.validator = URLValidator()
-        provideUtility(self.validator)
-
-    def tearDown(self):
-        """Tear down this text fixture."""
-        del self.validator
-        super(LADEESIPWithBadbaseurlTest, self).tearDown()
-
-    def getbaseurl(self):
-        """Get the base URL."""
-        # This should always be a non-existent path no matter where this test is being run.
-        # If you go out of your way to actually create this path on your system, please take
-        # a moment to question your other life choices 🧐
-        return "file:/definitely/a/non/exist/int/path/prefix/"
-
-    # https://github.com/NASA-PDS/pds-deep-archive/issues/102
-    def test_sip(self):
-        """Make sure that the SIP generation fails with a URLError due to a non-existent base URL."""
-        with self.assertRaises(URLError):
-            super(LADEESIPWithBadbaseurlTest, self).test_sip()
-
-
 class LADEEAIPTest(AIPFunctionalTestCase):
     """Test case for AIP generation for all collections from the LADEE test bundle."""
 
@@ -325,21 +294,77 @@ class DuplicateTabFileTest(AIPFunctionalTestCase):
         return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
 
 
+class NAIF3SIPWithBadbaseurlTest(SIPFunctionalTestCase):
+    """This is the test fixture for NAIF3 SIPs but with bad base URLs."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Override the abstract base class which just skips itself."""
+        pass
+
+    def getbundlefile(self):
+        """Get the bundle file."""
+        return "data/naif3/bundle_mars2020_spice_v003.xml"
+
+    def getallcollectionsflag(self):
+        """Get the all collections flag."""
+        return True
+
+    def getvalidsipfilename(self):
+        """Get the valid SIP file name.
+
+        This doesn't really matter because the goal is to raise a URLError when the SIP
+        is generated.
+        """
+        return "does/not/matter.tab"
+
+    def getsiteid(self):
+        """Get the site ID."""
+        return "PDS_ATM"
+
+    def setUp(self):
+        """Set up this text fixture."""
+        super().setUp()
+        from zope.component import provideUtility  # type: ignore
+        from pds2.aipgen.utils import URLValidator
+
+        self.validator = URLValidator()
+        provideUtility(self.validator)
+
+    def tearDown(self):
+        """Tear down this text fixture."""
+        del self.validator
+        super().tearDown()
+
+    def getbaseurl(self):
+        """Get the base URL."""
+        # This should always be a non-existent path no matter where this test is being run.
+        # If you go out of your way to actually create this path on your system, please take
+        # a moment to question your other life choices 🧐
+        return "file:/definitely/a/non/exist/int/path/prefix/"
+
+    # https://github.com/NASA-PDS/pds-deep-archive/issues/102
+    def test_sip(self):
+        """Make sure that the SIP generation fails with a URLError due to a non-existent base URL."""
+        with self.assertRaises(URLError):
+            super().test_sip()
+
+
 def test_suite():
     """Return a suite of tests, duh flake8."""
     return unittest.TestSuite(
         [
-            unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(LADEEAIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(SensitivitySIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(SensitivityAIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllSIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
-            unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPWithBadbaseurlTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(DuplicateTabFileTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightAllSIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEEAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(NAIF3SIPWithBadbaseurlTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SensitivityAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(SensitivitySIPTest),
         ]
     )
