@@ -1,8 +1,16 @@
 # Changelog
 
-## [release/1.2.0](https://github.com/NASA-PDS/deep-archive/tree/release/1.2.0) (2024-05-28)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-06-06)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.5...release/1.2.0)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...«unknown»)
+
+**Other closed issues:**
+
+- Update tests to use more stable test data on pds.nasa.gov versus an external site [\#169](https://github.com/NASA-PDS/deep-archive/issues/169)
+
+## [v1.2.0](https://github.com/NASA-PDS/deep-archive/tree/v1.2.0) (2024-05-28)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.5...v1.2.0)
 
 **Requirements:**
 
