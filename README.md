@@ -65,6 +65,29 @@ All users and developers of the NASA-PDS software are expected to abide by our [
 - Wiki: https://github.com/NASA-PDS/deep-archive/wiki
 
 
+### 💽 Getting Test Data
+
+If you need to mirror a part of a website to add to the test data, try this handy invocation of `wget`:
+```console
+$ wget \
+    --quiet \
+    --execute robots=off \
+    --cut-dirs=2 \
+    --reject='index.html*' \
+    --no-host-directories \
+    --mirror \
+    --no-parent \
+    --relative \
+    --timestamping \
+    --no-check-certificate \
+    --recursive \
+    "https://whatever/some/path"
+```
+Note ⑴: Although the author typically reaches for `curl`, it lacks a direct mirroring option—hence `wget` here.
+
+Note ⑵: This is mostly a "note-to-self" for the author of this subsection 😉.
+
+
 ## 💁‍♀️ Support
 
 If you are having issues file a bug report in Github: https://github.com/NASA-PDS/deep-archive/issues
