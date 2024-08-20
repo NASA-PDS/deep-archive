@@ -39,7 +39,7 @@ The code base finally includes unit and functional tests. Once you've run
 ``venv/bin/pip install --editable '.[dev]'`` you can run the entire test suite
 easily with::
 
-    venv/bin/pytest
+    venv/bin/tox -e py39
 
 
 Making Releases

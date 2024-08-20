@@ -31,8 +31,8 @@
 import unittest
 from urllib.error import URLError
 
-from .base import AIPFunctionalTestCase
-from .base import SIPFunctionalTestCase
+from base import AIPFunctionalTestCase
+from base import SIPFunctionalTestCase
 
 
 class LADEESIPTest(SIPFunctionalTestCase):
