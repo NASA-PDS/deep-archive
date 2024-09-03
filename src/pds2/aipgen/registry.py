@@ -69,7 +69,7 @@ _progresslogging = 100  # How frequently to report PDS progress; every N items
 # --------------
 
 _apiquerylimit = 50  # Pagination in the PDS API
-_defaultserver = "https://pds.nasa.gov/api/search/1.0/"  # Where to find the PDS API
+_defaultserver = "https://pds.nasa.gov/api/search/1/"  # Where to find the PDS API
 _searchkey = "ops:Harvest_Info.ops:harvest_date_time"  # How to sort products
 
 
@@ -168,7 +168,9 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
     If ``allcollections`` is True, then return all collections for LID-only references; otherwise
     return just the latest collection for LID-only references (has no effect on full LIDVID-references).
     """
-    url = f"{server_url}/products/{lidvid}/members/{'all' if allcollections else 'latest'}"
+    # Commenting out `all` vs. `latest` functionality for now since the API does not support it at this time
+    # url = f"{server_url}/products/{lidvid}/members/{'all' if allcollections else 'latest'}"
+    url = f"{server_url}/products/{lidvid}/members"
     params = {"sort": _searchkey, "limit": _apiquerylimit}
     while True:
         _logger.debug('Making request to %s with params %r', url, params)
