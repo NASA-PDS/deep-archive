@@ -48,6 +48,10 @@ This requirement is not impacted by the current version
 
 
 This requirement is not impacted by the current version
+## As a user, I want to include all versions of collections associated with a bundle referencing collections by LID using the Registry ([#181](https://github.com/NASA-PDS/deep-archive/issues/181)) 
+
+
+This requirement is not impacted by the current version
 # NSSDCA-delivery-requirements
 
 ## The tool shall be capable of generating a valid Archive Information Package transfer manifest and PDS4 XML label in accordance with the PDS4 Information Model ([#45](https://github.com/NASA-PDS/deep-archive/issues/45)) 
