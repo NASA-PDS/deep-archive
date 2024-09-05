@@ -1,6 +1,6 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-09-03)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-09-05)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...«unknown»)
 
@@ -10,6 +10,7 @@
 
 **Other closed issues:**
 
+- Remove all versions support from deep-archive until the API provides support for this [\#179](https://github.com/NASA-PDS/deep-archive/issues/179)
 - Update tests to use more stable test data on pds.nasa.gov versus an external site [\#169](https://github.com/NASA-PDS/deep-archive/issues/169)
 
 ## [v1.2.0](https://github.com/NASA-PDS/deep-archive/tree/v1.2.0) (2024-05-28)
