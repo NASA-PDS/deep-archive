@@ -1,11 +1,12 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-09-05)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-09-11)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...«unknown»)
 
 **Defects:**
 
+- Issues with manifests after multiple slash update fix \(\#162\) [\#178](https://github.com/NASA-PDS/deep-archive/issues/178) [[s.medium](https://github.com/NASA-PDS/deep-archive/labels/s.medium)]
 - Failing build due to deprecated config [\#171](https://github.com/NASA-PDS/deep-archive/issues/171) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 
 **Other closed issues:**
