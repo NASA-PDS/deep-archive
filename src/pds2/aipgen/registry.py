@@ -176,7 +176,7 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
     params = {"sort": _searchkey, "limit": _apiquerylimit}
     while True:
         _logger.debug('Making request to %s with params %r', url, params)
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params)  # type: ignore
         matches = r.json()["data"]
         num_matches = len(matches)
         for i in matches:
