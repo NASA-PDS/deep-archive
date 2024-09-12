@@ -279,7 +279,7 @@ def _writetransfermanifest(fn: str, pathprefix: str, bac: dict) -> tuple[str, in
         for lidvid, files in bac.items():
             for f in files:
                 # We use [:254] because we hard code the ``/``:
-                entry = f"{lidvid:255}/{_urltocommonpath(f.url, pathprefix)[:254]}\r\n".encode("utf-8")
+                entry = f"{lidvid:255}/{_urltocommonpath(f.url, pathprefix):254}\r\n".encode("utf-8")
                 o.write(entry)
                 hashish.update(entry)
                 size += len(entry)
