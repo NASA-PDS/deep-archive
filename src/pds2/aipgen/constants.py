@@ -32,7 +32,7 @@
 AIP_PRODUCT_URI_PREFIX = "urn:nasa:pds:system_bundle:product_aip:"
 
 # Version ID for the current PDS information model
-INFORMATION_MODEL_VERSION = "1.13.0.0"
+INFORMATION_MODEL_VERSION = "1.22.0.0"
 
 # Namespace URI for PDS XML
 PDS_NS_URI = "http://pds.nasa.gov/pds4/pds/v1"
@@ -41,10 +41,10 @@ PDS_NS_URI = "http://pds.nasa.gov/pds4/pds/v1"
 PRODUCT_COLLECTION_TAG = f"{{{PDS_NS_URI}}}Product_Collection"
 
 # Where to find the PDS schema
-PDS_SCHEMA_URL = "http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd"
+PDS_SCHEMA_URL = "http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1M00.xsd"
 
 # XML model processing instruction
-XML_MODEL_PI = '''href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch"
+XML_MODEL_PI = '''href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1M00.sch"
 schematypens="http://purl.oclc.org/dsdl/schematron"'''
 
 # Namespace URI for XML Schema
