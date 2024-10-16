@@ -1,8 +1,8 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2024-10-16)
+## [release/1.3.0](https://github.com/NASA-PDS/deep-archive/tree/release/1.3.0) (2024-10-16)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...«unknown»)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...release/1.3.0)
 
 **Defects:**
 
@@ -25,7 +25,11 @@
 
 ## [v1.1.5](https://github.com/NASA-PDS/deep-archive/tree/v1.1.5) (2024-02-27)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...v1.1.5)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/release/1.1.5...v1.1.5)
+
+## [release/1.1.5](https://github.com/NASA-PDS/deep-archive/tree/release/1.1.5) (2024-02-26)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.1.4...release/1.1.5)
 
 **Improvements:**
 
