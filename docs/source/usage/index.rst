@@ -184,6 +184,8 @@ include:
 As with ``pds-deep-archive``, you can also specify ``--include-latest-collection-only`` to select if you want just the latest version of LID-only collections in your deep archive versus the default behavior of **all** versions of them.
 
 
+
+
 PDS Delivery Checklist
 ----------------------
 
@@ -220,6 +222,10 @@ For more formalized details on the NSSDCA Delivery Process, see the following `p
 8.     The PDS Engineering Node Operations Team will notify you once delivery has been completed.
 
 8.  🎉 DONE
+
+.. note:: A limitation of the PDS API is that it does not provide support for a
+    collection referencing multiple versions of a product. As a result, the
+    ``pds-deep-registry-archive`` cannot support this feature either.
 
 
 .. _`pagination bug`: https://github.com/NASA-PDS/pds-api/issues/73
