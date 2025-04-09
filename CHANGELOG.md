@@ -1,8 +1,20 @@
 # Changelog
 
-## [release/1.3.0](https://github.com/NASA-PDS/deep-archive/tree/release/1.3.0) (2024-10-16)
+## [1.1.5](https://github.com/NASA-PDS/deep-archive/tree/1.1.5) (2025-04-09)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...release/1.3.0)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.3.0...1.1.5)
+
+**Requirements:**
+
+- As a user, I want deep archive to support LBLX label extensions [\#157](https://github.com/NASA-PDS/deep-archive/issues/157)
+
+**Defects:**
+
+- pds-deep-registry-archive produces incomplete SIPs for data recently uploaded to the Registry [\#202](https://github.com/NASA-PDS/deep-archive/issues/202) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+
+## [v1.3.0](https://github.com/NASA-PDS/deep-archive/tree/v1.3.0) (2024-10-16)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.2.0...v1.3.0)
 
 **Defects:**
 
