@@ -38,7 +38,7 @@ from base import SIPFunctionalTestCase
 class LADEESIPTest(SIPFunctionalTestCase):
     """Test case for SIP generation for all collections from the LADEE test bundle.
 
-    This case is produced on behalf of the PDS Atmospheres node and using an ``atmost.nmsu.edu``-style base URL.
+    This case is produced on behalf of the PDS Atmospheres node and using an ``atmos.nmsu.edu``-style base URL.
     """
 
     @classmethod
@@ -57,6 +57,37 @@ class LADEESIPTest(SIPFunctionalTestCase):
     def getvalidsipfilename(self):
         """Get the valid SIP file name."""
         return "data/ladee_test/valid/ladee_mission_bundle_v1.0_sip_v1.0.tab"
+
+    def getbaseurl(self):
+        """Get the base URL."""
+        return "https://atmos.nmsu.edu/PDS/data/PDS4/LADEE/"
+
+    def getsiteid(self):
+        """Get the site ID."""
+        return "PDS_ATM"
+
+
+class LADEELBLXSIPTest(SIPFunctionalTestCase):
+    """Test case for SIP generation for all collections from the LADEE test bundle but
+    with an ``.lblx`` file extension.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Override the abstract base class which just skips itself."""
+        pass
+
+    def getbundlefile(self):
+        """Get the bundle file."""
+        return "data/ladee_lblx_test/mission_bundle/LADEE_Bundle_1101.lblx"
+
+    def getallcollectionsflag(self):
+        """Get the all collections flag."""
+        return True
+
+    def getvalidsipfilename(self):
+        """Get the valid SIP file name."""
+        return "data/ladee_lblx_test/valid/ladee_mission_bundle_v1.0_20250404_sip_v1.0.tab"
 
     def getbaseurl(self):
         """Get the base URL."""
@@ -86,6 +117,29 @@ class LADEEAIPTest(AIPFunctionalTestCase):
     def getmanifests(self):
         """Get the manifests."""
         base = "data/ladee_test/valid/ladee_mission_bundle_v1.0_"
+        return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
+
+
+class LADEELBLXAIPTest(AIPFunctionalTestCase):
+    """Test case for AIP generation for all collections from the LADEE test bundle but with a
+    ``.lblx`` file."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Override the abstract base class which just skips itself."""
+        pass
+
+    def getbundlefile(self):
+        """Get the bundle file."""
+        return "data/ladee_lblx_test/mission_bundle/LADEE_Bundle_1101.lblx"
+
+    def getallcollectionsflag(self):
+        """Get the all collections flag."""
+        return True
+
+    def getmanifests(self):
+        """Get the manifests."""
+        base = "data/ladee_lblx_test/valid/ladee_mission_bundle_v1.0_20250404_"
         return (base + "checksum_manifest_v1.0.tab", base + "transfer_manifest_v1.0.tab")
 
 
@@ -361,6 +415,8 @@ def test_suite():
             unittest.defaultTestLoader.loadTestsFromTestCase(InsightLatestSIPTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(LADEEAIPTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(LADEESIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEELBLXAIPTest),
+            unittest.defaultTestLoader.loadTestsFromTestCase(LADEELBLXSIPTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(NAIF3SIPWithBadbaseurlTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionAIPTest),
             unittest.defaultTestLoader.loadTestsFromTestCase(SecondaryCollectionSIPTest),

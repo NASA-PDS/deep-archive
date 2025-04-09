@@ -2,8 +2,10 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
+    # Disabling trailing-whitespace because we can't have our test data files modified
+    # -   id: trailing-whitespace
+    # Ditto for the end-of-file fixer
+    # -   id: end-of-file-fixer
     -   id: check-executables-have-shebangs
     -   id: check-merge-conflict
     -   id: debug-statements

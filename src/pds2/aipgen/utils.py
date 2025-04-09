@@ -158,7 +158,7 @@ def comprehenddirectory(dn, con):
     """
     for dirpath, _dirnames, filenames in os.walk(dn):
         for fn in filenames:
-            if fn.lower().endswith(".xml"):
+            if fn.lower().endswith(".xml") or fn.lower().endswith(".lblx"):
                 xmlfile = os.path.join(dirpath, fn)
                 _logger.debug("📄 Deconstructing %s", xmlfile)
                 tree = parsexml(xmlfile)
