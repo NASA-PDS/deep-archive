@@ -193,8 +193,6 @@ The following is a checklist and procedure Discipline Node personnel should
 follow when delivering a PDS Deep Archive data package to the PDS Engineering
 Node upon a new release of data.
 
-For more formalized details on the NSSDCA Delivery Process, see the following `process document <https://github.com/NASA-PDS/pds-deep-archive/tree/main/docs/PDS4_Submission_Process_v1.0.docx>`_.
-
 1.  ▶  START: New Bundle is ready for Delivery.
 
 2.     Verify the Bundle has completed successful validation with PDS4 Validate Tool (no ERRORS).
