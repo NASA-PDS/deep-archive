@@ -1,6 +1,6 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-04-11)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-07-02)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.3.0...«unknown»)
 
@@ -10,6 +10,7 @@
 
 **Defects:**
 
+- Output manifest .tab files do not use forward slashes on Windows [\#208](https://github.com/NASA-PDS/deep-archive/issues/208) [[s.medium](https://github.com/NASA-PDS/deep-archive/labels/s.medium)]
 - pds-deep-registry-archive produces incomplete SIPs for data recently uploaded to the Registry [\#202](https://github.com/NASA-PDS/deep-archive/issues/202) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 
 ## [v1.3.0](https://github.com/NASA-PDS/deep-archive/tree/v1.3.0) (2024-10-16)
