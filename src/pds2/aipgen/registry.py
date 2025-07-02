@@ -34,7 +34,7 @@ import argparse
 import dataclasses
 import hashlib
 import logging
-import os.path
+import posixpath
 import sys
 from datetime import datetime
 from http import HTTPStatus
@@ -241,7 +241,7 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
 
 def _urltocommonpath(url: str, pathprefix: str) -> str:
     """Given a ``url`` and a ``pathprefix`` return the relative path of the path-only part of ``url``."""
-    return os.path.relpath(urlparse(url).path, pathprefix)
+    return posixpath.relpath(urlparse(url).path, pathprefix)
 
 
 def _writechecksummanifest(fn: str, pathprefix: str, bac: dict) -> tuple[str, int, int]:
@@ -361,7 +361,7 @@ def _findcommonpathprefix(bac: dict) -> str:
         for url in urls:
             yield urlparse(url).path
 
-    return os.path.commonpath(paths(urls(bac)))
+    return posixpath.commonpath(paths(urls(bac)))
 
 
 def generatedeeparchive(url: str, bundlelidvid: str, site: str, allcollections=True):
