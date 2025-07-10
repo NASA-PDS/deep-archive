@@ -175,7 +175,7 @@ def _writetable(hashedfiles, hashname, manifest, baseurl, bp):
         size += len(entry)
         count += 1
         if count % 100 == 0:
-            _logger.debug("⏰ Wrote %d entries into the SIP", count)
+            _logger.info("⏰ Wrote %d entries into the SIP", count)
     return hashish.hexdigest(), size
 
 

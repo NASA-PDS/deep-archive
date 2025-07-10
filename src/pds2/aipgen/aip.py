@@ -302,7 +302,7 @@ def _writechecksummanifest(chksumfn, lid, vid, con, prefixlen, allcollections):
                 size += len(entry)
                 count += 1
                 if count % 100 == 0:
-                    _logger.debug("⏲ Wrote %d entries into the checksum manifest", count)
+                    _logger.info("⏲ Wrote %d entries into the checksum manifest", count)
     return md5.hexdigest(), size, count, files
 
 
@@ -334,7 +334,7 @@ def _writetransfermanifest(xferfn, prefixlen, files):
                 size += len(entry)
                 count += 1
                 if count % 100 == 0:
-                    _logger.debug("⌚️ Wrote %d entries into the transfer manifest", count)
+                    _logger.info("⌚️ Wrote %d entries into the transfer manifest", count)
     return md5.hexdigest(), size, count
 
 
