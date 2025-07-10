@@ -1,12 +1,13 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-07-02)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-07-10)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.3.0...«unknown»)
 
 **Requirements:**
 
 - As a user, I want deep archive to support LBLX label extensions [\#157](https://github.com/NASA-PDS/deep-archive/issues/157)
+- As a user, I want to know that the software is still executing on long running jobs. [\#136](https://github.com/NASA-PDS/deep-archive/issues/136)
 
 **Defects:**
 
