@@ -29,7 +29,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """PDS AIP-GEN: Unit tests of the Utilities package"""
 import argparse
-import importlib.resources
 import logging
 import os
 import tempfile
