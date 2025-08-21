@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2019–2020 California Institute of Technology ("Caltech").
+# Copyright © 2019–2025 California Institute of Technology ("Caltech").
 # ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,5 +34,3 @@
 # packages, the ``site-packages/pds/__init__.py`` sets the __path__ for
 # future ``pds`` resolutions. So, ``pds2``. Lovely, huh? 😬
 """PDS2 Namespace."""
-
-__import__("pkg_resources").declare_namespace(__name__)
