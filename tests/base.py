@@ -30,6 +30,7 @@
 """PDS AIP-GEN test base classes."""
 import codecs
 import filecmp
+import importlib.resources
 import os
 import shutil
 import sqlite3
@@ -38,7 +39,6 @@ import unittest
 from datetime import date
 from datetime import datetime
 
-import pkg_resources
 from lxml import etree
 from pds2.aipgen.aip import process as produce_aip
 from pds2.aipgen.constants import PDS_NS_URI
@@ -64,13 +64,13 @@ class _FunctionalTestCase(unittest.TestCase):
 
     def setUp(self):
         super(_FunctionalTestCase, self).setUp()
-        bundledir = pkg_resources.resource_filename(__name__, os.path.dirname(self.getbundlefile()))
+        bundledir = importlib.resources.files(__name__).joinpath(os.path.dirname(self.getbundlefile()))
         self.dbfile = tempfile.NamedTemporaryFile()
         self.con = sqlite3.connect(self.dbfile.name)
         with self.con:
             createschema(self.con)
             comprehenddirectory(bundledir, self.con)
-        self.input = pkg_resources.resource_stream(__name__, self.getbundlefile())
+        self.input = importlib.resources.files(__name__).joinpath(self.getbundlefile()).open("rb")
         self.cwd, self.testdir = os.getcwd(), tempfile.mkdtemp()
         os.chdir(self.testdir)
         ts = datetime.utcnow()
@@ -112,7 +112,7 @@ class SIPFunctionalTestCase(_FunctionalTestCase):
     def setUp(self):
         """Set up this text fixture, duh."""
         super(SIPFunctionalTestCase, self).setUp()
-        self.valid = pkg_resources.resource_filename(__name__, self.getvalidsipfilename())
+        self.valid = importlib.resources.files(__name__).joinpath(self.getvalidsipfilename())
 
     def test_sip(self):
         """Test if a SIP manifest works as expected."""
@@ -172,8 +172,8 @@ class AIPFunctionalTestCase(_FunctionalTestCase):
     def setUp(self):
         """Set up this test fixture."""
         super(AIPFunctionalTestCase, self).setUp()
-        self.csum = pkg_resources.resource_filename(__name__, self.getmanifests()[0])
-        self.xfer = pkg_resources.resource_filename(__name__, self.getmanifests()[1])
+        self.csum = importlib.resources.files(__name__).joinpath(self.getmanifests()[0])
+        self.xfer = importlib.resources.files(__name__).joinpath(self.getmanifests()[1])
 
     def test_manifests(self):
         """See if the AIP generator makes the two manifest files."""

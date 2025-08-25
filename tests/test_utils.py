@@ -34,7 +34,6 @@ import os
 import tempfile
 import unittest
 
-import pkg_resources
 import zope.component  # type: ignore
 from pds2.aipgen.interfaces import IURLValidator
 from pds2.aipgen.utils import addloggingarguments
@@ -77,10 +76,12 @@ class BundleParsingTestCase(unittest.TestCase):
 
     def setUp(self):
         super(BundleParsingTestCase, self).setUp()
-        self.emptyBun = pkg_resources.resource_stream(__name__, "data/ladee_test/mission_bundle/LADEE_Bundle_1101.xml")
-        self.fullBunFN = pkg_resources.resource_filename(
-            __name__, "data/ladee_test/mission_bundle/context/collection_mission_context.xml"
-        )
+        test_dir = os.path.dirname(__file__)
+        # Not even AI can figure out how to get this to work with importlib.resources.files, so back to
+        # os.path.join.
+        bundle_path = os.path.join(test_dir, "data", "ladee_test", "mission_bundle", "LADEE_Bundle_1101.xml")
+        self.emptyBun = open(bundle_path, "rb")
+        self.fullBunFN = os.path.join(test_dir, "data", "ladee_test", "mission_bundle", "context", "collection_mission_context.xml")
 
     def test_lid_vid_retrieval(self):
         liv, vid = getlogicalversionidentifier(parsexml(self.emptyBun))
@@ -125,9 +126,9 @@ class URLValidatorTest(unittest.TestCase):
         validator = zope.component.getUtility(IURLValidator)
 
         # First, try with a valid URL
-        url = "file:" + pkg_resources.resource_filename(
-            __name__, "data/ladee_test/mission_bundle/context/collection_mission_context.xml"
-        )
+        test_dir = os.path.dirname(__file__)
+        context_path = os.path.join(test_dir, "data", "ladee_test", "mission_bundle", "context", "collection_mission_context.xml")
+        url = "file:" + context_path
         self.assertTrue(not self.singleton._checked)
         validator.validate(url)
         self.assertTrue(self.singleton._checked)

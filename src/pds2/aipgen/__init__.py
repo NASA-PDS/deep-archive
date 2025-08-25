@@ -29,13 +29,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """PDS AIP-GEN.
 
-Okay, it's more the AIP-GEN now. It started off as Archive Information Product Generator. But then it
+Okay, it's more than AIP-GEN now. It started off as Archive Information Product Generator. But then it
 got SIP (Submission Information Product) Generation too. And then it started working beyond filesystem
 PDS products and used the registry.
 
 But ``aipgen`` is where it all started.
 """
-import pkg_resources
+import importlib.resources
 
 
-__version__ = VERSION = pkg_resources.resource_string(__name__, "VERSION.txt").decode("utf-8").strip()
+__version__ = VERSION = importlib.resources.files(__name__).joinpath("VERSION.txt").read_text().strip()

@@ -34,23 +34,14 @@ html_theme         = 'sphinx_rtd_theme'
 master_doc         = 'index'
 pygments_style     = 'sphinx'
 source_suffix      = '.rst'
-templates_path     = ['_templates']
 todo_include_todos = True
 
 # -- Read the docs config -------
 
 html_logo = '_static/images/PDS_Planets.png'
-
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  # override wide tables in RTD theme
-    ],
-}
-
+html_css_files = ['theme_overrides.css']
 html_theme_options = {
     'canonical_url': '',
-    'logo_only': False,
-    'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     # Toc options
@@ -73,8 +64,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
-    'sphinx_rtd_theme',
-    'sphinxarg.ext',
 ]
 
 # Other Options
