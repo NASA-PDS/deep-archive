@@ -1,0 +1,65 @@
+# 🏃‍♀️ Continuous Integration and Delivery: Branch Testing
+# ======================================================
+
+
+---
+
+name: 🔁 Branch integration testing
+
+
+# Driving Event
+# -------------
+#
+# What event starts this workflow: a push to any branch other than main
+
+on:
+    push:
+        branches:
+            -   '**'
+            -   '!main'
+    workflow_dispatch:
+
+
+# What to Do
+# ----------
+#
+# Test the software with tox
+
+jobs:
+    branch-testing:
+        name: 🪵 Branch Testing
+        runs-on: ubuntu-latest
+        if: github.actor != 'pdsen-ci'
+
+        steps:
+            -
+                name: 💳 Checkout
+                uses: actions/checkout@v4
+                with:
+                    lfs: true
+                    fetch-depth: 0
+                    token: ${{secrets.ADMIN_GITHUB_TOKEN}}
+            -
+                name: Set up Python 3
+                uses: actions/setup-python@v5
+                with:
+                    python-version: '3.13'
+            -
+                name: 💵 Python Cache
+                uses: actions/cache@v4
+                with:
+                    path: ~/.cache/pip
+                    # The "key" used to indicate a set of cached files is the operating system runner
+                    # plus "py" for Python-specific builds, plus a hash of the wheels, plus "pds" because
+                    # we pds-prefix everything with "pds" in PDS! 😅
+                    key: pds-${{runner.os}}-py-${{hashFiles('**/*.whl')}}
+                    # To restore a set of files, we only need to match a prefix of the saved key.
+                    restore-keys: pds-${{runner.os}}-py-
+
+            -
+                name: 🩺 Test Software
+                run:
+                    pip install --editable '.[dev]'
+
+                    tox
+                shell: bash
