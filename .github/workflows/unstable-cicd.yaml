@@ -77,6 +77,11 @@ jobs:
                     pypi_username: ${{secrets.TEST_PYPI_USERNAME}}
                     pypi_password: ${{secrets.TEST_PYPI_PASSWORD}}
                     ADMIN_GITHUB_TOKEN: ${{secrets.ADMIN_GITHUB_TOKEN}}
+            -
+                name: 🛏️ Upload Coverage
+                uses: SonarSource/sonarqube-scan-action@v5
+                env:
+                    SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
 
 ...
 
