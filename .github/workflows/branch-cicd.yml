@@ -64,5 +64,5 @@ jobs:
             -
                 name: 🛏️ Upload Coverage
                 uses: SonarSource/sonarqube-scan-action@v5
-                with:
+                env:
                     SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
