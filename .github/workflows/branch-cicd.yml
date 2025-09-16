@@ -55,11 +55,14 @@ jobs:
                     key: pds-${{runner.os}}-py-${{hashFiles('**/*.whl')}}
                     # To restore a set of files, we only need to match a prefix of the saved key.
                     restore-keys: pds-${{runner.os}}-py-
-
             -
                 name: 🩺 Test Software
                 run:
                     pip install --editable '.[dev]'
-
                     tox
                 shell: bash
+            -
+                name: 🛏️ Upload Coverage
+                uses: SonarSource/sonarqube-scan-action@v5
+                env:
+                    SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}

@@ -48,6 +48,7 @@ pip-selfcheck.json
 .coverage
 htmlcov
 .tox/
+coverage.xml
 
 # Object files
 *.o
