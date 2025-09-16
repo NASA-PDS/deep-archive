@@ -1,6 +1,6 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-08-25)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-09-16)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.3.0...«unknown»)
 
