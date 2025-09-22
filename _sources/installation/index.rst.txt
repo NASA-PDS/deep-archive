@@ -26,7 +26,7 @@ Requirements
 Prior to installing this software, ensure your system meets the following
 requirements:
 
-•  Python_ 3. This software requires Python 3.9, 3.10, or 3.11.  Python 2 will
+•  Python_ 3. This software requires Python 3.13 or later.  Python 2 will
    absolutely *not* work, and indeed Python 2 came to its end of life on the
    first of January, 2020.  Run ``python --version``, or ``python3 --version``,
    to check what is installed.
@@ -166,47 +166,33 @@ environment for the Deep Archive software.
 To do so, open Windows PowerShell (as above) and at the prompt, type the
 following command (then press Enter)::
 
-    python3.11 -m venv pds
+    python3.13 -m venv pds
 
 .. note::
 
     If you installed Python from https://python.org/ or using Anaconda or
-    Miniconda, you may need to replace ``python3.11`` with ``python3`` or
+    Miniconda, you may need to replace ``python3.13`` with ``python3`` or
     even simply ``python``.
 
 This will create a subfolder in the current directory called ``pds`` which
 contains the virtual environment. Next, you'll need to "activate" the virtual
 environment by entering the following command (then press Enter)::
 
-    .\pds\Scripts\activate.ps1
+    .\pds\Scripts\Activate.ps1
 
 Your PowerShell prompt will change to show ``(pds)`` at the front, indicating
 that the virtual environment is now active.
-
-
-Installing LXML 4.9.0
-~~~~~~~~~~~~~~~~~~~~~
-
-Because the Deep Archive manipulates and parses XML files, the "LXML" API for
-Python must now be installed into the virtual environment. In the same
-Windows PowerShell with the ``(pds)`` prompt, enter the following command
-(then press Enter)::
-
-    pip install https://download.lfd.uci.edu/pythonlibs/archived/lxml-4.9.0-cp311-cp311-win_amd64.whl
-
-This will download and install LXML version 4.9.0 for Python 3.11 for 64-bit
-Intel/AMD processors for Windows.
 
 
 Installing PDS Deep Archive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, you can install the PDS Deep Archive. As of this writing, version
-1.1.5 or later is recommended for Windows. To install it, enter the following
+1.4.0 or later is recommended for Windows. To install it, enter the following
 command in the same Windows PowerShell with the ``(pds)`` prompt (then press
 Enter)::
 
-    pip install pds.deeparchive~=1.1.5
+    pip install pds.deeparchive~=1.4.0
 
 Feel free to change the version number in the command as needed.
 

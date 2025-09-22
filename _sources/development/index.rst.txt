@@ -6,8 +6,9 @@ build it out::
 
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
-    python3.9 -m venv venv
-    venv/bin/pip install --editable '.[dev]'
+    python3.13 -m venv venv
+    source venv/bin/activate
+    pip install --editable '.[dev]'
 
 .. note:: The above series of commands assume you have the corresponding
     development tools and familiarity with invoking them from the
@@ -22,8 +23,8 @@ the code are reflected in immediately.
 
 The documentation is in ``docs/source``, formatted as reStructuredText_ and
 structured with Sphinx_.  To build the HTML from the documentation, run
-``venv/bin/python setup.py build_sphinx``. It will write HTML output to
-``build/sphinx/html``.
+``sphinx-build -b html docs/source docs/build``. It will write HTML output to
+``docs/build`` and you can open ``docs/build/index.html`` in your browser.
 
 Commits back to GitHub will trigger workflows in GitHub Actions_ that
 re-publish the project website_ as well as send artifacts to the testing_
@@ -36,16 +37,16 @@ Testing
 -------
 
 The code base finally includes unit and functional tests. Once you've run
-``venv/bin/pip install --editable '.[dev]'`` you can run the entire test suite
+``pip install --editable '.[dev]'`` you can run the entire test suite
 easily with::
 
-    venv/bin/tox -e py39
+    tox -e py313
 
 
 Making Releases
 ---------------
 
-That's what our continuous integration is for; the "stable" workflow
+That's what our continuous integration is for—the "stable" workflow.
 
 
 Contribute
