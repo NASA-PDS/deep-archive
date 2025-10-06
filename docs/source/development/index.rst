@@ -6,7 +6,7 @@ build it out::
 
     git clone https://github.com/NASA-PDS/pds-deep-archive.git
     cd pds-deep-archive
-    python3.13 -m venv venv
+    python3 -m venv venv
     source venv/bin/activate
     pip install --editable '.[dev]'
 
@@ -40,7 +40,12 @@ The code base finally includes unit and functional tests. Once you've run
 ``pip install --editable '.[dev]'`` you can run the entire test suite
 easily with::
 
-    tox -e py313
+    tox
+
+To test against a specific Python version::
+
+    tox -e py312   # Test with Python 3.12
+    tox -e py313   # Test with Python 3.13
 
 
 Making Releases

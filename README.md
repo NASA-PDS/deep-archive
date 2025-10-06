@@ -42,7 +42,7 @@ Installation and Usage information can be found in the documentation online at h
 To build the Sphinx HTML documentation:
 
 ```console
-$ python3.13 -m venv venv
+$ python3 -m venv venv
 $ source venv/bin/pip activate
 $ pip install --editable '.[dev]
 $ sphinx-build --builder html docs/source docs/build
