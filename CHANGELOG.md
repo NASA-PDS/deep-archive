@@ -1,8 +1,24 @@
 # Changelog
 
-## [release/1.4.0](https://github.com/NASA-PDS/deep-archive/tree/release/1.4.0) (2025-09-16)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-10-07)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.3.0...release/1.4.0)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.4.0...«unknown»)
+
+**Improvements:**
+
+- Enable Python 3.12 compatibility [\#218](https://github.com/NASA-PDS/deep-archive/issues/218)
+
+**Defects:**
+
+- pds-deep-registry-archive does not include all collections within a bundle in SIP/AIP files [\#213](https://github.com/NASA-PDS/deep-archive/issues/213) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+
+**Other closed issues:**
+
+- Add test coverage reporting to deep archive CI [\#207](https://github.com/NASA-PDS/deep-archive/issues/207)
+
+## [v1.4.0](https://github.com/NASA-PDS/deep-archive/tree/v1.4.0) (2025-09-22)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.3.0...v1.4.0)
 
 **Requirements:**
 
