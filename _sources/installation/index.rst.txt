@@ -26,7 +26,7 @@ Requirements
 Prior to installing this software, ensure your system meets the following
 requirements:
 
-•  Python_ 3. This software requires Python 3.13 or later.  Python 2 will
+•  Python_ 3. This software requires Python 3.12 or later.  Python 2 will
    absolutely *not* work, and indeed Python 2 came to its end of life on the
    first of January, 2020.  Run ``python --version``, or ``python3 --version``,
    to check what is installed.
@@ -97,10 +97,9 @@ Windows Installation
 
 To install the Deep Archive software on Windows comprises the following steps:
 
-1. Installing Python 3.11 for Windows
-2. Creating a "virtual environment" to contain an isolated instance of Python 3.11
-3. Installing LXML 4.9.0 for Python 3.11 into the virtual environment
-4. Installing the PDS Deep Archive into the virtual environment
+1. Installing Python 3.12 or 3.13 for Windows
+2. Creating a "virtual environment" to contain an isolated instance of Python
+3. Installing the PDS Deep Archive into the virtual environment
 
 The remainder of this section details these steps.
 
@@ -108,9 +107,8 @@ The remainder of this section details these steps.
 Installing Python for Windows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python 3.11 (and specifically Python 3.11—no later or earlier versions will
-work) will need to be installed onto your Windows system. There are several
-ways to get Python 3.11:
+Python 3.12 or Python 3.13 will need to be installed onto your Windows system.
+There are several ways to get Python:
 
 • The "Microsoft Store" app
 • Directly from https://python.org/
@@ -119,27 +117,26 @@ ways to get Python 3.11:
 
 Use whatever is the most familiar to you. If you're not sure, the Microsoft
 Store app is probably the easiest. To use the Microsoft Store to install
-Python 3.11, do the following:
+Python, do the following:
 
 1. In the Windows taskbar's search box or Start Menu, open Microsoft Store.
-2. In the search box at the top, type ``Python 3.11``
-3. In the list of matching results, press the "Get" button next to Python 3.11.
+2. In the search box at the top, type ``Python 3.12`` or ``Python 3.13``
+3. In the list of matching results, press the "Get" button next to your chosen Python version.
 
 .. tip::
 
     If you're on a managed system, you may need to ask your system
-    administrator to install Python 3.11 for you.
+    administrator to install Python for you.
 
 Next, confirm that it's properly installed by opening Windows PowerShell and
-starting Python 3.11 from the command-line. Use the Windows taskbar search
-box or Start Menu to launch Windows PowerShell, then type ``python3.11`` and
+starting Python from the command-line. Use the Windows taskbar search
+box or Start Menu to launch Windows PowerShell, then type ``python`` and
 press Enter.
 
 .. note::
 
-    If you installed Python from https://python.org/ or using Anaconda or
-    Miniconda, the command you enter may be ``python3`` or even simply
-    ``python`` instead of ``python3.11``.
+    Depending on how you installed Python, the command you enter may be
+    ``python3``, ``python3.12``, ``python3.13``, or simply ``python``.
 
 .. tip::
 
@@ -166,13 +163,12 @@ environment for the Deep Archive software.
 To do so, open Windows PowerShell (as above) and at the prompt, type the
 following command (then press Enter)::
 
-    python3.13 -m venv pds
+    python -m venv pds
 
 .. note::
 
-    If you installed Python from https://python.org/ or using Anaconda or
-    Miniconda, you may need to replace ``python3.13`` with ``python3`` or
-    even simply ``python``.
+    Depending on how you installed Python, you may need to use ``python3``,
+    ``python3.12``, or ``python3.13`` instead of ``python``.
 
 This will create a subfolder in the current directory called ``pds`` which
 contains the virtual environment. Next, you'll need to "activate" the virtual

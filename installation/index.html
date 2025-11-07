@@ -111,7 +111,7 @@ running macOS.</p>
 <p>Prior to installing this software, ensure your system meets the following
 requirements:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://www.python.org/">Python</a> 3. This software requires Python 3.13 or later.  Python 2 will
+<li><p><a class="reference external" href="https://www.python.org/">Python</a> 3. This software requires Python 3.12 or later.  Python 2 will
 absolutely <em>not</em> work, and indeed Python 2 came to its end of life on the
 first of January, 2020.  Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code>, or <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">--version</span></code>,
 to check what is installed.</p></li>
@@ -177,17 +177,15 @@ pip3 install --index-url https://test.pypi.org/simple --extra-index-url https://
 <h2>Windows Installation<a class="headerlink" href="#windows-installation" title="Link to this heading"></a></h2>
 <p>To install the Deep Archive software on Windows comprises the following steps:</p>
 <ol class="arabic simple">
-<li><p>Installing Python 3.11 for Windows</p></li>
-<li><p>Creating a “virtual environment” to contain an isolated instance of Python 3.11</p></li>
-<li><p>Installing LXML 4.9.0 for Python 3.11 into the virtual environment</p></li>
+<li><p>Installing Python 3.12 or 3.13 for Windows</p></li>
+<li><p>Creating a “virtual environment” to contain an isolated instance of Python</p></li>
 <li><p>Installing the PDS Deep Archive into the virtual environment</p></li>
 </ol>
 <p>The remainder of this section details these steps.</p>
 <section id="installing-python-for-windows">
 <h3>Installing Python for Windows<a class="headerlink" href="#installing-python-for-windows" title="Link to this heading"></a></h3>
-<p>Python 3.11 (and specifically Python 3.11—no later or earlier versions will
-work) will need to be installed onto your Windows system. There are several
-ways to get Python 3.11:</p>
+<p>Python 3.12 or Python 3.13 will need to be installed onto your Windows system.
+There are several ways to get Python:</p>
 <ul class="simple">
 <li><p>The “Microsoft Store” app</p></li>
 <li><p>Directly from <a class="reference external" href="https://python.org/">https://python.org/</a></p></li>
@@ -196,26 +194,25 @@ ways to get Python 3.11:</p>
 </ul>
 <p>Use whatever is the most familiar to you. If you’re not sure, the Microsoft
 Store app is probably the easiest. To use the Microsoft Store to install
-Python 3.11, do the following:</p>
+Python, do the following:</p>
 <ol class="arabic simple">
 <li><p>In the Windows taskbar’s search box or Start Menu, open Microsoft Store.</p></li>
-<li><p>In the search box at the top, type <code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">3.11</span></code></p></li>
-<li><p>In the list of matching results, press the “Get” button next to Python 3.11.</p></li>
+<li><p>In the search box at the top, type <code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">3.12</span></code> or <code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">3.13</span></code></p></li>
+<li><p>In the list of matching results, press the “Get” button next to your chosen Python version.</p></li>
 </ol>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If you’re on a managed system, you may need to ask your system
-administrator to install Python 3.11 for you.</p>
+administrator to install Python for you.</p>
 </div>
 <p>Next, confirm that it’s properly installed by opening Windows PowerShell and
-starting Python 3.11 from the command-line. Use the Windows taskbar search
-box or Start Menu to launch Windows PowerShell, then type <code class="docutils literal notranslate"><span class="pre">python3.11</span></code> and
+starting Python from the command-line. Use the Windows taskbar search
+box or Start Menu to launch Windows PowerShell, then type <code class="docutils literal notranslate"><span class="pre">python</span></code> and
 press Enter.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you installed Python from <a class="reference external" href="https://python.org/">https://python.org/</a> or using Anaconda or
-Miniconda, the command you enter may be <code class="docutils literal notranslate"><span class="pre">python3</span></code> or even simply
-<code class="docutils literal notranslate"><span class="pre">python</span></code> instead of <code class="docutils literal notranslate"><span class="pre">python3.11</span></code>.</p>
+<p>Depending on how you installed Python, the command you enter may be
+<code class="docutils literal notranslate"><span class="pre">python3</span></code>, <code class="docutils literal notranslate"><span class="pre">python3.12</span></code>, <code class="docutils literal notranslate"><span class="pre">python3.13</span></code>, or simply <code class="docutils literal notranslate"><span class="pre">python</span></code>.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -238,14 +235,13 @@ interfering dependencies or conflicts. We recommend creating a virtual
 environment for the Deep Archive software.</p>
 <p>To do so, open Windows PowerShell (as above) and at the prompt, type the
 following command (then press Enter):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span><span class="mf">.13</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">pds</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">pds</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you installed Python from <a class="reference external" href="https://python.org/">https://python.org/</a> or using Anaconda or
-Miniconda, you may need to replace <code class="docutils literal notranslate"><span class="pre">python3.13</span></code> with <code class="docutils literal notranslate"><span class="pre">python3</span></code> or
-even simply <code class="docutils literal notranslate"><span class="pre">python</span></code>.</p>
+<p>Depending on how you installed Python, you may need to use <code class="docutils literal notranslate"><span class="pre">python3</span></code>,
+<code class="docutils literal notranslate"><span class="pre">python3.12</span></code>, or <code class="docutils literal notranslate"><span class="pre">python3.13</span></code> instead of <code class="docutils literal notranslate"><span class="pre">python</span></code>.</p>
 </div>
 <p>This will create a subfolder in the current directory called <code class="docutils literal notranslate"><span class="pre">pds</span></code> which
 contains the virtual environment. Next, you’ll need to “activate” the virtual
