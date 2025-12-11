@@ -152,7 +152,7 @@ def _writetable(hashedfiles, hashname, manifest, baseurl, bp):
     written.  ``bp`` is the base path that'll get stripped from URLs before writing.
     """
     _logger.debug("⎍ Writing SIP table with hash %s", hashname)
-    hashish, size, hashname, count, bp = hashlib.new("md5"), 0, hashname.upper(), 0, bp.replace("\\", "/")
+    hashish, size, hashname, count, bp = hashlib.new("md5", usedforsecurity=False), 0, hashname.upper(), 0, bp.replace("\\", "/")
     for url, digest, lidvid in sorted(hashedfiles):
         if baseurl.endswith("/"):
             baseurl = baseurl[:-1]

@@ -244,7 +244,8 @@ def parsexml(f):
 @functools.lru_cache(maxsize=_digestcachesize)
 def getdigest(url, hashname):
     """Compute a digest of the object at url and return it as a hex string."""
-    hashish = hashlib.new(hashname)
+    # Use usedforsecurity=False for MD5 to support FIPS mode (checksums, not crypto)
+    hashish = hashlib.new(hashname, usedforsecurity=False) if hashname.lower() == 'md5' else hashlib.new(hashname)
     _logger.debug("Getting «%s» for hashing with %s", url, hashname)
     with urllib.request.urlopen(url) as i:
         while True:
@@ -257,7 +258,7 @@ def getdigest(url, hashname):
 
 def getmd5(i):
     """Compute an MD5 digest of the input stream ``i`` and return it as a hex string."""
-    md5 = hashlib.new("md5")
+    md5 = hashlib.new("md5", usedforsecurity=False)
     while True:
         buf = i.read(_bufsiz)
         if len(buf) == 0:

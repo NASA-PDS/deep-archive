@@ -288,7 +288,7 @@ def _writechecksummanifest(chksumfn, lid, vid, con, prefixlen, allcollections):
     by lid-only if True, otherwise the latest version only if False.
     """
     _logger.debug("🧾 Writing checksum manifest for %s::%s to %s", lid, vid, chksumfn)
-    md5, size, count = hashlib.new("md5"), 0, 0
+    md5, size, count = hashlib.new("md5", usedforsecurity=False), 0, 0
     files = _getfiles(con, lid, vid, allcollections)
     with open(chksumfn, "wb") as o:
         # The tuples are (lid, vid, filepath)—we care just about filepath
@@ -314,7 +314,7 @@ def _writetransfermanifest(xferfn, prefixlen, files):
     (lid, vid, filepath).
     """
     _logger.debug("🚢 Writing transfer manifest to %s", xferfn)
-    md5, size, count = hashlib.new("md5"), 0, 0
+    md5, size, count = hashlib.new("md5", usedforsecurity=False), 0, 0
 
     # First, organize by lid::vids → sequences of files
     lidvidstofiles = {}
