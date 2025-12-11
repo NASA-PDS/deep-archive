@@ -1,8 +1,8 @@
 # Changelog
 
-## [release/1.5.0](https://github.com/NASA-PDS/deep-archive/tree/release/1.5.0) (2025-10-13)
+## [v1.5.0](https://github.com/NASA-PDS/deep-archive/tree/v1.5.0) (2025-11-07)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.4.0...release/1.5.0)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.4.0...v1.5.0)
 
 **Improvements:**
 
