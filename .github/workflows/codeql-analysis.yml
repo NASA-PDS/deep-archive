@@ -91,7 +91,7 @@ jobs:
 
 
     - name: Upload CodeQL Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: codeql-artifacts
         path: ${{ env.RESULTS_DIR }}
