@@ -251,7 +251,7 @@ def _writechecksummanifest(fn: str, pathprefix: str, bac: dict) -> tuple[str, in
     off paths, and using information from the ``bac``.  Return a triple of the MD5
     of the manifest, its size in bytes, and a count of the number of entries in it.
     """
-    hashish, size, count = hashlib.new("md5"), 0, 0
+    hashish, size, count = hashlib.new("md5", usedforsecurity=False), 0, 0
     with open(fn, "wb") as o:
         for files in bac.values():
             for f in files:
@@ -274,7 +274,7 @@ def _writetransfermanifest(fn: str, pathprefix: str, bac: dict) -> tuple[str, in
     the MD5 of the created manifest, its size in bytes, and a count of its entries.
     """
     _logger.debug("⚙️ Writing AIP transfer manifest to %s", fn)
-    hashish, size, count = hashlib.new("md5"), 0, 0
+    hashish, size, count = hashlib.new("md5", usedforsecurity=False), 0, 0
     with open(fn, "wb") as o:
         for lidvid, files in bac.items():
             for f in files:
@@ -321,7 +321,7 @@ def _writesip(bundlelidvid: str, bac: dict, title: str, site: str, ts: datetime,
     """
     _logger.debug("⚙️ Creating SIP for %s (title %s) for site %s", bundlelidvid, title, site)
     sipfn = _makefilename(bundlelidvid, ts, "sip", PDS_TABLE_FILENAME_EXTENSION)
-    hashish, size, count = hashlib.new("md5"), 0, 0
+    hashish, size, count = hashlib.new("md5", usedforsecurity=False), 0, 0
     with open(sipfn, "wb") as o:
         for lidvid, files in bac.items():
             for f in files:
