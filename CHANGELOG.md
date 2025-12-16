@@ -1,5 +1,13 @@
 # Changelog
 
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2025-12-16)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.5.0...«unknown»)
+
+**Defects:**
+
+- MD5 hashing does not work in FIPS mode [\#226](https://github.com/NASA-PDS/deep-archive/issues/226) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+
 ## [v1.5.0](https://github.com/NASA-PDS/deep-archive/tree/v1.5.0) (2025-11-07)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v1.4.0...v1.5.0)
