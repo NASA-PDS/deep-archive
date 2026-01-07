@@ -229,6 +229,8 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
             _logger.error("⚠️ Failed to parse JSON response from %s: %s", url, e)
             _logger.debug("Response content: %s", r.text[:500])
             raise ValueError(f"Invalid JSON response from {url}: {e}") from e
+        if "data" not in data:
+            _logger.warning('Response missing expected "data" key from %s', url)
         matches = data.get("data", [])
         num_matches = len(matches)
         for i in matches:
