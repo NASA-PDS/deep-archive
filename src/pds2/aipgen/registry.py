@@ -97,6 +97,7 @@ _propdatamd5 = "ops:Data_File_Info.ops:md5_checksum"
 _proplabelurl = "ops:Label_File_Info.ops:file_ref"
 _proplabelmd5 = "ops:Label_File_Info.ops:md5_checksum"
 # Fields to request from API to minimize payload size
+# _searchkey must be included because it's accessed in _getproducts() line 244 for pagination
 _fields = [_propdataurl, _propdatamd5, _proplabelurl, _proplabelmd5, _searchkey]
 
 
@@ -245,6 +246,48 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
         params["search-after"] = matches[-1]["properties"][_searchkey]
 
 
+def _getcollections_batch(server_url: str, collection_lidvids: list[str]) -> Iterator[dict[str, Any]]:
+    """Get multiple collections efficiently by batching requests.
+
+    Using the PDS API server at ``server_url``, fetch all collections matching the given
+    ``collection_lidvids`` by batching them into groups of _apiquerylimit (50) and making
+    one API call per batch using OR queries.
+
+    Yields collection dictionaries. Collections not found will be omitted from results.
+    """
+    if not collection_lidvids:
+        return
+
+    session = _get_session_with_retry()
+
+    # Process collections in batches of _apiquerylimit to avoid query string limits
+    for i in range(0, len(collection_lidvids), _apiquerylimit):
+        batch = collection_lidvids[i:i + _apiquerylimit]
+        # Build query: (lidvid eq "urn:..." or lidvid eq "urn:..." or ...)
+        or_conditions = " or ".join([f'lidvid eq "{lidvid}"' for lidvid in batch])
+        query = f"({or_conditions})"
+
+        url = f"{server_url}/products"
+        params = {"q": query, "limit": _apiquerylimit}
+
+        _logger.debug('Batch fetching %d collections (batch %d-%d of %d)',
+                      len(batch), i + 1, i + len(batch), len(collection_lidvids))
+        r = session.get(url, params=params)  # type: ignore
+        if not r.ok:
+            _logger.error("⚠️ Failed to batch fetch collections: HTTP %d", r.status_code)
+            r.raise_for_status()
+        try:
+            data = r.json()
+        except requests.exceptions.JSONDecodeError as e:
+            _logger.error("⚠️ Failed to parse JSON response from batch query: %s", e)
+            _logger.debug("Response content: %s", r.text[:500])
+            raise ValueError(f"Invalid JSON response from batch query: {e}") from e
+
+        matches = data.get("data", [])
+        for collection in matches:
+            yield collection
+
+
 def _addfiles(product: dict, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
     lidvid, props = product["id"], product["properties"]
@@ -292,12 +335,8 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
     collection_lidvids = bundle.get("properties", {}).get("ref_lidvid_collection", [])
     _logger.debug("📦 Found %d collections in bundle properties", len(collection_lidvids))
 
-    for collection_lidvid in collection_lidvids:
-        # Fetch the collection details directly
-        collection = _getbundle(url, collection_lidvid)
-        if collection is None:
-            _logger.warning("⚠️ Collection %s not found in registry", collection_lidvid)
-            continue
+    # Batch fetch all collections in groups of _apiquerylimit to minimize API calls
+    for collection in _getcollections_batch(url, collection_lidvids):
         _addfiles(collection, bac)
         # Still use /members endpoint for getting products from each collection
         for product in _getproducts(url, collection["id"]):
