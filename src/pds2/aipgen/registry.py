@@ -91,7 +91,8 @@ _propdataurl = "ops:Data_File_Info.ops:file_ref"
 _propdatamd5 = "ops:Data_File_Info.ops:md5_checksum"
 _proplabelurl = "ops:Label_File_Info.ops:file_ref"
 _proplabelmd5 = "ops:Label_File_Info.ops:md5_checksum"
-_fields = [_propdataurl, _propdatamd5, _proplabelurl, _proplabelmd5]
+# Fields to request from API to minimize payload size
+_fields = [_propdataurl, _propdatamd5, _proplabelurl, _proplabelmd5, _searchkey]
 
 
 # Program/Module Metadata
@@ -214,7 +215,8 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
     # Commenting out `all` vs. `latest` functionality for now since the API does not support it at this time
     # url = f"{server_url}/products/{lidvid}/members/{'all' if allcollections else 'latest'}"
     url = f"{server_url}/products/{lidvid}/members"
-    params = {"sort": _searchkey, "limit": _apiquerylimit}
+    # Request only the fields we need to minimize payload size
+    params = {"sort": _searchkey, "limit": _apiquerylimit, "fields": ",".join(_fields)}
     while True:
         _logger.debug('Making request to %s with params %r', url, params)
         r = session.get(url, params=params)  # type: ignore
