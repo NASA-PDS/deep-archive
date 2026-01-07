@@ -81,7 +81,12 @@ _searchkey = "ops:Harvest_Info.ops:harvest_date_time"  # How to sort products
 
 _retryattempts = 5  # Maximum number of retry attempts
 _retrybackoff = 2  # Exponential backoff factor (seconds)
-_retrystatus = [500, 502, 503, 504]  # HTTP status codes to retry on
+_retrystatus = [
+    HTTPStatus.INTERNAL_SERVER_ERROR,
+    HTTPStatus.BAD_GATEWAY,
+    HTTPStatus.SERVICE_UNAVAILABLE,
+    HTTPStatus.GATEWAY_TIMEOUT,
+]  # HTTP status codes to retry on
 
 
 # PDS API property keys we're interested in
