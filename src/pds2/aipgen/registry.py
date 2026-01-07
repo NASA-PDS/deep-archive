@@ -228,10 +228,19 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
     title = bundle.get("title", "«unknown»")
     _addfiles(bundle, bac)
 
-    # It turns out the PDS registry makes this *trivial* compared to the PDS filesystem version;
-    # Just understanding it all was there was the hard part! 😊 THANK YOU! 🙏
-    for collection in _getproducts(url, bundlelidvid, allcollections):
+    # Get collection LIDVIDs from the bundle's properties instead of using the /members endpoint
+    # This avoids issues with the /members endpoint and uses the ref_lidvid_collection field
+    collection_lidvids = bundle.get("properties", {}).get("ref_lidvid_collection", [])
+    _logger.debug("📦 Found %d collections in bundle properties", len(collection_lidvids))
+
+    for collection_lidvid in collection_lidvids:
+        # Fetch the collection details directly
+        collection = _getbundle(url, collection_lidvid)
+        if collection is None:
+            _logger.warning("⚠️ Collection %s not found in registry", collection_lidvid)
+            continue
         _addfiles(collection, bac)
+        # Still use /members endpoint for getting products from each collection
         for product in _getproducts(url, collection["id"]):
             _addfiles(product, bac)
 
