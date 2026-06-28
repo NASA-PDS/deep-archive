@@ -1,8 +1,8 @@
 # Changelog
 
-## [release/2.2.0](https://github.com/NASA-PDS/deep-archive/tree/release/2.2.0) (2026-01-10)
+## [v2.2.0](https://github.com/NASA-PDS/deep-archive/tree/v2.2.0) (2026-01-12)
 
-[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v2.0.0...release/2.2.0)
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v2.0.0...v2.2.0)
 
 **Improvements:**
 
@@ -11,7 +11,6 @@
 **Defects:**
 
 - Registry transient error not handled gracefully – JSONDecodeError on 500 response [\#237](https://github.com/NASA-PDS/deep-archive/issues/237) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
-- pds-deep-registry-archive does not include all collections within a bundle in SIP/AIP files second round [\#236](https://github.com/NASA-PDS/deep-archive/issues/236) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 
 ## [v2.0.0](https://github.com/NASA-PDS/deep-archive/tree/v2.0.0) (2025-12-16)
 
