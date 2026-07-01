@@ -50,7 +50,7 @@ jobs:
                     python-version: ${{matrix.python-version}}
             -
                 name: 💵 Python Cache
-                uses: actions/cache@v5
+                uses: actions/cache@v6
                 with:
                     path: ~/.cache/pip
                     # The "key" used to indicate a set of cached files is the operating system runner
