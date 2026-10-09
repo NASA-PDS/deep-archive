@@ -1,5 +1,13 @@
 # Changelog
 
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2026-10-09)
+
+[Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v2.2.0...«unknown»)
+
+**Defects:**
+
+- pds-deep-registry-archive does not return data products due to API / Registry bug [\#255](https://github.com/NASA-PDS/deep-archive/issues/255) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
+
 ## [v2.2.0](https://github.com/NASA-PDS/deep-archive/tree/v2.2.0) (2026-01-12)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v2.0.0...v2.2.0)
