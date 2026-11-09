@@ -288,6 +288,55 @@ def _getcollections_batch(server_url: str, collection_lidvids: list[str]) -> Ite
             yield collection
 
 
+def _getlatestlidvid(server_url: str, lid: str) -> Union[str, None]:
+    """Get the latest LIDVID of a product.
+
+    Using the PDS API server at ``server_url`` resolve the LID-only identifier ``lid`` to the full LIDVID
+    of its latest version. If ``lid`` can't be found, log a warning and return ``None``.
+    """
+    session = _get_session_with_retry()
+    url = f"{server_url}/products/{lid}"
+    _logger.debug('Resolving latest version of %s from %s', lid, url)
+    r = session.get(url, params={"fields": "lidvid"})  # type: ignore
+    if r.status_code == HTTPStatus.NOT_FOUND:
+        _logger.warning("⚠️ Collection %s referenced by the bundle cannot be found in the registry", lid)
+        return None
+    if not r.ok:
+        _logger.error("⚠️ Failed to fetch %s: HTTP %d", url, r.status_code)
+        r.raise_for_status()
+    try:
+        return r.json()["id"]
+    except requests.exceptions.JSONDecodeError as e:
+        _logger.error("⚠️ Failed to parse JSON response from %s: %s", url, e)
+        _logger.debug("Response content: %s", r.text[:500])
+        raise ValueError(f"Invalid JSON response from {url}: {e}") from e
+    except KeyError as e:
+        raise ValueError(f"Response from {url} has no product identifier") from e
+
+
+def _getcollectionlidvids(server_url: str, props: dict[str, Any]) -> list[str]:
+    """Get the LIDVIDs of the collections a bundle refers to.
+
+    Combine the ``ref_lidvid_collection`` and ``ref_lid_collection`` entries of the bundle properties ``props``
+    into a list of unique collection LIDVIDs. Any LID in ``ref_lid_collection`` that has no matching LIDVID
+    in ``ref_lidvid_collection`` is resolved to its latest version using the PDS API server at ``server_url``.
+    LIDs that can't be found in the registry are logged and skipped.
+    """
+    # Some bundles have a placeholder such as "null" in ref_lidvid_collection; only keep real LIDVIDs
+    lidvids = [i for i in props.get("ref_lidvid_collection", []) if "::" in i]
+    lids = {i.split("::")[0] for i in lidvids}
+    collection_lidvids = list(dict.fromkeys(lidvids))  # Unique, but keep order
+    for ref in props.get("ref_lid_collection", []):
+        lid = ref.split("::")[0]
+        if lid in lids:  # Already have a LIDVID for it
+            continue
+        lids.add(lid)
+        lidvid = _getlatestlidvid(server_url, lid)
+        if lidvid is not None:
+            collection_lidvids.append(lidvid)
+    return collection_lidvids
+
+
 def _addfiles(product: dict, bac: dict):
     """Add the PDS files described in the PDS ``product`` to the ``bac``."""
     lidvid, props = product["id"], product["properties"]
@@ -331,9 +380,15 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
     _addfiles(bundle, bac)
 
     # Get collection LIDVIDs from the bundle's properties instead of using the /members endpoint
-    # This avoids issues with the /members endpoint and uses the ref_lidvid_collection field
-    collection_lidvids = bundle.get("properties", {}).get("ref_lidvid_collection", [])
+    # This avoids issues with the /members endpoint and uses the ref_lidvid_collection and
+    # ref_lid_collection fields
+    collection_lidvids = _getcollectionlidvids(url, bundle.get("properties", {}))
     _logger.debug("📦 Found %d collections in bundle properties", len(collection_lidvids))
+    if not collection_lidvids:
+        _logger.error(
+            "⚠️ No collections could be found for bundle %s; the AIP and SIP will describe only the bundle label",
+            bundlelidvid
+        )
 
     # Batch fetch all collections in groups of _apiquerylimit to minimize API calls
     for collection in _getcollections_batch(url, collection_lidvids):
