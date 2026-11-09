@@ -322,7 +322,7 @@ def _getcollectionlidvids(server_url: str, props: dict[str, Any]) -> list[str]:
     in ``ref_lidvid_collection`` is resolved to its latest version using the PDS API server at ``server_url``.
     LIDs that can't be found in the registry are logged and skipped.
     """
-    # Some bundles have a placeholder such as "null" in ref_lidvid_collection; only keep real LIDVIDs
+    # Defensive guard: the API reports the literal "null" for a property that doesn't exist, so keep only real LIDVIDs
     lidvids = [i for i in props.get("ref_lidvid_collection", []) if "::" in i]
     lids = {i.split("::")[0] for i in lidvids}
     collection_lidvids = list(dict.fromkeys(lidvids))  # Unique, but keep order

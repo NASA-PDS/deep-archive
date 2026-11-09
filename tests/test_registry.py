@@ -98,13 +98,25 @@ class RegistryCollectionTest(unittest.TestCase):
     def test_lid_only_bundle(self):
         """A bundle with only ``ref_lid_collection`` resolves the latest collection and gathers its products."""
         fake = _FakeRegistry(
-            {"ref_lidvid_collection": ["null"], "ref_lid_collection": [_DATA_LID]},
+            {"ref_lid_collection": [_DATA_LID]},
             {_DATA_LID: _DATA_LIDVID},
             {_DATA_LIDVID: [f"{_DATA_LID}:p1::1.0", f"{_DATA_LID}:p2::1.0"]},
         )
         bac = self._run(fake)
         self.assertEqual({_BUNDLE, _DATA_LIDVID, f"{_DATA_LID}:p1::1.0", f"{_DATA_LID}:p2::1.0"}, set(bac))
         self.assertEqual(1, fake.count(f"/products/{_DATA_LID}"))
+
+    def test_null_lidvid_guard(self):
+        """Defensive guard: a literal ``"null"`` in ``ref_lidvid_collection`` is ignored, not queried."""
+        fake = _FakeRegistry(
+            {"ref_lidvid_collection": ["null"], "ref_lid_collection": [_DATA_LID]},
+            {_DATA_LID: _DATA_LIDVID},
+            {},
+        )
+        bac = self._run(fake)
+        self.assertEqual({_BUNDLE, _DATA_LIDVID}, set(bac))
+        batch_queries = [p["q"] for u, p in fake.calls if u == f"{_SERVER}/products"]
+        self.assertFalse(any('"null"' in q for q in batch_queries))
 
     def test_lidvid_only_bundle(self):
         """A bundle with only ``ref_lidvid_collection`` behaves as before and never resolves a LID."""
@@ -135,7 +147,7 @@ class RegistryCollectionTest(unittest.TestCase):
 
     def test_no_collections(self):
         """A bundle with no collection references logs an error and yields only the bundle."""
-        fake = _FakeRegistry({"ref_lidvid_collection": ["null"]}, {}, {})
+        fake = _FakeRegistry({}, {}, {})
         with self.assertLogs(registry._logger, level="ERROR") as logs:
             bac = self._run(fake)
         self.assertEqual({_BUNDLE}, set(bac))
