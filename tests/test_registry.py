@@ -1,5 +1,6 @@
 # encoding: utf-8
 """PDS AIP-GEN: Unit tests of the registry-based archive generator"""
+import hashlib
 import re
 import unittest
 from typing import Any
@@ -15,6 +16,11 @@ _BROWSE_LID = "urn:nasa:pds:testbundle:browse"
 _BROWSE_LIDVID = f"{_BROWSE_LID}::3.0"
 
 
+def _md5(text: str) -> str:
+    """Make a valid-looking MD5 digest from ``text``."""
+    return hashlib.md5(text.encode("utf-8")).hexdigest()
+
+
 def _product(lidvid: str, name: str) -> dict[str, Any]:
     """Make a minimal registry product with a label file and one data file."""
     return {
@@ -22,9 +28,9 @@ def _product(lidvid: str, name: str) -> dict[str, Any]:
         "title": name,
         "properties": {
             registry._proplabelurl: [f"https://example.invalid/{name}.xml"],
-            registry._proplabelmd5: [f"md5-{name}-label"],
+            registry._proplabelmd5: [_md5(f"{name}-label")],
             registry._propdataurl: [f"https://example.invalid/{name}.dat"],
-            registry._propdatamd5: [f"md5-{name}-data"],
+            registry._propdatamd5: [_md5(f"{name}-data")],
         },
     }
 
@@ -178,6 +184,84 @@ class RegistryCollectionTest(unittest.TestCase):
         with mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
             self.assertEqual(_DATA_LIDVID, registry._getlatestlidvid(_SERVER, _DATA_LID))
         self.assertEqual({"fields": "lidvid"}, fake.calls[0][1])
+
+
+def _badproduct(lidvid: str) -> dict[str, Any]:
+    """Make a registry product like a real bad one: a ``null`` data file and a label path with no host."""
+    return {
+        "id": lidvid,
+        "properties": {
+            registry._proplabelurl: ["/testbundle/data/bad.xml"],
+            registry._proplabelmd5: [_md5("bad-label")],
+            registry._propdataurl: ["null"],
+            registry._propdatamd5: ["null"],
+        },
+    }
+
+
+class RegistryFileReferenceTest(unittest.TestCase):
+    """Test handling of file references in registry products that are not absolute URLs."""
+
+    def test_addfiles_reports_bad_references(self):
+        """A literal ``"null"`` data file and a label path with no host are reported and not added."""
+        bad = _badproduct(f"{_DATA_LID}:bad::1.0")
+        bac: dict = {}
+        problems = registry._addfiles(bad, bac)
+        self.assertEqual(set(), bac[bad["id"]])
+        self.assertEqual(2, len(problems))
+        self.assertIn("data file reference of 'null'", problems[0])
+        self.assertIn("label file reference of '/testbundle/data/bad.xml'", problems[1])
+
+    def test_addfiles_good_product(self):
+        """A product with absolute URLs is added and reports no problems."""
+        good = _product(f"{_DATA_LID}:good::1.0", "good")
+        bac: dict = {}
+        self.assertEqual([], registry._addfiles(good, bac))
+        self.assertEqual(2, len(bac[good["id"]]))
+
+    def test_addfiles_reports_bad_md5(self):
+        """An MD5 that is ``null``, empty, or not a 32-digit hex number is reported and the file not added."""
+        for md5 in ("null", "", "md5-not-a-digest", "abc123"):
+            with self.subTest(md5=md5):
+                product = _product(f"{_DATA_LID}:p::1.0", "p")
+                product["properties"][registry._propdatamd5] = [md5]
+                bac: dict = {}
+                problems = registry._addfiles(product, bac)
+                self.assertEqual(1, len(problems))
+                self.assertIn(f"MD5 checksum of {md5!r}", problems[0])
+                self.assertEqual(1, len(bac[product["id"]]))  # Only the label
+
+    def test_addfiles_reports_missing_md5(self):
+        """Data files without matching MD5s, and a label without an MD5, are reported instead of dropped."""
+        product = _product(f"{_DATA_LID}:p::1.0", "p")
+        del product["properties"][registry._propdatamd5]
+        del product["properties"][registry._proplabelmd5]
+        bac: dict = {}
+        problems = registry._addfiles(product, bac)
+        self.assertEqual(2, len(problems))
+        self.assertIn("1 data file reference(s) but 0 MD5 checksum(s)", problems[0])
+        self.assertIn("label file reference but no MD5 checksum", problems[1])
+        self.assertEqual(set(), bac[product["id"]])
+
+    def test_comprehend_fails_listing_every_bad_reference(self):
+        """Comprehending the registry raises one error naming every product with a bad reference."""
+        bad1, bad2 = f"{_DATA_LID}:bad1::1.0", f"{_DATA_LID}:bad2::1.0"
+
+        class _BadMembersRegistry(_FakeRegistry):
+            def get(self, url, params=None):
+                if url.endswith("/members"):
+                    self.calls.append((url, params or {}))
+                    return _Response(200, {"data": [_badproduct(bad1), _badproduct(bad2)]})
+                return super().get(url, params)
+
+        fake = _BadMembersRegistry({"ref_lidvid_collection": [_DATA_LIDVID]}, {}, {})
+        with mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
+            with self.assertRaises(registry.InvalidFileReferenceError) as ctx:
+                registry._comprehendregistry(_SERVER, _BUNDLE)
+        message = str(ctx.exception)
+        self.assertIn("4 file reference(s)", message)
+        self.assertIn(bad1, message)
+        self.assertIn(bad2, message)
 
 
 if __name__ == "__main__":
