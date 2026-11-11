@@ -4,7 +4,6 @@ import hashlib
 import re
 import unittest
 from typing import Any
-from unittest import mock
 
 from pds2.aipgen import registry
 
@@ -97,7 +96,7 @@ class RegistryCollectionTest(unittest.TestCase):
     """Test discovery of a bundle's collections in the registry."""
 
     def _run(self, fake: _FakeRegistry) -> dict:
-        with mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
+        with unittest.mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
             bac, _ = registry._comprehendregistry(_SERVER, _BUNDLE)
         return bac
 
@@ -181,7 +180,7 @@ class RegistryCollectionTest(unittest.TestCase):
     def test_getlatestlidvid_found(self):
         """Resolving a known LID returns the full LIDVID and asks only for the ``lidvid`` field."""
         fake = _FakeRegistry({}, {_DATA_LID: _DATA_LIDVID}, {})
-        with mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
+        with unittest.mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
             self.assertEqual(_DATA_LIDVID, registry._getlatestlidvid(_SERVER, _DATA_LID))
         self.assertEqual({"fields": "lidvid"}, fake.calls[0][1])
 
