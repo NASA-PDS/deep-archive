@@ -219,8 +219,8 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
 
     Using the PDS API server at ``server_url`` generate products that belong to ``lidvid``.
 
-    If ``allcollections`` is True, then return all collections for LID-only references; otherwise
-    return just the latest collection for LID-only references (has no effect on full LIDVID-references).
+    The ``allcollections`` flag has no effect: the PDS API has no ``members`` variant for all versus the latest
+    version of a collection, so this always returns the members of the single ``lidvid`` given.
     """
     session = _get_session_with_retry()
     # Commenting out `all` vs. `latest` functionality for now since the API does not support it at this time
@@ -393,15 +393,12 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
     """Fathom the registry.
 
     Query the PDS API at ``url`` for all information about the PDS ``bundlelidvid`` and return a
-    comprehension of it. If ``allcollections`` is True, we include every reference from a collection
-    that's LID-only; if it's False, then we only include the latest reference form a LID-only reference.
-    A "comprehension of it" means a double of the "B.A.C." (a dict mapping PDS lidvids to sets of ``_File``s),
-    and the title of the PDS bundle.
+    comprehension of it. A "comprehension of it" means a double of the "B.A.C." (a dict mapping PDS lidvids
+    to sets of ``_File``s), and the title of the PDS bundle.
 
-    If ``allcollections`` is True, we include all collections, meaning that if a bundle references
-    a collection with LID only (no VID), we include all version IDs of that collection. When this
-    flag ``allcollections`` is False, then we include only the *latest* collection for a LID-only
-    reference.
+    If the bundle references a collection with LID only (no VID), we include only the *latest* version of that
+    collection in the registry; older versions are not included. The ``allcollections`` flag, which
+    ``pds-deep-archive`` uses to choose between all versions and the latest, has no effect here.
     """
     _logger.debug("🤔 Comprehending the registry at %s for %s", url, bundlelidvid)
 
@@ -579,8 +576,8 @@ def generatedeeparchive(url: str, bundlelidvid: str, site: str, allcollections=T
     A PDS "deep archive" 🧘‍♀️ (consisting of the Archive Information Package's transfer manifest and
     checksum manifest, and the Submission Information Package's table file—plus their corresponding
     labels) for the named PDS bundle identified by ``bundlelidvid``, for the PDS ``site``, using knowledge
-    in the PDS Registry at ``url``, including ``allcollections`` if True else just the latest collection
-    for PDS bundles that reference collections by logical identifier only.
+    in the PDS Registry at ``url``. A collection that the bundle references by logical identifier only is
+    resolved to its latest version; the ``allcollections`` flag has no effect.
     """
     # When is happening? Make a timestamp and remove the timezone info
     ts = datetime.utcnow()

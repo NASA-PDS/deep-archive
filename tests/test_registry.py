@@ -2,7 +2,7 @@
 """PDS AIP-GEN: Unit tests of the registry-based archive generator"""
 import hashlib
 import re
-import unittest
+import unittest.mock
 from typing import Any
 
 from pds2.aipgen import registry
@@ -110,6 +110,19 @@ class RegistryCollectionTest(unittest.TestCase):
         bac = self._run(fake)
         self.assertEqual({_BUNDLE, _DATA_LIDVID, f"{_DATA_LID}:p1::1.0", f"{_DATA_LID}:p2::1.0"}, set(bac))
         self.assertEqual(1, fake.count(f"/products/{_DATA_LID}"))
+
+    def test_lid_only_resolves_to_latest_regardless_of_flag(self):
+        """A LID-only reference is resolved to its latest version whether or not ``allcollections`` is set."""
+        for allcollections in (True, False):
+            with self.subTest(allcollections=allcollections):
+                fake = _FakeRegistry(
+                    {"ref_lid_collection": [_DATA_LID]},
+                    {_DATA_LID: _DATA_LIDVID},
+                    {_DATA_LIDVID: [f"{_DATA_LID}:p1::1.0"]},
+                )
+                with unittest.mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
+                    bac, _ = registry._comprehendregistry(_SERVER, _BUNDLE, allcollections)
+                self.assertEqual({_BUNDLE, _DATA_LIDVID, f"{_DATA_LID}:p1::1.0"}, set(bac))
 
     def test_null_lidvid_guard(self):
         """Defensive guard: a literal ``"null"`` in ``ref_lidvid_collection`` is ignored, not queried."""
@@ -254,7 +267,7 @@ class RegistryFileReferenceTest(unittest.TestCase):
                 return super().get(url, params)
 
         fake = _BadMembersRegistry({"ref_lidvid_collection": [_DATA_LIDVID]}, {}, {})
-        with mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
+        with unittest.mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
             with self.assertRaises(registry.InvalidFileReferenceError) as ctx:
                 registry._comprehendregistry(_SERVER, _BUNDLE)
         message = str(ctx.exception)

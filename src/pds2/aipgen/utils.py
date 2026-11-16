@@ -62,7 +62,8 @@ _plinematcher = re.compile(r"^[Pp],\s*([^\s]+)::([^\s]+)")  # Match separate lid
 # Help message for ``--include-latest-collection-only``:
 _allcollectionshelp = """For bundles that reference collections by LID, this flag will only include the latest version of
 collections in the bundle. By default, the software includes all versions of all collections located within the bundle
-root directory.
+root directory. Note that pds-deep-registry-archive always includes only the latest version of a collection that a
+bundle references by LID, so this flag has no effect there.
 """
 
 

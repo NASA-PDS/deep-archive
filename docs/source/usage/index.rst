@@ -181,7 +181,7 @@ include:
    tab-separated values file.
 •  ``insight_documents_v2.0_sip_v1.0_DATE.xml``, an PDS label for the SIP file.
 
-As with ``pds-deep-archive``, you can also specify ``--include-latest-collection-only`` to select if you want just the latest version of LID-only collections in your deep archive versus the default behavior of **all** versions of them.
+Unlike ``pds-deep-archive``, ``pds-deep-registry-archive`` has no option to include all versions of a collection. If a bundle references a collection by LID only, only the **latest** version of that collection in the registry is included in your deep archive, and ``--include-latest-collection-only`` has no effect.
 
 
 
