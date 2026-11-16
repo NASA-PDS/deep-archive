@@ -173,7 +173,7 @@ class RegistryCollectionTest(unittest.TestCase):
     def test_getlatestlidvid_not_found(self):
         """Resolving an unknown LID returns ``None``."""
         fake = _FakeRegistry({}, {}, {})
-        with mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
+        with unittest.mock.patch.object(registry, "_get_session_with_retry", return_value=fake):
             with self.assertLogs(registry._logger, level="WARNING"):
                 self.assertIsNone(registry._getlatestlidvid(_SERVER, _DATA_LID))
 
