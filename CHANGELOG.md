@@ -1,11 +1,13 @@
 # Changelog
 
-## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2026-11-11)
+## [«unknown»](https://github.com/NASA-PDS/deep-archive/tree/«unknown») (2026-11-17)
 
 [Full Changelog](https://github.com/NASA-PDS/deep-archive/compare/v2.2.0...«unknown»)
 
 **Defects:**
 
+- pds-deep-registry-archive does not report invalid file references and checksums in the registry [\#260](https://github.com/NASA-PDS/deep-archive/issues/260) [[s.medium](https://github.com/NASA-PDS/deep-archive/labels/s.medium)]
+- pds-deep-registry-archive generates incomplete AIP/SIP for bundles that reference collections by LID only \(no ref\_lidvid\_collection; finds 0 collections\) [\#258](https://github.com/NASA-PDS/deep-archive/issues/258) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 - pds-deep-registry-archive does not return data products due to API / Registry bug [\#255](https://github.com/NASA-PDS/deep-archive/issues/255) [[s.high](https://github.com/NASA-PDS/deep-archive/labels/s.high)]
 
 ## [v2.2.0](https://github.com/NASA-PDS/deep-archive/tree/v2.2.0) (2026-01-12)
