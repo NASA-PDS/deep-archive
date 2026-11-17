@@ -35,6 +35,7 @@ import dataclasses
 import hashlib
 import logging
 import posixpath
+import re
 import sys
 from datetime import datetime
 from http import HTTPStatus
@@ -113,6 +114,10 @@ __version__ = VERSION
 
 # Classes
 # =======
+
+
+class InvalidFileReferenceError(ValueError):
+    """The PDS Registry has file references that are not absolute URLs, so no manifest can be made from them."""
 
 
 @dataclasses.dataclass(order=True, frozen=True)
@@ -214,8 +219,8 @@ def _getproducts(server_url: str, lidvid: str, allcollections=True) -> Iterator[
 
     Using the PDS API server at ``server_url`` generate products that belong to ``lidvid``.
 
-    If ``allcollections`` is True, then return all collections for LID-only references; otherwise
-    return just the latest collection for LID-only references (has no effect on full LIDVID-references).
+    The ``allcollections`` flag has no effect: the PDS API has no ``members`` variant for all versus the latest
+    version of a collection, so this always returns the members of the single ``lidvid`` given.
     """
     session = _get_session_with_retry()
     # Commenting out `all` vs. `latest` functionality for now since the API does not support it at this time
@@ -288,33 +293,112 @@ def _getcollections_batch(server_url: str, collection_lidvids: list[str]) -> Ite
             yield collection
 
 
-def _addfiles(product: dict, bac: dict):
-    """Add the PDS files described in the PDS ``product`` to the ``bac``."""
+def _getlatestlidvid(server_url: str, lid: str) -> Union[str, None]:
+    """Get the latest LIDVID of a product.
+
+    Using the PDS API server at ``server_url`` resolve the LID-only identifier ``lid`` to the full LIDVID
+    of its latest version. If ``lid`` can't be found, log a warning and return ``None``.
+    """
+    session = _get_session_with_retry()
+    url = f"{server_url}/products/{lid}"
+    _logger.debug('Resolving latest version of %s from %s', lid, url)
+    r = session.get(url, params={"fields": "lidvid"})  # type: ignore
+    if r.status_code == HTTPStatus.NOT_FOUND:
+        _logger.warning("⚠️ Collection %s referenced by the bundle cannot be found in the registry", lid)
+        return None
+    if not r.ok:
+        _logger.error("⚠️ Failed to fetch %s: HTTP %d", url, r.status_code)
+        r.raise_for_status()
+    try:
+        return r.json()["id"]
+    except requests.exceptions.JSONDecodeError as e:
+        _logger.error("⚠️ Failed to parse JSON response from %s: %s", url, e)
+        _logger.debug("Response content: %s", r.text[:500])
+        raise ValueError(f"Invalid JSON response from {url}: {e}") from e
+    except KeyError as e:
+        raise ValueError(f"Response from {url} has no product identifier") from e
+
+
+def _getcollectionlidvids(server_url: str, props: dict[str, Any]) -> list[str]:
+    """Get the LIDVIDs of the collections a bundle refers to.
+
+    Combine the ``ref_lidvid_collection`` and ``ref_lid_collection`` entries of the bundle properties ``props``
+    into a list of unique collection LIDVIDs. Any LID in ``ref_lid_collection`` that has no matching LIDVID
+    in ``ref_lidvid_collection`` is resolved to its latest version using the PDS API server at ``server_url``.
+    LIDs that can't be found in the registry are logged and skipped.
+    """
+    # Defensive guard: the API reports the literal "null" for a property that doesn't exist, so keep only real LIDVIDs
+    lidvids = [i for i in props.get("ref_lidvid_collection", []) if "::" in i]
+    lids = {i.split("::")[0] for i in lidvids}
+    collection_lidvids = list(dict.fromkeys(lidvids))  # Unique, but keep order
+    for ref in props.get("ref_lid_collection", []):
+        lid = ref.split("::")[0]
+        if lid in lids:  # Already have a LIDVID for it
+            continue
+        lids.add(lid)
+        lidvid = _getlatestlidvid(server_url, lid)
+        if lidvid is not None:
+            collection_lidvids.append(lidvid)
+    return collection_lidvids
+
+
+def _isabsoluteurl(url: str) -> bool:
+    """Say whether ``url`` is an absolute URL with a scheme and host, as opposed to ``"null"`` or a bare path."""
+    parsed = urlparse(url)
+    return bool(parsed.scheme and parsed.netloc and parsed.path)
+
+
+def _isvalidmd5(md5: str) -> bool:
+    """Say whether ``md5`` is an MD5 digest of 32 hexadecimal digits, as opposed to ``"null"`` or the like."""
+    return re.fullmatch(r"[0-9a-fA-F]{32}", md5) is not None
+
+
+def _addfiles(product: dict, bac: dict) -> list[str]:
+    """Add the PDS files described in the PDS ``product`` to the ``bac``.
+
+    Return a description of each problem with the files of the ``product`` in the registry: a ``file_ref`` that
+    is not an absolute URL (such as the literal string ``null`` or a path with no scheme and host), an
+    ``md5_checksum`` that is not an MD5 digest, or data files and MD5s that don't pair up. A file with a problem
+    is not added to the ``bac``, since it can't be listed in a manifest; it's up to the caller to treat the
+    descriptions as an error.
+    """
     lidvid, props = product["id"], product["properties"]
     files = bac.get(lidvid, set())  # Get the current set (or a new empty set)
+    problems: list[str] = []
 
+    refs: list[tuple[str, str, str]] = []  # Triples of kind of file, URL, and MD5
     if _propdataurl in props:  # Are there data files in the product?
-        urls, md5s = props[_propdataurl], props[_propdatamd5]  # Get the URLs and MD5s of them
-        for url, md5 in zip(urls, md5s):  # For each URL and matching MD5
-            files.add(_File.make(url, md5))  # Add it to the set
+        urls, md5s = props[_propdataurl], props.get(_propdatamd5, [])  # Get the URLs and MD5s of them
+        if len(urls) != len(md5s):  # zip would quietly drop the extras
+            problems.append(f"{lidvid} has {len(urls)} data file reference(s) but {len(md5s)} MD5 checksum(s)")
+        refs.extend(("data file", url, md5) for url, md5 in zip(urls, md5s))
     if _proplabelurl in props:  # How about the label itself?
-        files.add(_File.make(props[_proplabelurl][0], props[_proplabelmd5][0]))  # Add it too
+        md5s = props.get(_proplabelmd5, [])
+        if md5s:
+            refs.append(("label file", props[_proplabelurl][0], md5s[0]))
+        else:
+            problems.append(f"{lidvid} has a label file reference but no MD5 checksum")
+    for kind, url, md5 in refs:
+        if not _isabsoluteurl(url):
+            problems.append(f"{lidvid} has a {kind} reference of {url!r}")
+        elif not _isvalidmd5(md5):
+            problems.append(f"{lidvid} has a {kind} {url} with an MD5 checksum of {md5!r}")
+        else:
+            files.add(_File.make(url, md5))
     bac[lidvid] = files  # Stash for future use
+    return problems
 
 
 def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tuple[dict, str]:
     """Fathom the registry.
 
     Query the PDS API at ``url`` for all information about the PDS ``bundlelidvid`` and return a
-    comprehension of it. If ``allcollections`` is True, we include every reference from a collection
-    that's LID-only; if it's False, then we only include the latest reference form a LID-only reference.
-    A "comprehension of it" means a double of the "B.A.C." (a dict mapping PDS lidvids to sets of ``_File``s),
-    and the title of the PDS bundle.
+    comprehension of it. A "comprehension of it" means a double of the "B.A.C." (a dict mapping PDS lidvids
+    to sets of ``_File``s), and the title of the PDS bundle.
 
-    If ``allcollections`` is True, we include all collections, meaning that if a bundle references
-    a collection with LID only (no VID), we include all version IDs of that collection. When this
-    flag ``allcollections`` is False, then we include only the *latest* collection for a LID-only
-    reference.
+    If the bundle references a collection with LID only (no VID), we include only the *latest* version of that
+    collection in the registry; older versions are not included. The ``allcollections`` flag, which
+    ``pds-deep-archive`` uses to choose between all versions and the latest, has no effect here.
     """
     _logger.debug("🤔 Comprehending the registry at %s for %s", url, bundlelidvid)
 
@@ -328,19 +412,34 @@ def _comprehendregistry(url: str, bundlelidvid: str, allcollections=True) -> tup
     if bundle is None:
         raise ValueError(f"🤷‍♀️ The bundle {bundlelidvid} cannot be found in the registry at {url}")
     title = bundle.get("title", "«unknown»")
-    _addfiles(bundle, bac)
+    problems = _addfiles(bundle, bac)
 
     # Get collection LIDVIDs from the bundle's properties instead of using the /members endpoint
-    # This avoids issues with the /members endpoint and uses the ref_lidvid_collection field
-    collection_lidvids = bundle.get("properties", {}).get("ref_lidvid_collection", [])
+    # This avoids issues with the /members endpoint and uses the ref_lidvid_collection and
+    # ref_lid_collection fields
+    collection_lidvids = _getcollectionlidvids(url, bundle.get("properties", {}))
     _logger.debug("📦 Found %d collections in bundle properties", len(collection_lidvids))
+    if not collection_lidvids:
+        _logger.error(
+            "⚠️ No collections could be found for bundle %s; the AIP and SIP will describe only the bundle label",
+            bundlelidvid
+        )
 
     # Batch fetch all collections in groups of _apiquerylimit to minimize API calls
     for collection in _getcollections_batch(url, collection_lidvids):
-        _addfiles(collection, bac)
+        problems.extend(_addfiles(collection, bac))
         # Still use /members endpoint for getting products from each collection
         for product in _getproducts(url, collection["id"]):
-            _addfiles(product, bac)
+            problems.extend(_addfiles(product, bac))
+
+    # A file we can't locate would silently be missing from the AIP and SIP, so report them all and stop
+    if problems:
+        details = "\n".join(f"  • {problem}" for problem in problems)
+        raise InvalidFileReferenceError(
+            f"The registry at {url} has {len(problems)} file reference(s) in {bundlelidvid} that are not absolute "
+            f"URLs, so the AIP and SIP cannot be generated. The registry records of these products must be "
+            f"corrected (or the products re-registered) before trying again:\n{details}"
+        )
 
     # C'est tout 🌊
     return bac, title
@@ -477,8 +576,8 @@ def generatedeeparchive(url: str, bundlelidvid: str, site: str, allcollections=T
     A PDS "deep archive" 🧘‍♀️ (consisting of the Archive Information Package's transfer manifest and
     checksum manifest, and the Submission Information Package's table file—plus their corresponding
     labels) for the named PDS bundle identified by ``bundlelidvid``, for the PDS ``site``, using knowledge
-    in the PDS Registry at ``url``, including ``allcollections`` if True else just the latest collection
-    for PDS bundles that reference collections by logical identifier only.
+    in the PDS Registry at ``url``. A collection that the bundle references by logical identifier only is
+    resolved to its latest version; the ``allcollections`` flag has no effect.
     """
     # When is happening? Make a timestamp and remove the timezone info
     ts = datetime.utcnow()
@@ -512,6 +611,9 @@ def main():
     _logger.debug("💢 command line args = %r", args)
     try:
         generatedeeparchive(args.url, args.bundle, args.site, not args.include_latest_collection_only)
+    except InvalidFileReferenceError as ex:
+        _logger.error("💥 %s", ex)
+        sys.exit(-1)
     except Exception:
         _logger.exception("💥 We got an unexpected error; sorry it didn't work out")
         sys.exit(-1)

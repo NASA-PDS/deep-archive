@@ -61,7 +61,7 @@ jobs:
                     restore-keys: pds-${{runner.os}}-py-
             -
                 name: 🩺 Test Software
-                run:
-                    pip install --editable '.[dev]'
+                run: |
+                    pip install --editable '.[dev]' tox
                     tox
                 shell: bash
