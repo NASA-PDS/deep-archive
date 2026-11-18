@@ -257,7 +257,7 @@ include:</p>
 tab-separated values file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">insight_documents_v2.0_sip_v1.0_DATE.xml</span></code>, an PDS label for the SIP file.</p></li>
 </ul>
-<p>As with <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>, you can also specify <code class="docutils literal notranslate"><span class="pre">--include-latest-collection-only</span></code> to select if you want just the latest version of LID-only collections in your deep archive versus the default behavior of <strong>all</strong> versions of them.</p>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">pds-deep-archive</span></code>, <code class="docutils literal notranslate"><span class="pre">pds-deep-registry-archive</span></code> has no option to include all versions of a collection. If a bundle references a collection by LID only, only the <strong>latest</strong> version of that collection in the registry is included in your deep archive, and <code class="docutils literal notranslate"><span class="pre">--include-latest-collection-only</span></code> has no effect.</p>
 </section>
 <section id="pds-delivery-checklist">
 <h2>PDS Delivery Checklist<a class="headerlink" href="#pds-delivery-checklist" title="Link to this heading"></a></h2>
